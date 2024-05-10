@@ -51,7 +51,8 @@ production stylesheet in assets/built/screen.css
 
     You can use this variable throughout your styles
      */
-
+     --sidenote-highlight-background: var(--color-lighter-gray);
+     --sidenote-anchor-highlight-background: var(--color-light-gray);
     /* Fonts */
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     --font-serif: Georgia, Times, serif;
