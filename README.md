@@ -1,9 +1,18 @@
 # Basilica
-
 This is a modified version of the [Casper](https://github.com/TryGhost/Casper/releases) theme for Dungeon Church.
 
 Changes to this repo are deployed onto the live production site.
 
+## Notes
+To work on this:
+
+1. [Install Ghost locally](https://ghost.org/tutorials/local-ghost/)
+2. Upload the zip of this repo into the theme section of the admin panel
+3. `ghost run -D` shows debug output in terminal
+
+Editing the theme files is live in local dev mode, but adding new hbs files requires a restart.
+
+# Original Readme
 ## First time using a Ghost theme?
 
 Ghost uses a simple templating language called [Handlebars](http://handlebarsjs.com/) for its themes.

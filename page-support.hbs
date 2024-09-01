@@ -1,0 +1,42 @@
+{{!< default}}
+{{!-- The tag above means: insert everything in this file into the body of the default.hbs template --}}
+
+<main class="gh-main">
+  <div class="gh-signup-page">
+    <header class="gh-signup-header">
+      <h1 class="is-title">Support {{@site.title}}</h1>
+    </header>
+    <form data-members-form data-members-autoredirect="false" class="gh-signup-form">
+      <section class="gh-signup-info-section">
+        <section class="gh-signup-group">
+          <div class="gh-signup-label-wrapper">
+            <label for="signup-name" class="gh-signup-label">Name</label>
+          </div>
+          <input data-members-name id="signup-name" class="gh-signup-input" type="text" name="name" placeholder=""
+            autocomplete="off" autocorrect="off" autocapitalize="" aria-label="Name" value="">
+        </section>
+        <section class="gh-signup-group">
+          <div class="gh-signup-label-wrapper">
+            <label for="signup-email" class="gh-signup-label">Email</label>
+          </div>
+          <input data-members-email id="signup-email" class="gh-signup-input" type="email" name="email"
+            placeholder="email@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Email"
+            value="">
+        </section>
+      </section>
+        <section class="gh-signup-plans gh-inner">
+        {{> "components/signup-card" plan="Congregate"}}
+        {{> "components/signup-card" plan="Tithe"}}
+        {{> "components/signup-card" plan="Donate"}}
+      </section>
+      <dialog class="gh-signup-popup">
+        <button class="gh-close button-reset" type="reset">{{> "icons/close"}}</button>
+        <div class="gh-signup-popup-message"></div>
+        <p class="gh-signup-error" data-members-error><!-- error message will appear here --></p>
+      </div>
+    </form>
+  <section class="gh-signup-alternatives">
+    <p>Already a member? <a href="#/portal/signin" data-portal="signin">Sign in</a>.</p>
+  </section>
+  </div>
+</main>

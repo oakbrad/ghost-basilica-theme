@@ -1,0 +1,40 @@
+<div class="gh-card gh-plan-card {{plan}}">
+  <h3>{{plan}}</h3>
+  <div class="gh-signup-amount-interval">
+  {{#match plan "!=" "Congregate"}}
+    {{#match plan "Tithe"}}
+      <span class="gh-signup-interval">Monthly</span>
+      <div class="input-price">
+            <span>$</span>
+            <input type="number" min="5" value="10" placeholder="10" id="price" name="price"></input>
+       </div>
+    {{/match}}
+    {{#match plan "Donate"}}
+      <span class="gh-signup-interval">Single Payment</span>
+    {{/match}}
+  {{else}}
+    <span class="gh-signup-interval">Free</span>
+  {{/match}}
+  </div>
+  <ul class="gh-signup-perks">
+    {{#match plan "!=" "Donate"}}
+    <li>Church newsletter</li>
+    <li>Website comments</li>
+    {{/match}}
+    {{#match plan "==" "Tithe"}}
+    <li>Respect and admiration</li>
+    {{/match}}
+    {{#match plan "==" "Donate"}}
+    <li>Tip your dungeon master</li>
+    {{/match}}
+  </ul>
+  <div class="gh-signup-button-wrapper">
+    {{#match plan "monthly"}}
+      <a class="gh-signup-choose gh-button disabled" id="choose-monthly" href="javascript:" data-portal="signup/658cc24f9458ad1f4271e4c0/monthly">Choose <div class="gh-signup-loader hidden">{{> "icons/loader"}}</div></a>
+    {{/match}}
+
+    {{#match plan "none"}}
+      <button class="gh-signup-choose gh-button disabled" type="submit" disabled>Choose <div class="gh-signup-loader hidden">{{> "icons/loader"}}</div></button>
+    {{/match}}
+  </div>
+</div>
