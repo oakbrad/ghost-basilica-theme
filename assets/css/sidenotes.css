@@ -24,7 +24,7 @@
   left: 0;
   right: 0;
   padding: 0.5em 0.8em;
-  color: var(--color-secondary-text);
+  color: var(--color-secondary-text, #666);
   max-width: 20em;
 }
 
@@ -35,7 +35,7 @@
   left: -2em;
   width: 1.5em;
   text-align: right;
-  color: var(--color-primary);
+  color: var(--color-primary, #3eb0ef);
 }
 
 /* Sidenote content paragraphs */
@@ -59,31 +59,36 @@
     position: relative;
   }
   
+  .gh-content {
+    position: relative;
+  }
+  
   .sidenote-wrapper {
     position: absolute;
     right: -21em;
     width: 20em;
     top: 0;
+    z-index: 100;
   }
   
   .sidenote {
     position: absolute;
     width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-left: 3px solid var(--color-primary, #3eb0ef);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
 
 /* Footnote reference styling */
-a[href^="#fn"] {
+sup[id^="fnref"] a {
   text-decoration: none;
-  color: var(--color-primary);
-  vertical-align: super;
-  font-size: 0.75em;
+  color: var(--color-primary, #3eb0ef);
   padding: 0 0.1em;
 }
 
 /* Footnote back reference styling */
 .footnotes a[href^="#fnref"] {
   text-decoration: none;
-  color: var(--color-primary);
+  color: var(--color-primary, #3eb0ef);
 }
-
