@@ -31,6 +31,8 @@
                 <a class="gh-head-logo{{#unless @site.logo}} no-image{{/unless}}" href="{{@site.url}}">
                     {{#if @site.logo}}
                         <img src="{{@site.logo}}" alt="{{@site.title}}">
+                    {{else}}
+                        {{@site.title}}
                     {{/if}}
                 </a>
                 <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search>{{> "icons/search"}}</button>
