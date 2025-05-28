@@ -23,8 +23,8 @@ The Sheet
         <p>Sign up or log in to view this exclusive content.</p>
         <div class="members-cta-buttons">
           {{#unless @site.members_invite_only}}
-            <a class="gh-head-button primary" href="#/portal/signup" data-portal="signup">Subscribe</a>
-            <a class="gh-head-button secondary" href="#/portal/signin" data-portal="signin">Sign in</a>
+            <a class="gh-head-button" href="#/portal/signup" data-portal="signup">Subscribe</a>
+            <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
           {{else}}
             <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
           {{/unless}}
@@ -122,18 +122,18 @@ The Sheet
     transition: all 0.2s ease;
   }
 
-  .members-cta-buttons .primary {
+  .members-cta-buttons .gh-head-button:first-child {
     background-color: var(--ghost-accent-color);
     color: #fff;
   }
   
-  .members-cta-buttons .secondary {
+  .members-cta-buttons .gh-head-button:last-child {
     background-color: transparent;
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
   
-  .members-cta-buttons .secondary:hover {
+  .members-cta-buttons .gh-head-button:last-child:hover {
     border-color: #fff;
     background-color: rgba(255, 255, 255, 0.1);
   }
@@ -399,4 +399,3 @@ The Sheet
     {{/if}}
   });
 </script>
-
