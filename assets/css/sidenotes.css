@@ -1,0 +1,89 @@
+/* Sidenotes Styles */
+
+/* Hide sidenotes when needed */
+.hide-sidenotes .sidenote-wrapper {
+  display: none;
+}
+
+/* Hide endnotes when needed */
+.hide-endnotes .footnotes {
+  display: none;
+}
+
+/* Sidenote wrapper container */
+.sidenote-wrapper {
+  position: relative;
+  margin-top: -1.5em;
+}
+
+/* Individual sidenote */
+.sidenote {
+  position: absolute;
+  font-size: 0.8em;
+  line-height: 1.4;
+  left: 0;
+  right: 0;
+  padding: 0.5em 0.8em;
+  color: var(--color-secondary-text);
+  max-width: 20em;
+}
+
+/* Sidenote number */
+.sidenote-number {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  position: absolute;
+  left: -2em;
+  width: 1.5em;
+  text-align: right;
+  color: var(--color-primary);
+}
+
+/* Sidenote content paragraphs */
+.sidenote p {
+  margin: 0 0 0.5em 0;
+}
+
+.sidenote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Highlighted sidenote */
+.active-sidenote {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+/* Media query for sidenotes layout */
+@media (min-width: 1200px) {
+  .post-full-content {
+    position: relative;
+  }
+  
+  .sidenote-wrapper {
+    position: absolute;
+    right: -21em;
+    width: 20em;
+    top: 0;
+  }
+  
+  .sidenote {
+    position: absolute;
+    width: 100%;
+  }
+}
+
+/* Footnote reference styling */
+a[href^="#fn"] {
+  text-decoration: none;
+  color: var(--color-primary);
+  vertical-align: super;
+  font-size: 0.75em;
+  padding: 0 0.1em;
+}
+
+/* Footnote back reference styling */
+.footnotes a[href^="#fnref"] {
+  text-decoration: none;
+  color: var(--color-primary);
+}
+
