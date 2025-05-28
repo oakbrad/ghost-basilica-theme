@@ -29,22 +29,38 @@ function debounce(func, wait, immediate) {
 
 // Show sidenotes
 function showSidenotes() {
-  document.querySelector(articleSelector).classList.remove("hide-sidenotes");
+  const article = document.querySelector(articleSelector);
+  if (article) {
+    article.classList.remove("hide-sidenotes");
+    console.log("Showing sidenotes");
+  }
 }
 
 // Hide sidenotes
 function hideSidenotes() {
-  document.querySelector(articleSelector).classList.add("hide-sidenotes");
+  const article = document.querySelector(articleSelector);
+  if (article) {
+    article.classList.add("hide-sidenotes");
+    console.log("Hiding sidenotes");
+  }
 }
 
 // Show endnotes (regular footnotes)
 function showEndnotes() {
-  document.querySelector(articleSelector).classList.remove("hide-endnotes");
+  const article = document.querySelector(articleSelector);
+  if (article) {
+    article.classList.remove("hide-endnotes");
+    console.log("Showing endnotes");
+  }
 }
 
 // Hide endnotes (regular footnotes)
 function hideEndnotes() {
-  document.querySelector(articleSelector).classList.add("hide-endnotes");
+  const article = document.querySelector(articleSelector);
+  if (article) {
+    article.classList.add("hide-endnotes");
+    console.log("Hiding endnotes");
+  }
 }
 
 // Insert sidenotes into the DOM
@@ -167,10 +183,12 @@ function insertAndPositionSidenotes() {
     insertSidenotes();
     positionSidenotes();
     hideEndnotes();
+    showSidenotes();
     // Reposition after a short delay to ensure proper layout
     setTimeout(() => positionSidenotes(), 200);
   } else {
     console.log("Screen is not wide enough for sidenotes");
+    showEndnotes();
   }
 }
 
@@ -190,10 +208,8 @@ function onResize() {
     positionSidenotes();
   } else {
     console.log("Screen is not wide enough for sidenotes");
-    if (sidenotesInDom) {
-      hideSidenotes();
-      showEndnotes();
-    }
+    hideSidenotes();
+    showEndnotes();
   }
 }
 
@@ -235,6 +251,10 @@ function initSidenotes() {
   
   if (articleContent && footnoteContainer) {
     console.log("Found article content and footnote container");
+    
+    // Make sure footnotes are visible by default
+    showEndnotes();
+    
     // Set up event listeners
     window.addEventListener("resize", debounce(onResize, 100));
     
