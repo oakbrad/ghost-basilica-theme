@@ -5,11 +5,11 @@
  */
 
 // Configuration
-const articleSelector = '.gh-content';
-const notesWrapperClass = 'sidenote-wrapper';
-const notesWrapperSelector = '.sidenote-wrapper';
-const footnoteContainerSelector = '.footnotes';
-const footnoteSelector = 'li';
+var articleSelector = '.gh-content';
+var notesWrapperClass = 'sidenote-wrapper';
+var notesWrapperSelector = '.sidenote-wrapper';
+var footnoteContainerSelector = '.footnotes';
+var footnoteSelector = 'li';
 
 // Debounce function to limit how often a function can be called
 function debounce(func, wait, immediate) {
@@ -29,7 +29,7 @@ function debounce(func, wait, immediate) {
 
 // Show sidenotes
 function showSidenotes() {
-  const article = document.querySelector(articleSelector);
+  var article = document.querySelector(articleSelector);
   if (article) {
     article.classList.remove("hide-sidenotes");
     console.log("Showing sidenotes");
@@ -38,7 +38,7 @@ function showSidenotes() {
 
 // Hide sidenotes
 function hideSidenotes() {
-  const article = document.querySelector(articleSelector);
+  var article = document.querySelector(articleSelector);
   if (article) {
     article.classList.add("hide-sidenotes");
     console.log("Hiding sidenotes");
@@ -47,7 +47,7 @@ function hideSidenotes() {
 
 // Show endnotes (regular footnotes)
 function showEndnotes() {
-  const article = document.querySelector(articleSelector);
+  var article = document.querySelector(articleSelector);
   if (article) {
     article.classList.remove("hide-endnotes");
     console.log("Showing endnotes");
@@ -56,7 +56,7 @@ function showEndnotes() {
 
 // Hide endnotes (regular footnotes)
 function hideEndnotes() {
-  const article = document.querySelector(articleSelector);
+  var article = document.querySelector(articleSelector);
   if (article) {
     article.classList.add("hide-endnotes");
     console.log("Hiding endnotes");
@@ -66,53 +66,55 @@ function hideEndnotes() {
 // Insert sidenotes into the DOM
 function insertSidenotes() {
   console.log("Inserting sidenotes...");
-  const articleContent = document.querySelector(articleSelector);
+  var articleContent = document.querySelector(articleSelector);
   if (!articleContent) {
     console.log("No article content found");
     return;
   }
   
-  const footnoteContainer = articleContent.querySelector(footnoteContainerSelector);
+  var footnoteContainer = articleContent.querySelector(footnoteContainerSelector);
   if (!footnoteContainer) {
     console.log("No footnote container found");
     return;
   }
   
-  const footnotes = footnoteContainer.querySelectorAll(footnoteSelector);
+  var footnotes = footnoteContainer.querySelectorAll(footnoteSelector);
   if (!footnotes.length) {
     console.log("No footnotes found");
     return;
   }
   
-  console.log(`Found ${footnotes.length} footnotes`);
+  console.log("Found " + footnotes.length + " footnotes");
   
   // Process each paragraph or element in the article
-  for (const child of articleContent.children) {
+  for (var i = 0; i < articleContent.children.length; i++) {
+    var child = articleContent.children[i];
     if (child.classList.contains(notesWrapperClass) || child === footnoteContainer) {
       continue;
     }
     
     // Find footnote references in this element
-    const anchors = child.querySelectorAll('sup[id^="fnref"] a');
+    var anchors = child.querySelectorAll('sup[id^="fnref"] a');
     if (anchors.length) {
-      console.log(`Found ${anchors.length} footnote references in element`);
-      const sidenoteContainer = document.createElement("div");
+      console.log("Found " + anchors.length + " footnote references in element");
+      var sidenoteContainer = document.createElement("div");
       sidenoteContainer.setAttribute("class", notesWrapperClass);
       
-      for (const anchor of anchors) {
-        const href = anchor.getAttribute('href');
+      for (var j = 0; j < anchors.length; j++) {
+        var anchor = anchors[j];
+        var href = anchor.getAttribute('href');
         if (!href || !href.startsWith('#fn:')) continue;
         
-        const id = href.substring(1); // Remove the # from the href
-        const footnoteId = id;
-        const footnote = document.getElementById(footnoteId);
+        var id = href.substring(1); // Remove the # from the href
+        var footnoteId = id;
+        var footnote = document.getElementById(footnoteId);
         
         if (!footnote) {
-          console.log(`No footnote found for ID: ${footnoteId}`);
+          console.log("No footnote found for ID: " + footnoteId);
           continue;
         }
         
-        const sidenoteWrapper = document.createElement("aside");
+        var sidenoteWrapper = document.createElement("aside");
         sidenoteWrapper.setAttribute("id", id.replace("fn:", "sn:"));
         sidenoteWrapper.setAttribute("class", "sidenote");
         sidenoteWrapper.setAttribute("role", "note");
@@ -122,13 +124,13 @@ function insertSidenotes() {
         sidenoteWrapper.innerHTML = footnote.innerHTML;
         
         // Remove "jump back to text" link, since it'll be right next to the anchor
-        const backLinks = sidenoteWrapper.querySelectorAll("a[href^='#fnref']");
-        for (const link of backLinks) {
-          link.remove();
+        var backLinks = sidenoteWrapper.querySelectorAll("a[href^='#fnref']");
+        for (var k = 0; k < backLinks.length; k++) {
+          backLinks[k].remove();
         }
         
         // Add the footnote number at the beginning of the sidenote
-        sidenoteWrapper.insertAdjacentHTML("afterbegin", `<div class='sidenote-number'>${anchor.textContent}</div>`);
+        sidenoteWrapper.insertAdjacentHTML("afterbegin", '<div class="sidenote-number">' + anchor.textContent + '</div>');
         sidenoteContainer.insertAdjacentElement("beforeend", sidenoteWrapper);
       }
       
@@ -142,42 +144,42 @@ function insertSidenotes() {
 // Position sidenotes vertically aligned with their references
 function positionSidenotes() {
   console.log("Positioning sidenotes...");
-  const sidenotes = document.querySelectorAll("aside.sidenote");
-  console.log(`Found ${sidenotes.length} sidenotes to position`);
+  var sidenotes = document.querySelectorAll("aside.sidenote");
+  console.log("Found " + sidenotes.length + " sidenotes to position");
   
-  for (let i = 0; i < sidenotes.length; i++) {
-    const sidenote = sidenotes[i];
-    const refId = sidenote.getAttribute("data-ref-id");
-    const reference = document.getElementById(refId);
+  for (var i = 0; i < sidenotes.length; i++) {
+    var sidenote = sidenotes[i];
+    var refId = sidenote.getAttribute("data-ref-id");
+    var reference = document.getElementById(refId);
     
     if (!reference) {
-      console.log(`No reference found for ID: ${refId}`);
+      console.log("No reference found for ID: " + refId);
       continue;
     }
     
-    const referenceParent = reference.parentNode;
-    const referencePosition = reference.getBoundingClientRect().top;
-    const referenceParentPosition = referenceParent.getBoundingClientRect().top;
+    var referenceParent = reference.parentNode;
+    var referencePosition = reference.getBoundingClientRect().top;
+    var referenceParentPosition = referenceParent.getBoundingClientRect().top;
     
     // Bump down sidenote if it would overlap with the previous one
-    let newPosition = referencePosition;
+    var newPosition = referencePosition;
     if (i > 0) {
-      const prevSideNote = sidenotes[i - 1];
-      const prevSidenoteEnd = prevSideNote.getBoundingClientRect().bottom;
+      var prevSideNote = sidenotes[i - 1];
+      var prevSidenoteEnd = prevSideNote.getBoundingClientRect().bottom;
       if (referencePosition < prevSidenoteEnd) {
         newPosition = prevSidenoteEnd + 20;
       }
     }
     
-    sidenote.style.top = `${Math.round(newPosition - referenceParentPosition)}px`;
-    console.log(`Positioned sidenote ${i+1} at ${sidenote.style.top}`);
+    sidenote.style.top = Math.round(newPosition - referenceParentPosition) + "px";
+    console.log("Positioned sidenote " + (i+1) + " at " + sidenote.style.top);
   }
 }
 
 // Insert and position sidenotes
 function insertAndPositionSidenotes() {
   console.log("Checking if we should insert sidenotes...");
-  const mediaQuery = window.matchMedia("(min-width: 1200px)");
+  var mediaQuery = window.matchMedia("(min-width: 1200px)");
   if (mediaQuery.matches) {
     console.log("Screen is wide enough, inserting sidenotes");
     insertSidenotes();
@@ -185,7 +187,9 @@ function insertAndPositionSidenotes() {
     hideEndnotes();
     showSidenotes();
     // Reposition after a short delay to ensure proper layout
-    setTimeout(() => positionSidenotes(), 200);
+    setTimeout(function() {
+      positionSidenotes();
+    }, 200);
   } else {
     console.log("Screen is not wide enough for sidenotes");
     showEndnotes();
@@ -194,9 +198,9 @@ function insertAndPositionSidenotes() {
 
 // Handle window resize
 function onResize() {
-  const sidenotesInDom = Boolean(document.querySelector(notesWrapperSelector));
-  console.log(`Resize event, sidenotes in DOM: ${sidenotesInDom}`);
-  const mediaQuery = window.matchMedia("(min-width: 1200px)");
+  var sidenotesInDom = Boolean(document.querySelector(notesWrapperSelector));
+  console.log("Resize event, sidenotes in DOM: " + sidenotesInDom);
+  var mediaQuery = window.matchMedia("(min-width: 1200px)");
   
   if (mediaQuery.matches) {
     console.log("Screen is wide enough for sidenotes");
@@ -215,14 +219,14 @@ function onResize() {
 
 // Handle clicking on a footnote reference
 function onAnchorClick(evt) {
-  const mediaQuery = window.matchMedia("(min-width: 1200px)");
+  var mediaQuery = window.matchMedia("(min-width: 1200px)");
   dehighlightNotes();
   
   if (mediaQuery.matches) {
-    const href = evt.target.getAttribute('href');
+    var href = evt.target.getAttribute('href');
     if (href && href.startsWith('#fn:')) {
-      const sidenoteId = href.replace('#fn:', '#sn:');
-      const sidenote = document.querySelector(sidenoteId);
+      var sidenoteId = href.replace('#fn:', '#sn:');
+      var sidenote = document.querySelector(sidenoteId);
       
       if (sidenote) {
         evt.preventDefault();
@@ -236,9 +240,9 @@ function onAnchorClick(evt) {
 
 // Remove highlighting from all notes
 function dehighlightNotes() {
-  const highlighted = document.querySelectorAll(".active-sidenote");
-  for (let highlight of highlighted) {
-    highlight.classList.remove("active-sidenote");
+  var highlighted = document.querySelectorAll(".active-sidenote");
+  for (var i = 0; i < highlighted.length; i++) {
+    highlighted[i].classList.remove("active-sidenote");
   }
 }
 
@@ -246,8 +250,8 @@ function dehighlightNotes() {
 function initSidenotes() {
   console.log("Initializing sidenotes...");
   // Only run on post pages that have footnotes
-  const articleContent = document.querySelector(articleSelector);
-  const footnoteContainer = articleContent?.querySelector(footnoteContainerSelector);
+  var articleContent = document.querySelector(articleSelector);
+  var footnoteContainer = articleContent ? articleContent.querySelector(footnoteContainerSelector) : null;
   
   if (articleContent && footnoteContainer) {
     console.log("Found article content and footnote container");
@@ -259,14 +263,14 @@ function initSidenotes() {
     window.addEventListener("resize", debounce(onResize, 100));
     
     // Add click handlers to footnote references
-    const anchors = document.querySelectorAll('sup[id^="fnref"] a');
-    console.log(`Found ${anchors.length} footnote reference anchors`);
-    for (const anchor of anchors) {
-      anchor.addEventListener("click", onAnchorClick);
+    var anchors = document.querySelectorAll('sup[id^="fnref"] a');
+    console.log("Found " + anchors.length + " footnote reference anchors");
+    for (var i = 0; i < anchors.length; i++) {
+      anchors[i].addEventListener("click", onAnchorClick);
     }
     
     // Handle clicks outside of sidenotes to dehighlight
-    document.addEventListener("click", (evt) => {
+    document.addEventListener("click", function(evt) {
       if (evt.target.nodeName !== "A") {
         dehighlightNotes();
       }
