@@ -13,7 +13,27 @@ The Sheet
 {{!< default}}
 
 <article class="timeline-container">
-  <div id="timeline-embed"></div>
+  {{!-- Check if content is restricted and if user has access --}}
+  {{#if access}}
+    <div id="timeline-embed"></div>
+  {{else}}
+    <div class="members-only-content">
+      <div class="members-only-message">
+        <h2>This timeline is for paid members only</h2>
+        <p>Sign up or log in to view this exclusive content.</p>
+        <div class="members-cta-buttons">
+          {{#unless @member}}
+            {{#unless @site.members_invite_only}}
+              <a class="gh-head-button primary" href="#/portal/signup" data-portal="signup">Subscribe</a>
+              <a class="gh-head-link" href="#/portal/signin" data-portal="signin">Sign in</a>
+            {{else}}
+              <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
+            {{/unless}}
+          {{/unless}}
+        </div>
+      </div>
+    </div>
+  {{/if}}
 </article>
 
 <link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
@@ -58,6 +78,64 @@ The Sheet
     width: 100%;
   }
 
+  /* Members-only message styling */
+  .members-only-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode));
+  }
+
+  .members-only-message {
+    max-width: 500px;
+    padding: 40px;
+    text-align: center;
+    background-color: rgba(21, 23, 26, 0.8);
+    border-left: 4px solid var(--ghost-accent-color);
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .members-only-message h2 {
+    margin-top: 0;
+    color: #fff;
+  }
+
+  .members-only-message p {
+    margin-bottom: 30px;
+  }
+
+  .members-cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .members-cta-buttons .gh-head-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+  }
+
+  .members-cta-buttons .primary {
+    background-color: var(--ghost-accent-color);
+    color: #fff;
+  }
+
+  .members-cta-buttons .gh-head-link {
+    color: #fff;
+    text-decoration: underline;
+    font-weight: 500;
+    padding: 10px 0;
+  }
+
   /* Main timeline container */
   .tl-timeline {
     background-color: var(--color-darkmode);
@@ -68,7 +146,7 @@ The Sheet
   /* Slide background - create a vignette effect */
   .tl-slide .tl-slide-background {
     opacity: 1 !important;
-    position: absolute; /* make sure it’s behind content */
+    position: absolute; /* make sure it's behind content */
     top: 0;
     left: 0;
     right: 0;
@@ -275,46 +353,47 @@ The Sheet
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
-    const sheetUrl = metaTag ? metaTag.content : null;
+    // Only initialize timeline if user has access
+    {{#if access}}
+      const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
+      const sheetUrl = metaTag ? metaTag.content : null;
 
-    if (sheetUrl) {
-      window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
-        timenav_position: "bottom",
-        initial_zoom: 4,
-        scale_factor: 2,
-        zoom_sequence: [1,2,3],
-        start_at_slide: 0,
-        use_bc: false,
-        hash_bookmark: false,
-        lang: "/assets/timelinejs/timeline-locale.json",
-      });
-    } else {
-      document.getElementById("timeline-embed").innerHTML = "Missing timeline URL.";
-    }
-  });
-
-
-/* NUKE ALL NEGATIVE "BCE" DATES AND TICKS */
-  function removeBCETicks() {
-    document.querySelectorAll('.tl-timeaxis-tick').forEach(tick => {
-      const left = parseFloat(tick.style.left);
-      if (left < 0) {
-        tick.remove();
+      if (sheetUrl) {
+        window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
+          timenav_position: "bottom",
+          initial_zoom: 4,
+          scale_factor: 2,
+          zoom_sequence: [1,2,3],
+          start_at_slide: 0,
+          use_bc: false,
+          hash_bookmark: false,
+          lang: "/assets/timelinejs/timeline-locale.json",
+        });
+      } else {
+        document.getElementById("timeline-embed").innerHTML = "Missing timeline URL.";
       }
-    });
-  }
 
-  const waitForTimeline = setInterval(() => {
-    const ticksReady = document.querySelectorAll('.tl-timeaxis-tick');
-    if (ticksReady.length > 0) {
-      clearInterval(waitForTimeline);
-      removeBCETicks();
+      /* NUKE ALL NEGATIVE "BCE" DATES AND TICKS */
+      function removeBCETicks() {
+        document.querySelectorAll('.tl-timeaxis-tick').forEach(tick => {
+          const left = parseFloat(tick.style.left);
+          if (left < 0) {
+            tick.remove();
+          }
+        });
+      }
 
-      const axis = document.querySelector('.tl-timeaxis-content-container');
-      const observer = new MutationObserver(removeBCETicks);
-      observer.observe(axis, { childList: true, subtree: true });
-    }
-  }, 200);
+      const waitForTimeline = setInterval(() => {
+        const ticksReady = document.querySelectorAll('.tl-timeaxis-tick');
+        if (ticksReady.length > 0) {
+          clearInterval(waitForTimeline);
+          removeBCETicks();
 
+          const axis = document.querySelector('.tl-timeaxis-content-container');
+          const observer = new MutationObserver(removeBCETicks);
+          observer.observe(axis, { childList: true, subtree: true });
+        }
+      }, 200);
+    {{/if}}
+  });
 </script>
