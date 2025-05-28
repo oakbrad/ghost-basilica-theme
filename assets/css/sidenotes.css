@@ -1,21 +1,12 @@
 /* Sidenotes Styles */
 
-/* Hide sidenotes when needed */
-.hide-sidenotes .sidenote-wrapper {
-  display: none;
-}
-
-/* Hide footnotes when sidenotes are active */
-@media (min-width: 1200px) {
-  body:not(.hide-sidenotes) .footnotes {
-    display: none;
-  }
-}
-
-/* Sidenote wrapper container */
-.sidenote-wrapper {
-  position: relative;
-  margin-top: -1.5em;
+/* Sidenotes container */
+.sidenotes-container {
+  position: absolute;
+  right: -21em;
+  width: 20em;
+  top: 0;
+  z-index: 100;
 }
 
 /* Individual sidenote */
@@ -23,11 +14,13 @@
   position: absolute;
   font-size: 0.8em;
   line-height: 1.4;
-  left: 0;
-  right: 0;
+  width: 100%;
   padding: 0.5em 0.8em;
   color: #666;
-  max-width: 20em;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid #3eb0ef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
 }
 
 /* Sidenote number */
@@ -38,6 +31,7 @@
   width: 1.5em;
   text-align: right;
   color: #3eb0ef;
+  font-weight: bold;
 }
 
 /* Sidenote content paragraphs */
@@ -51,35 +45,33 @@
 
 /* Highlighted sidenote */
 .active-sidenote {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(62, 176, 239, 0.1);
   border-radius: 3px;
 }
 
 /* Media query for sidenotes layout */
 @media (min-width: 1200px) {
-  .post-full-content {
+  .post-full-content,
+  .post-content,
+  .gh-content,
+  article {
     position: relative;
   }
   
-  .gh-content {
-    position: relative;
+  /* Hide footnotes section on wide screens */
+  .footnotes {
+    display: none;
+  }
+}
+
+/* Show footnotes on small screens */
+@media (max-width: 1199px) {
+  .sidenotes-container {
+    display: none;
   }
   
-  .sidenote-wrapper {
-    position: absolute;
-    right: -21em;
-    width: 20em;
-    top: 0;
-    z-index: 100;
-    display: block;
-  }
-  
-  .sidenote {
-    position: absolute;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-left: 3px solid #3eb0ef;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  .footnotes {
+    display: block !important;
   }
 }
 

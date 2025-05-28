@@ -111,6 +111,15 @@ $(document).ready(function () {
     });
     // FitVids - Makes video embeds responsive
     $(".gh-content").fitVids();
+    
+    // Debug helper for sidenotes
+    console.log("jQuery ready. Checking for footnotes...");
+    console.log("Footnote references found: " + $('sup[id^="fnref"] a').length);
+    console.log("Footnotes section found: " + $('.footnotes').length);
+    console.log("Content container: .gh-content exists: " + ($('.gh-content').length > 0));
+    console.log("Content container: .post-content exists: " + ($('.post-content').length > 0));
+    console.log("Content container: .post-full-content exists: " + ($('.post-full-content').length > 0));
+    console.log("Window width: " + $(window).width() + "px");
 });
 </script>
 

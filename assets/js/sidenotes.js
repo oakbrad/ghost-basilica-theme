@@ -1,25 +1,50 @@
 /**
  * Sidenotes.js - Transform footnotes into sidenotes
- * Based on Molly White's implementation for Citation Needed
+ * A direct DOM manipulation approach for Ghost themes
  */
 
 (function() {
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
-        // Only run on post pages
-        if (document.body.classList.contains('post-template')) {
-            initSidenotes();
-        }
+        console.log("Sidenotes.js: DOM content loaded");
+        initSidenotes();
     });
 
     function initSidenotes() {
+        // Check if we're on a post or page
+        if (!document.querySelector('.post') && !document.querySelector('article')) {
+            console.log("Sidenotes.js: Not on a post or page, exiting");
+            return;
+        }
+
+        // Find the content container
+        var contentContainer = findContentContainer();
+        if (!contentContainer) {
+            console.log("Sidenotes.js: Could not find content container, exiting");
+            return;
+        }
+        console.log("Sidenotes.js: Found content container", contentContainer);
+
+        // Find footnotes section
+        var footnotesSection = document.querySelector('.footnotes');
+        if (!footnotesSection) {
+            console.log("Sidenotes.js: No footnotes section found, exiting");
+            return;
+        }
+        console.log("Sidenotes.js: Found footnotes section", footnotesSection);
+
+        // Find all footnote references
+        var footnoteRefs = document.querySelectorAll('sup[id^="fnref"] a');
+        if (footnoteRefs.length === 0) {
+            console.log("Sidenotes.js: No footnote references found, exiting");
+            return;
+        }
+        console.log("Sidenotes.js: Found " + footnoteRefs.length + " footnote references");
+
         // Add event listeners
         window.addEventListener('resize', debounce(onResize, 100));
-        window.addEventListener('beforeprint', hideSidenotes);
-        window.addEventListener('afterprint', showSidenotes);
         
         // Add click handlers to footnote references
-        var footnoteRefs = document.querySelectorAll('sup[id^="fnref"] a');
         for (var i = 0; i < footnoteRefs.length; i++) {
             footnoteRefs[i].addEventListener('click', onFootnoteClick);
         }
@@ -32,147 +57,163 @@
         });
         
         // Initial setup
-        insertAndPositionSidenotes();
+        processFootnotes(contentContainer, footnotesSection);
     }
 
-    function getAnchorParentContainer(anchor) {
-        var el = anchor;
-        while (el.parentNode && !el.parentNode.classList.contains('gh-content')) {
-            el = el.parentNode;
-        }
-        return el;
-    }
-
-    function insertSidenotes() {
-        var articleContent = document.querySelector('.gh-content');
-        if (!articleContent) return;
+    function findContentContainer() {
+        // Try different selectors used in Ghost themes
+        var selectors = [
+            '.gh-content',
+            '.post-content',
+            '.post-full-content',
+            'article .post-content',
+            'article .content',
+            '.article-content',
+            'article'
+        ];
         
-        for (var i = 0; i < articleContent.children.length; i++) {
-            var child = articleContent.children[i];
-            
-            // Skip footnotes section and existing sidenote wrappers
-            if (child.classList.contains('sidenote-wrapper') || 
-                child.classList.contains('footnotes')) {
-                continue;
-            }
-            
-            // Find footnote references in this element
-            var footnoteRefs = child.querySelectorAll('sup[id^="fnref"] a');
-            if (footnoteRefs.length) {
-                // Create sidenote container
-                var sidenoteContainer = document.createElement('div');
-                sidenoteContainer.setAttribute('class', 'sidenote-wrapper');
-                
-                // Process each footnote reference
-                for (var j = 0; j < footnoteRefs.length; j++) {
-                    var footnoteRef = footnoteRefs[j];
-                    var refId = footnoteRef.getAttribute('href').replace('#', '');
-                    var footnote = document.getElementById(refId);
-                    
-                    if (footnote) {
-                        // Create sidenote element
-                        var sidenoteEl = document.createElement('aside');
-                        sidenoteEl.setAttribute('id', 'sidenote-' + refId);
-                        sidenoteEl.setAttribute('class', 'sidenote');
-                        sidenoteEl.setAttribute('role', 'note');
-                        sidenoteEl.setAttribute('data-ref-id', footnoteRef.parentNode.id);
-                        
-                        // Get footnote content (excluding the backref)
-                        var footnoteContent = footnote.cloneNode(true);
-                        var backref = footnoteContent.querySelector('.footnote-backref');
-                        if (backref) backref.remove();
-                        
-                        // Add footnote number and content
-                        sidenoteEl.innerHTML = '<span class="sidenote-number">' + 
-                                              footnoteRef.textContent + 
-                                              '</span>' + 
-                                              footnoteContent.innerHTML;
-                        
-                        // Add to container
-                        sidenoteContainer.appendChild(sidenoteEl);
-                    }
-                }
-                
-                // Add sidenote container after the current element
-                if (sidenoteContainer.children.length > 0) {
-                    child.insertAdjacentElement('afterend', sidenoteContainer);
-                    i++; // Skip the container we just added
-                }
+        for (var i = 0; i < selectors.length; i++) {
+            var container = document.querySelector(selectors[i]);
+            if (container) {
+                return container;
             }
         }
+        
+        return null;
     }
 
-    function positionSidenotes() {
-        var sidenotes = document.querySelectorAll('aside.sidenote');
-        for (var i = 0; i < sidenotes.length; i++) {
-            var sidenote = sidenotes[i];
-            var refId = sidenote.getAttribute('data-ref-id');
+    function processFootnotes(contentContainer, footnotesSection) {
+        var mediaQuery = window.matchMedia('(min-width: 1200px)');
+        if (!mediaQuery.matches) {
+            console.log("Sidenotes.js: Screen width too small for sidenotes");
+            return;
+        }
+        
+        console.log("Sidenotes.js: Processing footnotes");
+        
+        // Create sidenotes container
+        var sidenoteContainer = document.createElement('div');
+        sidenoteContainer.setAttribute('class', 'sidenotes-container');
+        contentContainer.appendChild(sidenoteContainer);
+        
+        // Get all footnotes
+        var footnotes = footnotesSection.querySelectorAll('li[id^="fn:"]');
+        console.log("Sidenotes.js: Found " + footnotes.length + " footnotes");
+        
+        // Process each footnote
+        for (var i = 0; i < footnotes.length; i++) {
+            var footnote = footnotes[i];
+            var footnoteId = footnote.id;
+            var refId = 'fnref:' + footnoteId.split(':')[1];
             var reference = document.getElementById(refId);
             
             if (reference) {
-                var referenceParent = getAnchorParentContainer(reference);
-                var referencePosition = reference.getBoundingClientRect().top;
-                var parentPosition = referenceParent.getBoundingClientRect().top;
+                console.log("Sidenotes.js: Processing footnote " + footnoteId + " with reference " + refId);
                 
-                // Adjust position if it would overlap with previous sidenote
-                var newPosition = referencePosition;
-                if (i > 0) {
-                    var prevSidenote = sidenotes[i - 1];
-                    var prevBottom = prevSidenote.getBoundingClientRect().bottom;
-                    if (referencePosition < prevBottom) {
-                        newPosition = prevBottom;
-                    }
+                // Create sidenote element
+                var sidenote = document.createElement('aside');
+                sidenote.setAttribute('class', 'sidenote');
+                sidenote.setAttribute('id', 'sidenote-' + footnoteId);
+                sidenote.setAttribute('data-ref-id', refId);
+                
+                // Clone footnote content
+                var footnoteContent = footnote.cloneNode(true);
+                
+                // Remove backref
+                var backref = footnoteContent.querySelector('.footnote-backref');
+                if (backref) {
+                    backref.remove();
                 }
                 
-                // Set the top position
-                sidenote.style.top = Math.round(newPosition - parentPosition) + 'px';
+                // Add footnote number
+                var refNumber = reference.querySelector('a').textContent;
+                sidenote.innerHTML = '<span class="sidenote-number">' + refNumber + '</span>' + footnoteContent.innerHTML;
+                
+                // Add to container
+                sidenoteContainer.appendChild(sidenote);
+                
+                // Position sidenote
+                positionSidenote(sidenote, reference);
+            } else {
+                console.log("Sidenotes.js: Could not find reference for footnote " + footnoteId);
             }
         }
+        
+        // Hide footnotes section
+        footnotesSection.style.display = 'none';
     }
 
-    function showSidenotes() {
-        document.body.classList.remove('hide-sidenotes');
+    function positionSidenote(sidenote, reference) {
+        // Get positions
+        var refRect = reference.getBoundingClientRect();
+        var containerRect = findContentContainer().getBoundingClientRect();
+        
+        // Calculate top position relative to container
+        var topPosition = refRect.top - containerRect.top;
+        
+        // Set position
+        sidenote.style.top = topPosition + 'px';
+        console.log("Sidenotes.js: Positioned sidenote at top: " + topPosition + "px");
+        
+        // Check for overlaps with previous sidenotes
+        checkAndFixOverlaps();
     }
 
-    function hideSidenotes() {
-        document.body.classList.add('hide-sidenotes');
-    }
-
-    function removeSidenotes() {
-        var wrappers = document.querySelectorAll('div.sidenote-wrapper');
-        for (var i = 0; i < wrappers.length; i++) {
-            wrappers[i].remove();
+    function checkAndFixOverlaps() {
+        var sidenotes = document.querySelectorAll('.sidenote');
+        
+        for (var i = 1; i < sidenotes.length; i++) {
+            var currentNote = sidenotes[i];
+            var previousNote = sidenotes[i - 1];
+            
+            var currentTop = parseInt(currentNote.style.top);
+            var previousBottom = parseInt(previousNote.style.top) + previousNote.offsetHeight + 10; // 10px buffer
+            
+            if (currentTop < previousBottom) {
+                currentNote.style.top = previousBottom + 'px';
+                console.log("Sidenotes.js: Fixed overlap, moved sidenote to " + previousBottom + "px");
+            }
         }
-    }
-
-    function insertAndPositionSidenotes() {
-        var mediaQuery = window.matchMedia('(min-width: 1200px)');
-        if (mediaQuery.matches) {
-            insertSidenotes();
-            positionSidenotes();
-            // Reposition after a short delay to ensure proper layout
-            setTimeout(positionSidenotes, 200);
-        }
-    }
-
-    function redoSidenotes() {
-        removeSidenotes();
-        insertAndPositionSidenotes();
     }
 
     function onResize() {
-        var sidenotesInDom = document.querySelector('div.sidenote-wrapper') !== null;
         var mediaQuery = window.matchMedia('(min-width: 1200px)');
+        var sidenoteContainer = document.querySelector('.sidenotes-container');
+        var footnotesSection = document.querySelector('.footnotes');
         
         if (mediaQuery.matches) {
-            if (!sidenotesInDom) {
-                insertSidenotes();
+            if (!sidenoteContainer) {
+                // Recreate sidenotes if they don't exist
+                if (footnotesSection) {
+                    processFootnotes(findContentContainer(), footnotesSection);
+                }
+            } else {
+                // Reposition existing sidenotes
+                var sidenotes = document.querySelectorAll('.sidenote');
+                for (var i = 0; i < sidenotes.length; i++) {
+                    var sidenote = sidenotes[i];
+                    var refId = sidenote.getAttribute('data-ref-id');
+                    var reference = document.getElementById(refId);
+                    
+                    if (reference) {
+                        positionSidenote(sidenote, reference);
+                    }
+                }
             }
-            showSidenotes();
-            positionSidenotes();
+            
+            // Hide footnotes section
+            if (footnotesSection) {
+                footnotesSection.style.display = 'none';
+            }
         } else {
-            if (sidenotesInDom) {
-                hideSidenotes();
+            // Show footnotes section on small screens
+            if (footnotesSection) {
+                footnotesSection.style.display = 'block';
+            }
+            
+            // Hide sidenotes container
+            if (sidenoteContainer) {
+                sidenoteContainer.style.display = 'none';
             }
         }
     }
@@ -183,7 +224,8 @@
         
         if (mediaQuery.matches) {
             var refId = this.parentNode.id;
-            var sidenote = document.getElementById('sidenote-' + this.getAttribute('href').replace('#', ''));
+            var footnoteId = this.getAttribute('href').replace('#', '');
+            var sidenote = document.getElementById('sidenote-' + footnoteId);
             
             if (sidenote) {
                 evt.preventDefault();
@@ -192,6 +234,9 @@
                 // Highlight both the reference and the sidenote
                 this.classList.add('active-sidenote');
                 sidenote.classList.add('active-sidenote');
+                
+                // Scroll to sidenote if needed
+                sidenote.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
     }
