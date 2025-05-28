@@ -1,0 +1,302 @@
+<!-- 
+USING THIS TEMPLATE:
+
+Apply it to a post in Ghost via Templates
+Go to Code Injection, and inject the URL of the Google Sheet:
+
+<meta name="custom:sheet_url" content="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit">
+
+In order for this to work, the Sheet must be "Published" not just "Shared"
+-->
+{{!< default}}
+
+<article class="map-container">
+  <div id="map"></div>
+</article>
+
+<!-- Load Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- PapaParse for CSV parsing -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/js/fontawesome.min.js"></script>
+
+<!-- leaflet-providers -->
+<script src="https://unpkg.com/leaflet-providers@2.0.0/leaflet-providers.js"></script>
+
+<!-- Leaflet.awesome-markers -->
+<link rel="stylesheet" href="/assets/leaflet/leaflet.awesome-markers.css">
+<script src="/assets/leaflet/leaflet.awesome-markers.js"></script>
+
+<!-- Leaflet Markercluster -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+<!-- Leaflet Markercluster layer support -->
+<script src="https://unpkg.com/leaflet.markercluster.layersupport@2.0.1/dist/leaflet.markercluster.layersupport.js"></script>
+
+<!-- Leaflet control geocoder -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+
+<!-- jQuery-CSV -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: var(--background-color);
+    font-family: var(--font-sans);
+    color: var(--color);
+    overflow: hidden;
+  }
+
+  .gh-main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .site-footer,
+  .content-title,
+  .post-full-footer,
+  .post-content {
+    display: none !important;
+  }
+
+  .map-container {
+    flex: 1;
+    height: calc(100vh - 88px); /* Adjust header height if needed */
+    width: 100%;
+  }
+
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Loading indicator */
+  .loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    color: var(--color);
+    font-size: 1.5em;
+    text-align: center;
+  }
+
+  /* Dark mode styling for map elements */
+  .leaflet-container {
+    background-color: var(--color-darkmode);
+  }
+
+  .leaflet-popup-content-wrapper {
+    background-color: var(--color-darkmode);
+    color: #fff;
+    border-radius: 4px;
+  }
+
+  .leaflet-popup-tip {
+    background-color: var(--color-darkmode);
+  }
+
+  .leaflet-control {
+    background-color: rgba(30, 30, 30, 0.8);
+    color: #fff;
+    border-radius: 4px;
+  }
+
+  .leaflet-control a {
+    color: #fff !important;
+  }
+
+  .leaflet-bar a {
+    background-color: rgba(40, 40, 40, 0.8);
+    color: #fff;
+    border-bottom: 1px solid #444;
+  }
+
+  .leaflet-bar a:hover {
+    background-color: rgba(60, 60, 60, 0.9);
+  }
+
+  /* Custom marker popup styling */
+  .custom-popup h3 {
+    margin: 0 0 10px 0;
+    color: var(--ghost-accent-color);
+  }
+
+  .custom-popup p {
+    margin: 0 0 5px 0;
+  }
+
+  .custom-popup img {
+    max-width: 100%;
+    margin: 10px 0;
+    border-radius: 4px;
+  }
+</style>
+
+<div class="loader">Loading map data...</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Get Google Sheet URL from meta tag
+    const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
+    const sheetUrl = metaTag ? metaTag.content : null;
+    
+    if (!sheetUrl) {
+      document.querySelector('.loader').innerHTML = 'Error: Missing Google Sheet URL. Add it in the post settings under Code Injection.';
+      return;
+    }
+
+    // Initialize the map
+    const map = L.map('map', {
+      attributionControl: true,
+      zoomControl: true,
+      scrollWheelZoom: true
+    }).setView([0, 0], 2); // Default view, will be updated based on data
+
+    // Add a dark-themed tile layer
+    L.tileLayer.provider('CartoDB.DarkMatter').addTo(map);
+
+    // Add zoom control to the top right
+    map.zoomControl.setPosition('topright');
+
+    // Add scale control
+    L.control.scale({
+      imperial: false,
+      position: 'bottomright'
+    }).addTo(map);
+
+    // Function to create custom icon
+    function createCustomIcon(color, icon) {
+      return L.AwesomeMarkers.icon({
+        icon: icon || 'circle',
+        prefix: 'fa',
+        markerColor: color || 'blue',
+        iconColor: 'white'
+      });
+    }
+
+    // Function to create popup content
+    function createPopupContent(point) {
+      let content = '<div class="custom-popup">';
+      
+      if (point.Title) {
+        content += `<h3>${point.Title}</h3>`;
+      }
+      
+      if (point.Description) {
+        content += `<p>${point.Description}</p>`;
+      }
+      
+      if (point.Image) {
+        content += `<img src="${point.Image}" alt="${point.Title || 'Location image'}" />`;
+      }
+      
+      if (point.Link) {
+        content += `<p><a href="${point.Link}" target="_blank">Learn more</a></p>`;
+      }
+      
+      content += '</div>';
+      return content;
+    }
+
+    // Extract Google Sheet ID from URL
+    function getSheetId(url) {
+      const regex = /\/d\/([a-zA-Z0-9-_]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    // Function to load data from Google Sheets
+    function loadGoogleSheetData(sheetUrl) {
+      const sheetId = getSheetId(sheetUrl);
+      
+      if (!sheetId) {
+        document.querySelector('.loader').innerHTML = 'Error: Invalid Google Sheet URL format.';
+        return;
+      }
+      
+      // Construct the CSV export URL
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+      
+      // Use PapaParse to fetch and parse the CSV
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          processData(results.data);
+        },
+        error: function(error) {
+          document.querySelector('.loader').innerHTML = 'Error loading data: ' + error;
+        }
+      });
+    }
+
+    // Process the data and add markers to the map
+    function processData(data) {
+      if (!data || data.length === 0) {
+        document.querySelector('.loader').innerHTML = 'No data found in the Google Sheet.';
+        return;
+      }
+
+      // Create a marker cluster group
+      const markers = L.markerClusterGroup();
+      const bounds = L.latLngBounds();
+      
+      // Process each point
+      data.forEach(function(point) {
+        // Skip if no coordinates
+        if (!point.Latitude || !point.Longitude) return;
+        
+        const lat = parseFloat(point.Latitude);
+        const lng = parseFloat(point.Longitude);
+        
+        // Skip if invalid coordinates
+        if (isNaN(lat) || isNaN(lng)) return;
+        
+        // Create marker
+        const marker = L.marker([lat, lng], {
+          icon: createCustomIcon(point['Marker Color'], point['Marker Icon'])
+        });
+        
+        // Add popup
+        marker.bindPopup(createPopupContent(point));
+        
+        // Add to cluster group
+        markers.addLayer(marker);
+        
+        // Extend bounds
+        bounds.extend([lat, lng]);
+      });
+      
+      // Add markers to map
+      map.addLayer(markers);
+      
+      // Fit map to bounds if we have markers
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
+      
+      // Hide loader
+      document.querySelector('.loader').style.display = 'none';
+    }
+
+    // Load the data
+    loadGoogleSheetData(sheetUrl);
+  });
+</script>
+
