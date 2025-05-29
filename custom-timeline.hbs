@@ -20,8 +20,16 @@ The Sheet
   {{else}}
     <div class="members-only-content">
       <div class="members-only-message">
-        <h2>This timeline is for tithing members only.</h2>
-        <p>Sign up or log in to view this exclusive content.</p>
+        {{#match visibility "members"}}
+          <h2>This timeline is for tithing members only.</h2>
+          <p>Sign up or log in to view this exclusive content.</p>
+        {{else match visibility "paid"}}
+          <h2>This timeline is for tithing members only.</h2>
+          <p>Sign up or log in to view this exclusive content.</p>
+        {{else}}
+          <h2>This content is not available.</h2>
+          <p>Please check back later or contact the site administrator.</p>
+        {{/match}}
         <div class="members-cta-buttons">
           {{#unless @member}}
             {{#unless @site.members_invite_only}}
