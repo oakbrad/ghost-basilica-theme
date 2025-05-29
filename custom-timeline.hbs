@@ -13,25 +13,7 @@ The Sheet
 {{!< default}}
 
 <article class="timeline-container">
-  {{!-- Check if content is restricted and if user has access --}}
-  {{#if access}}
-    <div id="timeline-embed"></div>
-  {{else}}
-    <div class="members-only-content">
-      <div class="members-only-message">
-        <h2>This timeline is for paid members only</h2>
-        <p>Sign up or log in to view this exclusive content.</p>
-        <div class="members-cta-buttons">
-          {{#unless @site.members_invite_only}}
-            <a class="gh-head-button" href="#/portal/signup" data-portal="signup">Subscribe</a>
-            <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
-          {{else}}
-            <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
-          {{/unless}}
-        </div>
-      </div>
-    </div>
-  {{/if}}
+  <div id="timeline-embed"></div>
 </article>
 
 <link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
@@ -74,68 +56,6 @@ The Sheet
   #timeline-embed {
     height: 100%;
     width: 100%;
-  }
-
-  /* Members-only message styling */
-  .members-only-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode));
-  }
-
-  .members-only-message {
-    max-width: 500px;
-    padding: 40px;
-    text-align: center;
-    background-color: rgba(21, 23, 26, 0.8);
-    border-left: 4px solid var(--ghost-accent-color);
-    color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  }
-
-  .members-only-message h2 {
-    margin-top: 0;
-    color: #fff;
-  }
-
-  .members-only-message p {
-    margin-bottom: 30px;
-  }
-
-  .members-cta-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-
-  .members-cta-buttons .gh-head-button {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: all 0.2s ease;
-  }
-
-  .members-cta-buttons .gh-head-button:first-child {
-    background-color: var(--ghost-accent-color);
-    color: #fff;
-  }
-  
-  .members-cta-buttons .gh-head-button:last-child {
-    background-color: transparent;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-  
-  .members-cta-buttons .gh-head-button:last-child:hover {
-    border-color: #fff;
-    background-color: rgba(255, 255, 255, 0.1);
   }
 
   /* Main timeline container */
@@ -355,7 +275,6 @@ The Sheet
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Only initialize timeline if user has access
     {{#if access}}
       const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
       const sheetUrl = metaTag ? metaTag.content : null;
@@ -396,6 +315,9 @@ The Sheet
           observer.observe(axis, { childList: true, subtree: true });
         }
       }, 200);
+    {{else}}
+      document.getElementById("timeline-embed").innerHTML = "<div style='display:flex;align-items:center;justify-content:center;height:100%;'><div style='text-align:center;padding:20px;'><h2>This timeline is for paid members only</h2><p>Sign up or log in to view this exclusive content.</p><div style='display:flex;gap:10px;justify-content:center;'><a href='#/portal/signup' data-portal='signup' class='gh-head-button'>Subscribe</a><a href='#/portal/signin' data-portal='signin' class='gh-head-link'>Sign in</a></div></div></div>";
     {{/if}}
   });
 </script>
+
