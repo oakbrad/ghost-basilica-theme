@@ -91,6 +91,14 @@ The Sheet
     height: 100vh;
   }
 
+  /* Ensure site-content takes full height */
+  .site-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+  }
+
   .site-footer,
   .content-title,
   .post-full-footer,
@@ -104,12 +112,16 @@ The Sheet
 
   .timeline-container {
     flex: 1;
-    height: 100%; /* Use 100% height to inherit from site-content instead of fixed calculation */
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Use 100% height to inherit from site-content */
     width: 100%;
+    padding-top: 88px; /* Add padding to account for the header height */
+    box-sizing: border-box; /* Ensure padding is included in the height calculation */
   }
 
   #timeline-embed {
-    height: 100%;
+    flex: 1; /* Make timeline-embed fill the available space */
     width: 100%;
   }
 
