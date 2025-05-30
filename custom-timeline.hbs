@@ -103,23 +103,20 @@ The Sheet
     display: none !important;
   }
 
+  /* Timeline container styles */
   .timeline-container {
-    flex: 1;
-    /* Use a dynamic approach instead of hardcoded 88px */
-    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-    position: relative;
     z-index: 1;
   }
 
   #timeline-embed {
     height: 100%;
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
   }
 
   /* Styling for access message */
@@ -433,43 +430,71 @@ The Sheet
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Position the timeline container correctly
-    function adjustTimelinePosition() {
+    // Function to adjust the timeline container position and size
+    function adjustTimelineContainer() {
       const timelineContainer = document.querySelector('.timeline-container');
       if (!timelineContainer) return;
       
-      // Get the header and any announcement bar
+      // Reset any previous adjustments
+      timelineContainer.style.top = '0';
+      timelineContainer.style.height = '100%';
+      
+      // Get all elements that might affect the timeline position
       const header = document.querySelector('.gh-head');
-      const announcementBar = document.querySelector('.announcement');
       
-      // Calculate the total offset from the top
-      let offsetTop = 0;
+      // Look for announcement bar with various possible class names
+      const announcementBar = document.querySelector('.gh-announcement, .announcement, .site-announcement, .announcement-bar');
       
+      let topOffset = 0;
+      
+      // Add header height if it exists
       if (header) {
-        offsetTop += header.offsetHeight;
+        topOffset += header.offsetHeight;
       }
       
+      // Add announcement bar height if it exists and is visible
       if (announcementBar && window.getComputedStyle(announcementBar).display !== 'none') {
-        offsetTop += announcementBar.offsetHeight;
+        topOffset += announcementBar.offsetHeight;
       }
       
-      // Apply the offset to the timeline container
-      timelineContainer.style.height = `calc(100vh - ${offsetTop}px)`;
-      timelineContainer.style.top = `${offsetTop}px`;
+      // Apply the calculated offset
+      timelineContainer.style.top = topOffset + 'px';
+      timelineContainer.style.height = `calc(100% - ${topOffset}px)`;
+      
+      // Debug info
+      if (window.location.search.includes('debug=true')) {
+        console.log('Timeline adjusted:');
+        console.log('- Header height:', header ? header.offsetHeight : 0);
+        console.log('- Announcement bar:', announcementBar ? announcementBar.offsetHeight : 0);
+        console.log('- Total offset:', topOffset);
+      }
     }
     
     // Run the adjustment initially
-    adjustTimelinePosition();
+    adjustTimelineContainer();
     
-    // Re-adjust on window resize
-    window.addEventListener('resize', adjustTimelinePosition);
+    // Set up a MutationObserver to watch for DOM changes
+    const observer = new MutationObserver(function(mutations) {
+      adjustTimelineContainer();
+    });
     
-    // Re-adjust after a short delay to ensure all elements are fully loaded
-    setTimeout(adjustTimelinePosition, 500);
+    // Observe the entire document for changes
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
     
-    // Also check periodically for any dynamic changes (like announcement bar appearing/disappearing)
-    setInterval(adjustTimelinePosition, 1000);
-
+    // Also adjust on window resize
+    window.addEventListener('resize', adjustTimelineContainer);
+    
+    // Adjust after a delay to ensure everything is loaded
+    setTimeout(adjustTimelineContainer, 500);
+    
+    // Periodically check for changes that might not trigger the observer
+    setInterval(adjustTimelineContainer, 1000);
+    
     // Only initialize the timeline if the timeline-embed element exists
     // (it won't exist for members/paid content if the user doesn't have access)
     const timelineEmbed = document.getElementById('timeline-embed');
