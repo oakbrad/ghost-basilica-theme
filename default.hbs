@@ -16,6 +16,9 @@
     {{!-- Theme assets - use the {asset} helper to reference styles & scripts,
     this will take care of caching and cache-busting automatically --}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/screen.css"}}" />
+    
+    {{!-- Spreadsheet Embed CSS --}}
+    <link rel="stylesheet" type="text/css" href="{{asset "css/spreadsheet-embed.css"}}" />
 
     {{!-- This tag outputs all your advanced SEO meta, structured data, and other important settings,
     it should always be the last tag before the closing head tag --}}
@@ -112,6 +115,9 @@ $(document).ready(function () {
     $(".gh-content").fitVids();
 });
 </script>
+
+{{!-- Spreadsheet Embed Script - Transforms Google Spreadsheet links into embedded timelines --}}
+<script src="{{asset "js/spreadsheet-embed.js"}}"></script>
 
 {{!-- Ghost outputs required functional scripts with this tag - it should always be the last thing before the closing body tag --}}
 {{ghost_foot}}
