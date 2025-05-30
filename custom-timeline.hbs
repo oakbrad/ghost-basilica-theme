@@ -105,7 +105,8 @@ The Sheet
 
   .timeline-container {
     flex: 1;
-    height: calc(100vh - 88px); /* Adjust header height if needed */
+    /* Use a dynamic approach instead of hardcoded 88px */
+    height: calc(100vh - var(--header-height, 88px));
     width: 100%;
   }
 
@@ -425,6 +426,36 @@ The Sheet
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Calculate and set the header height dynamically
+    function updateHeaderHeight() {
+      // Get the header element
+      const header = document.querySelector('.gh-head');
+      
+      // Get the announcement bar if it exists
+      const announcementBar = document.querySelector('.announcement');
+      
+      if (header) {
+        let headerHeight = header.offsetHeight;
+        
+        // Add announcement bar height if it exists and is visible
+        if (announcementBar && window.getComputedStyle(announcementBar).display !== 'none') {
+          headerHeight += announcementBar.offsetHeight;
+        }
+        
+        // Set the CSS variable for header height
+        document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+      }
+    }
+    
+    // Run initially
+    updateHeaderHeight();
+    
+    // Update on resize to handle mobile layout changes
+    window.addEventListener('resize', updateHeaderHeight);
+    
+    // Update after a short delay to ensure all elements are fully loaded
+    setTimeout(updateHeaderHeight, 500);
+
     // Only initialize the timeline if the timeline-embed element exists
     // (it won't exist for members/paid content if the user doesn't have access)
     const timelineEmbed = document.getElementById('timeline-embed');
@@ -486,4 +517,3 @@ The Sheet
     document.querySelector('.debug-info').style.display = 'block';
   }
 </script>
-
