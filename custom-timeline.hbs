@@ -1,70 +1,5 @@
 {{!< default}}
 
-<div class="timeline-wrapper">
-  <article class="timeline-container">
-    {{!-- Debug information to check post data structure --}}
-    <div class="debug-info" style="display: none;">
-      Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
-      Visibility: {{post.visibility}}<br>
-      Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-      Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
-    </div>
-
-    {{!-- Check post visibility and render accordingly --}}
-    {{#post}}
-      {{!-- For public posts, render the timeline for everyone --}}
-      {{#has visibility="public"}}
-        <div id="timeline-embed"></div>
-      {{else}}
-        {{!-- For members-only posts, check if user is a member --}}
-        {{#has visibility="members"}}
-          {{#if @member}}
-            <div id="timeline-embed"></div>
-          {{else}}
-            <div class="timeline-access-message">
-              <h2>This timeline is available to members</h2>
-              <p>Sign up or log in to view this timeline.</p>
-              <div class="timeline-access-cta">
-                <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
-                <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
-              </div>
-            </div>
-          {{/if}}
-        {{else}}
-          {{!-- For paid-members-only posts, check if user is a paid member --}}
-          {{#has visibility="paid"}}
-            {{#if @member.paid}}
-              <div id="timeline-embed"></div>
-            {{else}}
-              <div class="timeline-access-message">
-                <h2>This timeline is available to paid members</h2>
-                <p>Upgrade your membership to view this timeline.</p>
-                <div class="timeline-access-cta">
-                  {{#if @member}}
-                    <a href="#/portal/account/plans" class="timeline-upgrade-button">Upgrade now</a>
-                  {{else}}
-                    <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
-                    <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
-                  {{/if}}
-                </div>
-              </div>
-            {{/if}}
-          {{else}}
-            {{!-- Default case, just show the timeline --}}
-            <div id="timeline-embed"></div>
-          {{/has}}
-        {{/has}}
-      {{/has}}
-    {{else}}
-      {{!-- If no post context, show the timeline --}}
-      <div id="timeline-embed"></div>
-    {{/post}}
-  </article>
-</div>
-
-<link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
-<script src="/assets/timelinejs/js/timeline.js"></script>
-
 <style>
   html, body {
     margin: 0;
@@ -95,17 +30,21 @@
 
   /* Timeline wrapper and container styles */
   .timeline-wrapper {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100vh;
     overflow: hidden;
+    z-index: 10;
   }
 
   .timeline-container {
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 1;
     overflow: hidden;
   }
 
@@ -423,6 +362,71 @@
 
 </style>
 
+<div class="timeline-wrapper">
+  <article class="timeline-container">
+    {{!-- Debug information to check post data structure --}}
+    <div class="debug-info" style="display: none;">
+      Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
+      Visibility: {{post.visibility}}<br>
+      Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
+      Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
+    </div>
+
+    {{!-- Check post visibility and render accordingly --}}
+    {{#post}}
+      {{!-- For public posts, render the timeline for everyone --}}
+      {{#has visibility="public"}}
+        <div id="timeline-embed"></div>
+      {{else}}
+        {{!-- For members-only posts, check if user is a member --}}
+        {{#has visibility="members"}}
+          {{#if @member}}
+            <div id="timeline-embed"></div>
+          {{else}}
+            <div class="timeline-access-message">
+              <h2>This timeline is available to members</h2>
+              <p>Sign up or log in to view this timeline.</p>
+              <div class="timeline-access-cta">
+                <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+                <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+              </div>
+            </div>
+          {{/if}}
+        {{else}}
+          {{!-- For paid-members-only posts, check if user is a paid member --}}
+          {{#has visibility="paid"}}
+            {{#if @member.paid}}
+              <div id="timeline-embed"></div>
+            {{else}}
+              <div class="timeline-access-message">
+                <h2>This timeline is available to paid members</h2>
+                <p>Upgrade your membership to view this timeline.</p>
+                <div class="timeline-access-cta">
+                  {{#if @member}}
+                    <a href="#/portal/account/plans" class="timeline-upgrade-button">Upgrade now</a>
+                  {{else}}
+                    <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+                    <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+                  {{/if}}
+                </div>
+              </div>
+            {{/if}}
+          {{else}}
+            {{!-- Default case, just show the timeline --}}
+            <div id="timeline-embed"></div>
+          {{/has}}
+        {{/has}}
+      {{/has}}
+    {{else}}
+      {{!-- If no post context, show the timeline --}}
+      <div id="timeline-embed"></div>
+    {{/post}}
+  </article>
+</div>
+
+<link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
+<script src="/assets/timelinejs/js/timeline.js"></script>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     // Function to adjust the timeline container position and size
@@ -431,14 +435,14 @@
       const timelineContainer = document.querySelector('.timeline-container');
       if (!timelineWrapper || !timelineContainer) return;
       
+      // Reset any previous adjustments
+      timelineContainer.style.top = '0';
+      
       // Get all elements that might affect the timeline position
       const header = document.querySelector('.gh-head');
       
       // Look for announcement bar with various possible class names
       const announcementBar = document.querySelector('.gh-announcement, .announcement, .site-announcement, .announcement-bar');
-      
-      // Get the viewport height
-      const viewportHeight = window.innerHeight;
       
       let topOffset = 0;
       
@@ -452,22 +456,16 @@
         topOffset += announcementBar.offsetHeight;
       }
       
-      // Calculate the available height
-      const availableHeight = viewportHeight - topOffset;
-      
-      // Apply the calculated position and size
-      timelineWrapper.style.height = viewportHeight + 'px';
+      // Apply the calculated position
       timelineContainer.style.top = topOffset + 'px';
-      timelineContainer.style.height = availableHeight + 'px';
+      timelineContainer.style.height = `calc(100vh - ${topOffset}px)`;
       
       // Debug info
       if (window.location.search.includes('debug=true')) {
         console.log('Timeline adjusted:');
-        console.log('- Viewport height:', viewportHeight);
         console.log('- Header height:', header ? header.offsetHeight : 0);
         console.log('- Announcement bar:', announcementBar ? announcementBar.offsetHeight : 0);
         console.log('- Total offset:', topOffset);
-        console.log('- Available height:', availableHeight);
       }
     }
     
