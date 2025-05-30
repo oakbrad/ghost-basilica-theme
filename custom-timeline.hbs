@@ -2,7 +2,7 @@
 USING THIS TEMPLATE:
 
 Apply it to a post in Ghost via Templates
-The template will automatically detect Google Sheets URLs in your post content.
+The template will automatically detect Google Sheets URLs embedded in your post content.
 Simply paste a Google Sheets URL in your post, like:
 https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml
 
@@ -437,33 +437,98 @@ Alternatively, you can still use Code Injection with:
     // If no meta tag is found, try to extract from post content
     if (!sheetUrl) {
       // Look for Google Sheets URL in the post content
-      // This regex matches Google Sheets URLs in the format:
-      // https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml
       const postContent = document.querySelector('.post-content');
       
       if (postContent) {
-        // First, look for iframe embeds that Ghost creates
-        const iframes = postContent.querySelectorAll('iframe');
-        for (let i = 0; i < iframes.length; i++) {
-          const src = iframes[i].getAttribute('src');
-          if (src && src.includes('docs.google.com/spreadsheets')) {
-            sheetUrl = src;
-            break;
+        // 1. Check for Ghost embed cards (most likely format)
+        const embedCards = postContent.querySelectorAll('.kg-embed-card');
+        for (let i = 0; i < embedCards.length; i++) {
+          const card = embedCards[i];
+          
+          // Check for iframes within embed cards
+          const cardIframes = card.querySelectorAll('iframe');
+          for (let j = 0; j < cardIframes.length; j++) {
+            const src = cardIframes[j].getAttribute('src');
+            if (src && src.includes('docs.google.com/spreadsheets')) {
+              sheetUrl = src;
+              break;
+            }
+          }
+          
+          // Also check for HTML content with Google Sheets URLs
+          if (!sheetUrl && card.innerHTML.includes('docs.google.com/spreadsheets')) {
+            const regex = /https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9_-]+(?:\/pubhtml|\/edit[^"'\s]*)/g;
+            const matches = card.innerHTML.match(regex);
+            if (matches && matches.length > 0) {
+              sheetUrl = matches[0];
+            }
+          }
+          
+          if (sheetUrl) break;
+        }
+        
+        // 2. Check for direct iframes (fallback)
+        if (!sheetUrl) {
+          const iframes = postContent.querySelectorAll('iframe');
+          for (let i = 0; i < iframes.length; i++) {
+            const src = iframes[i].getAttribute('src');
+            if (src && src.includes('docs.google.com/spreadsheets')) {
+              sheetUrl = src;
+              break;
+            }
           }
         }
         
-        // If no iframe found, try to find the URL in the text content
+        // 3. Check for HTML content with Google Sheets URLs (fallback)
         if (!sheetUrl) {
-          const regex = /https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/[a-zA-Z0-9_-]+\/pubhtml/g;
+          // This regex matches various Google Sheets URL formats
+          const regex = /https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9_-]+(?:\/pubhtml|\/edit[^"'\s]*)/g;
           const matches = postContent.innerHTML.match(regex);
           if (matches && matches.length > 0) {
             sheetUrl = matches[0];
           }
         }
+        
+        // 4. Check for Google Sheets URLs in data attributes (some embeds use these)
+        if (!sheetUrl) {
+          const allElements = postContent.querySelectorAll('*[data-src]');
+          for (let i = 0; i < allElements.length; i++) {
+            const dataSrc = allElements[i].getAttribute('data-src');
+            if (dataSrc && dataSrc.includes('docs.google.com/spreadsheets')) {
+              sheetUrl = dataSrc;
+              break;
+            }
+          }
+        }
+        
+        // 5. Check for any element with href attribute containing Google Sheets URL
+        if (!sheetUrl) {
+          const links = postContent.querySelectorAll('a[href*="docs.google.com/spreadsheets"]');
+          if (links.length > 0) {
+            sheetUrl = links[0].getAttribute('href');
+          }
+        }
       }
     }
 
+    // Debug output
+    if (window.location.search.includes('debug=true')) {
+      console.log("Sheet URL found:", sheetUrl);
+    }
+
+    // Ensure the URL is in the correct format for TimelineJS
     if (sheetUrl) {
+      // If it's not a pubhtml URL, try to convert it
+      if (!sheetUrl.includes('/pubhtml')) {
+        // Extract the document ID
+        const matches = sheetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (matches && matches[1]) {
+          const docId = matches[1];
+          // Convert to pubhtml format
+          sheetUrl = `https://docs.google.com/spreadsheets/d/${docId}/pubhtml`;
+        }
+      }
+      
       window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
         timenav_position: "bottom",
         initial_zoom: 4,
@@ -516,3 +581,87 @@ Alternatively, you can still use Code Injection with:
   }
 </script>
 
+<!-- Debug script to help understand how Ghost embeds Google Sheets -->
+<script>
+  // Only load in debug mode
+  if (window.location.search.includes('debug=true')) {
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("Debug script loaded");
+      
+      // Log the entire post content for inspection
+      const postContent = document.querySelector('.post-content');
+      if (postContent) {
+          console.log("Post content found:", postContent);
+          console.log("Post content HTML:", postContent.innerHTML);
+          
+          // Look for various potential embed formats
+          
+          // 1. Check for iframes
+          const iframes = postContent.querySelectorAll('iframe');
+          console.log("Iframes found:", iframes.length);
+          iframes.forEach((iframe, index) => {
+              console.log(`Iframe ${index} src:`, iframe.getAttribute('src'));
+          });
+          
+          // 2. Check for figure elements (Ghost often wraps embeds in figures)
+          const figures = postContent.querySelectorAll('figure');
+          console.log("Figures found:", figures.length);
+          figures.forEach((figure, index) => {
+              console.log(`Figure ${index} class:`, figure.className);
+              console.log(`Figure ${index} HTML:`, figure.innerHTML);
+          });
+          
+          // 3. Check for Ghost card elements
+          const cards = postContent.querySelectorAll('.kg-card');
+          console.log("Ghost cards found:", cards.length);
+          cards.forEach((card, index) => {
+              console.log(`Card ${index} class:`, card.className);
+              console.log(`Card ${index} HTML:`, card.innerHTML);
+          });
+          
+          // 4. Check for embed cards specifically
+          const embedCards = postContent.querySelectorAll('.kg-embed-card');
+          console.log("Embed cards found:", embedCards.length);
+          embedCards.forEach((card, index) => {
+              console.log(`Embed card ${index} HTML:`, card.innerHTML);
+              
+              // Check for iframes within embed cards
+              const cardIframes = card.querySelectorAll('iframe');
+              cardIframes.forEach((iframe, i) => {
+                  console.log(`Embed card ${index} iframe ${i} src:`, iframe.getAttribute('src'));
+              });
+          });
+          
+          // 5. Look for any elements with Google Sheets URL in attributes
+          const allElements = postContent.querySelectorAll('*');
+          console.log("Searching all elements for Google Sheets references...");
+          allElements.forEach((el, index) => {
+              const attributes = el.attributes;
+              for (let i = 0; i < attributes.length; i++) {
+                  const attr = attributes[i];
+                  if (attr.value.includes('docs.google.com/spreadsheets')) {
+                      console.log(`Element with Google Sheets reference:`, el);
+                      console.log(`Attribute: ${attr.name}, Value: ${attr.value}`);
+                  }
+              }
+              
+              // Also check for text content with Google Sheets URLs
+              if (el.textContent && el.textContent.includes('docs.google.com/spreadsheets')) {
+                  console.log(`Element with Google Sheets in text:`, el);
+                  console.log(`Text content: ${el.textContent}`);
+              }
+          });
+      } else {
+          console.log("Post content not found");
+      }
+      
+      // Check if the timeline element exists
+      const timelineEmbed = document.getElementById('timeline-embed');
+      if (timelineEmbed) {
+          console.log("Timeline embed element found");
+      } else {
+          console.log("Timeline embed element not found");
+      }
+    });
+  }
+</script>
