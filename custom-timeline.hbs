@@ -106,13 +106,20 @@ The Sheet
   .timeline-container {
     flex: 1;
     /* Use a dynamic approach instead of hardcoded 88px */
-    height: calc(100vh - var(--header-height, 88px));
+    height: 100vh;
     width: 100%;
+    position: relative;
+    z-index: 1;
   }
 
   #timeline-embed {
     height: 100%;
     width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   /* Styling for access message */
@@ -426,35 +433,42 @@ The Sheet
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Calculate and set the header height dynamically
-    function updateHeaderHeight() {
-      // Get the header element
-      const header = document.querySelector('.gh-head');
+    // Position the timeline container correctly
+    function adjustTimelinePosition() {
+      const timelineContainer = document.querySelector('.timeline-container');
+      if (!timelineContainer) return;
       
-      // Get the announcement bar if it exists
+      // Get the header and any announcement bar
+      const header = document.querySelector('.gh-head');
       const announcementBar = document.querySelector('.announcement');
       
+      // Calculate the total offset from the top
+      let offsetTop = 0;
+      
       if (header) {
-        let headerHeight = header.offsetHeight;
-        
-        // Add announcement bar height if it exists and is visible
-        if (announcementBar && window.getComputedStyle(announcementBar).display !== 'none') {
-          headerHeight += announcementBar.offsetHeight;
-        }
-        
-        // Set the CSS variable for header height
-        document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+        offsetTop += header.offsetHeight;
       }
+      
+      if (announcementBar && window.getComputedStyle(announcementBar).display !== 'none') {
+        offsetTop += announcementBar.offsetHeight;
+      }
+      
+      // Apply the offset to the timeline container
+      timelineContainer.style.height = `calc(100vh - ${offsetTop}px)`;
+      timelineContainer.style.top = `${offsetTop}px`;
     }
     
-    // Run initially
-    updateHeaderHeight();
+    // Run the adjustment initially
+    adjustTimelinePosition();
     
-    // Update on resize to handle mobile layout changes
-    window.addEventListener('resize', updateHeaderHeight);
+    // Re-adjust on window resize
+    window.addEventListener('resize', adjustTimelinePosition);
     
-    // Update after a short delay to ensure all elements are fully loaded
-    setTimeout(updateHeaderHeight, 500);
+    // Re-adjust after a short delay to ensure all elements are fully loaded
+    setTimeout(adjustTimelinePosition, 500);
+    
+    // Also check periodically for any dynamic changes (like announcement bar appearing/disappearing)
+    setInterval(adjustTimelinePosition, 1000);
 
     // Only initialize the timeline if the timeline-embed element exists
     // (it won't exist for members/paid content if the user doesn't have access)
@@ -479,7 +493,6 @@ The Sheet
       timelineEmbed.innerHTML = "Missing timeline URL.";
     }
   });
-
 
 /* NUKE ALL NEGATIVE "BCE" DATES AND TICKS */
   function removeBCETicks() {
