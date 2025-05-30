@@ -103,15 +103,21 @@ The Sheet
     display: none !important;
   }
 
+  /* Modified timeline container to match site-content size */
   .timeline-container {
-    flex: 1;
-    height: calc(100vh - 88px); /* Adjust header height if needed */
+    position: relative;
     width: 100%;
+    height: 100%;
   }
 
   #timeline-embed {
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
+    height: 100%;
   }
 
   /* Styling for access message */
