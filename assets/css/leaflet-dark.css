@@ -1,0 +1,101 @@
+/* Leaflet Dark Mode Styles */
+
+/* Base map container */
+html.dark-mode #map {
+    background-color: var(--color-darkmode);
+}
+
+/* Map attribution */
+html.dark-mode .leaflet-control-attribution {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+html.dark-mode .leaflet-control-attribution a {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Zoom controls */
+html.dark-mode .leaflet-control-zoom {
+    border-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-control-zoom a {
+    background-color: color-mod(var(--color-darkmode) l(+10%)) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: color-mod(var(--color-darkmode) l(+20%)) !important;
+}
+
+html.dark-mode .leaflet-control-zoom a:hover {
+    background-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-control-zoom-in {
+    border-bottom-color: color-mod(var(--color-darkmode) l(+20%)) !important;
+}
+
+/* Popup styles */
+html.dark-mode .leaflet-popup-content-wrapper {
+    background-color: color-mod(var(--color-darkmode) l(+5%)) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-mode .leaflet-popup-tip {
+    background-color: color-mod(var(--color-darkmode) l(+5%)) !important;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-mode .leaflet-popup-close-button {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+html.dark-mode .leaflet-popup-close-button:hover {
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Tooltip styles */
+html.dark-mode .leaflet-tooltip {
+    background-color: color-mod(var(--color-darkmode) l(+5%)) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-mode .leaflet-tooltip-top:before {
+    border-top-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-tooltip-bottom:before {
+    border-bottom-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-tooltip-left:before {
+    border-left-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-tooltip-right:before {
+    border-right-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+/* Layer control */
+html.dark-mode .leaflet-control-layers {
+    background-color: color-mod(var(--color-darkmode) l(+5%)) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: color-mod(var(--color-darkmode) l(+15%)) !important;
+}
+
+html.dark-mode .leaflet-control-layers-toggle {
+    background-color: color-mod(var(--color-darkmode) l(+10%)) !important;
+}
+
+html.dark-mode .leaflet-control-layers-expanded {
+    background-color: color-mod(var(--color-darkmode) l(+5%)) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Adjust image brightness in dark mode */
+html.dark-mode .leaflet-image-layer {
+    filter: brightness(0.9) contrast(1.1);
+}
+
