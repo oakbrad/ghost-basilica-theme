@@ -103,21 +103,22 @@ The Sheet
     display: none !important;
   }
 
-  /* Modified timeline container to match site-content size */
+  /* Timeline container styles */
   .timeline-container {
-    position: relative;
+    flex: 1;
+    height: calc(100vh - 88px); /* Adjust header height if needed */
     width: 100%;
-    height: 100%;
+  }
+
+  /* Make the site-content container take up full height */
+  .site-content {
+    height: calc(100vh - 88px); /* Match the timeline-container height */
+    overflow: hidden;
   }
 
   #timeline-embed {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
     height: 100%;
+    width: 100%;
   }
 
   /* Styling for access message */
