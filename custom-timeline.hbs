@@ -2,13 +2,14 @@
 USING THIS TEMPLATE:
 
 Apply it to a post in Ghost via Templates
-Go to Code Injection, and inject the URL of the Google Sheet:
-
-<meta name="custom:sheet_url" content="https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml">
+The template will automatically detect Google Sheets URLs in your post content.
+Simply paste a Google Sheets URL in your post, like:
+https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml
 
 In order for this to work, the Sheet must be "Published" not just "Shared"
 
-The Sheet
+Alternatively, you can still use Code Injection with:
+<meta name="custom:sheet_url" content="https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml">
 -->
 {{!< default}}
 
@@ -420,7 +421,6 @@ The Sheet
       flex-direction: column;
     }
   }
-
 </style>
 
 <script>
@@ -430,8 +430,38 @@ The Sheet
     const timelineEmbed = document.getElementById('timeline-embed');
     if (!timelineEmbed) return;
 
+    // First check for the meta tag (backward compatibility)
     const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
-    const sheetUrl = metaTag ? metaTag.content : null;
+    let sheetUrl = metaTag ? metaTag.content : null;
+
+    // If no meta tag is found, try to extract from post content
+    if (!sheetUrl) {
+      // Look for Google Sheets URL in the post content
+      // This regex matches Google Sheets URLs in the format:
+      // https://docs.google.com/spreadsheets/d/e/XXXXX/pubhtml
+      const postContent = document.querySelector('.post-content');
+      
+      if (postContent) {
+        // First, look for iframe embeds that Ghost creates
+        const iframes = postContent.querySelectorAll('iframe');
+        for (let i = 0; i < iframes.length; i++) {
+          const src = iframes[i].getAttribute('src');
+          if (src && src.includes('docs.google.com/spreadsheets')) {
+            sheetUrl = src;
+            break;
+          }
+        }
+        
+        // If no iframe found, try to find the URL in the text content
+        if (!sheetUrl) {
+          const regex = /https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/[a-zA-Z0-9_-]+\/pubhtml/g;
+          const matches = postContent.innerHTML.match(regex);
+          if (matches && matches.length > 0) {
+            sheetUrl = matches[0];
+          }
+        }
+      }
+    }
 
     if (sheetUrl) {
       window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
@@ -445,10 +475,9 @@ The Sheet
         lang: "/assets/timelinejs/timeline-locale.json",
       });
     } else {
-      timelineEmbed.innerHTML = "Missing timeline URL.";
+      timelineEmbed.innerHTML = "Missing timeline URL. Please add a Google Sheets URL to your post or use Code Injection.";
     }
   });
-
 
 /* NUKE ALL NEGATIVE "BCE" DATES AND TICKS */
   function removeBCETicks() {
