@@ -5,128 +5,203 @@
  * that appear in the margin of the page when there's enough horizontal space.
  * At smaller screen sizes, it falls back to the default footnote behavior.
  * 
- * Inspired by Molly White's implementation for Citation Needed.
+ * Based on Molly White's implementation for Citation Needed.
  */
 
-(function() {
-    // Only run on post pages
-    if (!document.querySelector('.post-content')) {
-        return;
+function getAnchorParentContainer(anchor) {
+    let el = anchor;
+    while (el.parentNode && !el.parentNode.classList.contains("gh-content")) {
+        el = el.parentNode;
     }
+    return el;
+}
 
-    // Media query to check if we have enough horizontal space for sidenotes
-    const mediaQuery = window.matchMedia('(min-width: 1200px)');
-    
-    // Elements
-    const article = document.querySelector('.post-content');
-    const footnotes = document.querySelector('.footnotes');
-    
-    // If no footnotes, exit
-    if (!footnotes) {
-        return;
-    }
-    
-    // Create container for sidenotes
-    const sidenotesContainer = document.createElement('div');
-    sidenotesContainer.className = 'sidenotes-container';
-    article.appendChild(sidenotesContainer);
-    
-    // Get all footnote references and footnote content
-    const footnoteRefs = article.querySelectorAll('sup[id^="fnref"]');
-    const footnoteItems = footnotes.querySelectorAll('li[id^="fn"]');
-    
-    // Create sidenotes
-    footnoteRefs.forEach((ref, index) => {
-        // Get the footnote ID
-        const id = ref.id.replace('fnref', '');
-        const footnote = document.getElementById(`fn${id}`);
-        
-        if (!footnote) {
-            return;
+function insertSidenotes() {
+    const articleContent = document.querySelector("article .gh-content");
+    if (!articleContent) return;
+
+    for (const child of articleContent.children) {
+        if (
+            child.classList.contains("gh-notes-wrapper") ||
+            child.classList.contains("footnotes")
+        ) {
+            // Don't add sidenotes for refs used within sidenotes
+            continue;
         }
         
-        // Create sidenote
-        const sidenote = document.createElement('div');
-        sidenote.className = 'sidenote';
-        sidenote.id = `sn${id}`;
-        
-        // Get footnote content (excluding the backlink)
-        const footnoteContent = footnote.innerHTML.replace(/<a href="#fnref[^>]*>↩<\/a>/, '');
-        sidenote.innerHTML = footnoteContent;
-        
-        // Position the sidenote
-        positionSidenote(ref, sidenote);
-        
-        // Add sidenote to container
-        sidenotesContainer.appendChild(sidenote);
-    });
-    
-    // Function to position sidenotes
-    function positionSidenote(reference, sidenote) {
-        const refRect = reference.getBoundingClientRect();
-        const articleRect = article.getBoundingClientRect();
-        
-        // Calculate top position relative to the article
-        const top = refRect.top - articleRect.top;
-        sidenote.style.top = `${top}px`;
+        const anchors = child.querySelectorAll(".footnote-ref a");
+        if (anchors.length) {
+            // Extra wrapper helps with initial positioning
+            const sidenoteContainer = document.createElement("div");
+            sidenoteContainer.setAttribute("class", "gh-notes-wrapper");
+            
+            for (const anchor of anchors) {
+                const id = anchor.id || anchor.getAttribute("href").substring(1);
+                const contentId = id.replace("fnref", "fn");
+                const content = document.getElementById(contentId);
+                
+                if (!content) continue;
+                
+                const sidenoteWrapper = document.createElement("aside");
+                sidenoteWrapper.setAttribute("id", id.replace("fnref", "sidenote"));
+                sidenoteWrapper.setAttribute("class", "gh-note");
+                sidenoteWrapper.setAttribute("role", "note");
+                sidenoteWrapper.setAttribute("data-anchor-id", id);
+
+                // Remove "jump back to text" link, since it'll be right next to the anchor
+                sidenoteWrapper.innerHTML = content.innerHTML;
+                const links = sidenoteWrapper.querySelectorAll("a");
+                for (const link of links) {
+                    if (link.textContent === "↩" || link.getAttribute("href").startsWith("#fnref")) {
+                        link.remove();
+                    }
+                }
+
+                // Add sidenote to DOM
+                sidenoteWrapper.insertAdjacentHTML("afterbegin", `${anchor.textContent}. `);
+                sidenoteContainer.insertAdjacentElement("beforeend", sidenoteWrapper);
+            }
+            
+            child.insertAdjacentElement("afterend", sidenoteContainer);
+        }
     }
-    
-    // Function to check for collisions between sidenotes
-    function checkCollisions() {
-        const sidenotes = document.querySelectorAll('.sidenote');
+}
+
+function positionSidenotes() {
+    const sidenotes = document.querySelectorAll("aside.gh-note");
+    for (let i = 0; i < sidenotes.length; i++) {
+        const sidenote = sidenotes[i];
+        const anchorId = sidenote.getAttribute("data-anchor-id");
+        const anchor = document.querySelector(
+            `.gh-content > *:not(.gh-notes-wrapper, .footnotes) #${anchorId}, .gh-content > *:not(.gh-notes-wrapper, .footnotes) a[href="#${anchorId.replace("fnref", "fn")}"]`
+        );
         
-        // Reset positions
-        sidenotes.forEach((sidenote, index) => {
-            const ref = document.getElementById(`fnref${sidenote.id.replace('sn', '')}`);
-            if (ref) {
-                positionSidenote(ref, sidenote);
+        if (!anchor) continue;
+        
+        const anchorParent = getAnchorParentContainer(anchor);
+
+        const anchorPosition = anchor.getBoundingClientRect().top;
+        const anchorParentPosition = anchorParent.getBoundingClientRect().top;
+
+        // Bump down sidenote if it would overlap with the previous one
+        let newPosition = anchorPosition;
+        if (i > 0) {
+            const prevSideNote = sidenotes[i - 1];
+            const prevSidenoteEnd = prevSideNote.getBoundingClientRect().bottom;
+            if (anchorPosition < prevSidenoteEnd) {
+                newPosition = prevSidenoteEnd;
+            }
+        }
+
+        sidenote.style.top = `${Math.round(newPosition - anchorParentPosition)}px`;
+    }
+}
+
+function showSidenotes() {
+    const article = document.querySelector(".article");
+    if (article) {
+        article.classList.remove("hide-sidenotes");
+    }
+}
+
+function hideSidenotes() {
+    const article = document.querySelector(".article");
+    if (article) {
+        article.classList.add("hide-sidenotes");
+    }
+}
+
+function removeSidenotes() {
+    document.querySelectorAll("div.gh-notes-wrapper").forEach((e) => e.remove());
+}
+
+function insertAndPositionSidenotes() {
+    const mediaQuery = window.matchMedia("(min-width: 1349px)");
+    if (mediaQuery.matches) {
+        insertSidenotes();
+        positionSidenotes();
+        // Janky, but this will help with issue where sidenotes don't repaint during for loop
+        setTimeout(() => positionSidenotes(), 200);
+    }
+}
+
+function onResize() {
+    const sidenotesInDom = Boolean(document.querySelector("div.gh-notes-wrapper"));
+    const mediaQuery = window.matchMedia("(min-width: 1349px)");
+    if (mediaQuery.matches) {
+        if (!sidenotesInDom) {
+            insertSidenotes();
+        }
+        showSidenotes();
+        positionSidenotes();
+    } else {
+        if (sidenotesInDom) {
+            hideSidenotes();
+        }
+    }
+}
+
+function onAnchorClick(evt) {
+    const mediaQuery = window.matchMedia("(min-width: 1349px)");
+    dehilightNotes();
+    if (mediaQuery.matches) {
+        const anchorId = evt.target.id || evt.target.getAttribute("href").substring(1);
+        const sidenote = document.getElementById(anchorId.replace("fnref", "sidenote"));
+        if (sidenote) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            evt.target.classList.add("active-sidenote");
+            sidenote.classList.add("active-sidenote");
+        }
+    }
+}
+
+function dehilightNotes() {
+    const highlighted = document.querySelectorAll(".active-sidenote");
+    for (let highlight of highlighted) {
+        highlight.classList.remove("active-sidenote");
+    }
+}
+
+// Debounce function to limit how often a function is called
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
+// Initialize sidenotes
+function initSidenotes() {
+    if (document.body.classList.contains("post-template")) {
+        window.addEventListener("resize", debounce(onResize, 100));
+        window.addEventListener("beforeprint", hideSidenotes);
+        window.addEventListener("afterprint", showSidenotes);
+        
+        // Add click handlers to footnote references
+        const anchors = document.querySelectorAll(".footnote-ref a");
+        for (const anchor of anchors) {
+            anchor.addEventListener("click", onAnchorClick);
+        }
+        
+        // Hide sidenotes when clicking elsewhere
+        document.addEventListener("click", (evt) => {
+            if (evt.target.nodeName !== "A") {
+                dehilightNotes();
             }
         });
         
-        // Check for collisions
-        for (let i = 0; i < sidenotes.length - 1; i++) {
-            const current = sidenotes[i];
-            const next = sidenotes[i + 1];
-            
-            const currentRect = current.getBoundingClientRect();
-            const nextRect = next.getBoundingClientRect();
-            
-            // If there's a collision, move the next sidenote down
-            if (currentRect.bottom > nextRect.top) {
-                const overlap = currentRect.bottom - nextRect.top + 10; // 10px extra space
-                const currentTop = parseInt(next.style.top, 10);
-                next.style.top = `${currentTop + overlap}px`;
-            }
-        }
+        insertAndPositionSidenotes();
     }
-    
-    // Function to toggle sidenotes based on screen width
-    function toggleSidenotes(e) {
-        if (e.matches) {
-            // Show sidenotes, hide footnotes
-            sidenotesContainer.style.display = 'block';
-            footnotes.style.display = 'none';
-            
-            // Check for collisions after a short delay to ensure layout is complete
-            setTimeout(checkCollisions, 100);
-        } else {
-            // Hide sidenotes, show footnotes
-            sidenotesContainer.style.display = 'none';
-            footnotes.style.display = 'block';
-        }
-    }
-    
-    // Initial check
-    toggleSidenotes(mediaQuery);
-    
-    // Listen for changes
-    mediaQuery.addListener(toggleSidenotes);
-    
-    // Recalculate positions on window resize
-    window.addEventListener('resize', function() {
-        if (mediaQuery.matches) {
-            checkCollisions();
-        }
-    });
-})();
+}
+
+// Run when DOM is fully loaded
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSidenotes);
+} else {
+    initSidenotes();
+}
 

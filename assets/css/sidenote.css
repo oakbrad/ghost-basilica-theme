@@ -1,15 +1,16 @@
 /* Sidenotes
 /* ---------------------------------------------------------- */
 
-.sidenotes-container {
+/* Notes wrapper */
+.gh-notes-wrapper {
+    position: relative;
+}
+
+/* Individual sidenote */
+.gh-note {
     position: absolute;
     right: -320px;
     width: 300px;
-    display: none;
-}
-
-.sidenote {
-    position: absolute;
     font-size: 0.85em;
     line-height: 1.4;
     color: var(--color-darkgrey);
@@ -19,21 +20,39 @@
     overflow-y: auto;
 }
 
-.sidenote p {
+.gh-note p {
     margin: 0 0 0.5em 0;
 }
 
-.sidenote a {
+.gh-note a {
     color: var(--color-primary);
 }
 
+/* Hide sidenotes on smaller screens */
+@media (max-width: 1349px) {
+    .gh-note {
+        display: none;
+    }
+}
+
+/* Highlight active sidenote */
+.active-sidenote {
+    background-color: var(--color-lightgrey);
+    transition: background-color 0.2s ease;
+}
+
 /* Hide the footnote backlink in sidenotes */
-.sidenote a[href^="#fnref"] {
+.gh-note a[href^="#fnref"] {
     display: none;
 }
 
-@media (max-width: 1200px) {
-    .sidenotes-container {
+/* Hide the footnotes section when sidenotes are active */
+@media (min-width: 1349px) {
+    .hide-sidenotes .gh-notes-wrapper {
+        display: none;
+    }
+    
+    .post-template .footnotes {
         display: none;
     }
 }
