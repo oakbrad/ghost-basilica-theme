@@ -194,20 +194,6 @@ function initSidenotes() {
             }
         });
         
-        // Handle theme changes for dark mode
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'class' && 
-                    (mutation.target.classList.contains('dark-mode') || 
-                     mutation.target.classList.contains('auto-color'))) {
-                    // Theme changed, update sidenotes if needed
-                    positionSidenotes();
-                }
-            });
-        });
-        
-        observer.observe(document.documentElement, { attributes: true });
-        
         insertAndPositionSidenotes();
     }
 }
