@@ -57,3 +57,33 @@
     }
 }
 
+/* Dark mode styles */
+.dark-mode .gh-note {
+    color: var(--color-midgrey);
+    border-left-color: var(--color-darkgrey);
+}
+
+.dark-mode .active-sidenote {
+    background-color: var(--color-darkgrey);
+}
+
+.dark-mode .gh-note a {
+    color: var(--ghost-accent-color, #3eb0ef);
+}
+
+/* Auto color mode - follows system preference */
+@media (prefers-color-scheme: dark) {
+    .auto-color .gh-note {
+        color: var(--color-midgrey);
+        border-left-color: var(--color-darkgrey);
+    }
+    
+    .auto-color .active-sidenote {
+        background-color: var(--color-darkgrey);
+    }
+    
+    .auto-color .gh-note a {
+        color: var(--ghost-accent-color, #3eb0ef);
+    }
+}
+
