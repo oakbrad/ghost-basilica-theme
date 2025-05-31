@@ -46,11 +46,14 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5)  !important;
         backdrop-filter: blur(8px)  !important;
         -webkit-backdrop-filter: blur(8px)  !important;
-    }
+        max-width: 300px !important; /* Set maximum width for popups */
+}
 
     .leaflet-popup-content {
         color: #fff !important;
         margin: 12px  !important;
+        width: auto !important; /* Allow content to determine width up to max-width */
+        word-wrap: break-word !important; /* Ensure text wraps */
     }
     
     /* Styling for access message */
@@ -303,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Add popup if specified
                   if (marker.popup) {
-                    m.bindPopup(marker.popup);
+                    m.bindPopup(marker.popup, { maxWidth: 300 });
                   }
                   
                   // Add tooltip if specified
