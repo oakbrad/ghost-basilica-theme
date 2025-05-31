@@ -1,0 +1,40 @@
+/* Sidenotes
+/* ---------------------------------------------------------- */
+
+.sidenotes-container {
+    position: absolute;
+    right: -320px;
+    width: 300px;
+    display: none;
+}
+
+.sidenote {
+    position: absolute;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: var(--color-darkgrey);
+    padding-left: 20px;
+    border-left: 1px solid var(--color-lightgrey);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.sidenote p {
+    margin: 0 0 0.5em 0;
+}
+
+.sidenote a {
+    color: var(--color-primary);
+}
+
+/* Hide the footnote backlink in sidenotes */
+.sidenote a[href^="#fnref"] {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .sidenotes-container {
+        display: none;
+    }
+}
+

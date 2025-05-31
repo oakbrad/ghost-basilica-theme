@@ -63,11 +63,21 @@ function js(done) {
         src([
             // pull in lib files first so our own code can depend on it
             'assets/js/lib/*.js',
-            'assets/js/*.js'
+            'assets/js/*.js',
+            '!assets/js/sidenote.js' // Exclude sidenote.js from the main bundle
         ], {sourcemaps: true}),
         concat('casper.js'),
         uglify(),
         dest('assets/built/', {sourcemaps: '.'}),
+        livereload()
+    ], handleError(done));
+}
+
+function sidenoteJs(done) {
+    pump([
+        src('assets/js/sidenote.js', {sourcemaps: true}),
+        uglify(),
+        dest('assets/built/'),
         livereload()
     ], handleError(done));
 }
@@ -90,10 +100,10 @@ function zipper(done) {
 }
 
 const cssWatcher = () => watch('assets/css/**', css);
-const jsWatcher = () => watch('assets/js/**', js);
+const jsWatcher = () => watch('assets/js/**', parallel(js, sidenoteJs));
 const hbsWatcher = () => watch(['*.hbs', 'partials/**/*.hbs'], hbs);
 const watcher = parallel(cssWatcher, jsWatcher, hbsWatcher);
-const build = series(css, js);
+const build = series(css, parallel(js, sidenoteJs));
 
 exports.build = build;
 exports.zip = series(build, zipper);

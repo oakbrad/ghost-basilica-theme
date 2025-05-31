@@ -16,6 +16,7 @@
     {{!-- Theme assets - use the {asset} helper to reference styles & scripts,
     this will take care of caching and cache-busting automatically --}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/screen.css"}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset "css/sidenote.css"}}" />
 
     {{!-- This tag outputs all your advanced SEO meta, structured data, and other important settings,
     it should always be the last tag before the closing head tag --}}
@@ -112,6 +113,11 @@ $(document).ready(function () {
     $(".gh-content").fitVids();
 });
 </script>
+
+{{!-- Add sidenote.js for post pages --}}
+{{#is "post"}}
+<script src="{{asset "built/sidenote.js"}}"></script>
+{{/is}}
 
 {{!-- Ghost outputs required functional scripts with this tag - it should always be the last thing before the closing body tag --}}
 {{ghost_foot}}
