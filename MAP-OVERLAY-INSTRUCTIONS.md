@@ -12,6 +12,26 @@ This theme supports adding markers and other overlays to your Leaflet maps direc
 
 The map data will be automatically parsed and the markers/overlays will be added to your map.
 
+## Animated WebM Overlay
+
+The theme includes an animated clouds overlay using a WebM video file. This creates a dynamic, atmospheric effect over your maps. The clouds overlay is automatically added to all maps with default settings.
+
+If you want to customize or disable the animated overlay, you can add the following to your JSON configuration:
+
+```json
+{
+  "animatedOverlay": {
+    "enabled": true,
+    "url": "/assets/images/overlays/clouds.webm",
+    "opacity": 0.4,
+    "autoplay": true,
+    "loop": true
+  }
+}
+```
+
+Set `enabled` to `false` to disable the animated overlay. You can also customize the URL to use a different WebM file, or adjust the opacity and playback settings.
+
 ## JSON Format
 
 The map data should be in a specific JSON format. Here's the general structure:
@@ -23,7 +43,8 @@ The map data should be in a specific JSON format. Here's the general structure:
   "polygons": [...],
   "circles": [...],
   "rectangles": [...],
-  "view": {...}
+  "view": {...},
+  "animatedOverlay": {...}
 }
 ```
 

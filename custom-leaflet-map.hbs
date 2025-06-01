@@ -242,6 +242,7 @@
 />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
+<script src="{{asset "js/leaflet-animated-overlay.js"}}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -273,6 +274,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add the image
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
+    
+    // Add animated clouds overlay by default
+    const defaultCloudsUrl = '/assets/images/overlays/clouds.webm';
+    let animatedOverlaySettings = {
+      enabled: true,
+      url: defaultCloudsUrl,
+      opacity: 0.4,
+      autoplay: true,
+      loop: true,
+      muted: true
+    };
 
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
@@ -285,7 +297,17 @@ document.addEventListener("DOMContentLoaded", function () {
     map.setView([h / 2, w / 2], clampedZoom);
     
     // Process map data from post content
-    processMapData(map, h, w);
+    processMapData(map, h, w, animatedOverlaySettings);
+    
+    // Add the animated overlay after processing map data (in case settings were customized)
+    if (animatedOverlaySettings.enabled) {
+      L.animatedWebmOverlay(animatedOverlaySettings.url, imageBounds, {
+        opacity: animatedOverlaySettings.opacity,
+        autoplay: animatedOverlaySettings.autoplay,
+        loop: animatedOverlaySettings.loop,
+        muted: animatedOverlaySettings.muted
+      }).addTo(map);
+    }
   };
 
   img.src = imageUrl;
@@ -294,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
    * Process map data from post content
    * Looks for JSON data in the post content and adds markers and other overlays to the map
    */
-  function processMapData(map, imageHeight, imageWidth) {
+  function processMapData(map, imageHeight, imageWidth, animatedOverlaySettings) {
     const mapDataContainer = document.querySelector('.map-data-container');
     if (!mapDataContainer) return;
     
@@ -369,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Process circles
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
-                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                if (circle.center && Array.isArray(circle.center) && circle.radius) {
                   const options = circle.options || {};
                   L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
                 }
@@ -391,6 +413,34 @@ document.addEventListener("DOMContentLoaded", function () {
               if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
                 const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
                 map.setView(mapData.view.center, zoom);
+              }
+            }
+            
+            // Process animated overlay settings if provided
+            if (mapData.animatedOverlay) {
+              // Update the animated overlay settings with user-provided values
+              if (typeof mapData.animatedOverlay.enabled === 'boolean') {
+                animatedOverlaySettings.enabled = mapData.animatedOverlay.enabled;
+              }
+              
+              if (mapData.animatedOverlay.url) {
+                animatedOverlaySettings.url = mapData.animatedOverlay.url;
+              }
+              
+              if (typeof mapData.animatedOverlay.opacity === 'number') {
+                animatedOverlaySettings.opacity = mapData.animatedOverlay.opacity;
+              }
+              
+              if (typeof mapData.animatedOverlay.autoplay === 'boolean') {
+                animatedOverlaySettings.autoplay = mapData.animatedOverlay.autoplay;
+              }
+              
+              if (typeof mapData.animatedOverlay.loop === 'boolean') {
+                animatedOverlaySettings.loop = mapData.animatedOverlay.loop;
+              }
+              
+              if (typeof mapData.animatedOverlay.muted === 'boolean') {
+                animatedOverlaySettings.muted = mapData.animatedOverlay.muted;
               }
             }
           }
