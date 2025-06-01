@@ -18,8 +18,7 @@
 
     /* Leaflet tooltip styling */
     .leaflet-tooltip {
-        position: relative !important;
-        background-color: transparent !important;
+        background-color: rgba(21, 23, 26, 0.9) !important;
         color: #fff !important;
         font-family: var(--font-sans) !important;
         font-size: 2em !important;
@@ -27,23 +26,10 @@
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 4px !important;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
-        width: 400px !important;
-        white-space: normal !important;
-        z-index: 1 !important;
-    }
-    
-    .leaflet-tooltip::before {
-        content: "" !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background-color: rgba(21, 23, 26, 0.9) !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
-        border-radius: 4px !important;
-        z-index: -1 !important;
+        width: 400px !important;
+        white-space: normal !important;
     }
     
     .leaflet-tooltip b {
@@ -177,11 +163,6 @@
             padding: 6px 10px !important;
             white-space: normal !important;
         }
-        
-        .leaflet-tooltip::before {
-            width: 100% !important;
-            height: 100% !important;
-        }
     }
 
     /* Map data container - hidden by default */
@@ -192,197 +173,174 @@
 
 {{!-- Debug information to check post data structure --}}
 <div class="debug-info" style="display: none;">
-    Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
-    Visibility: {{post.visibility}}<br>
-    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
+    <pre>{{json post}}</pre>
 </div>
 
-{{#post}}
-    {{!-- For public posts, render the map for everyone --}}
-    {{#has visibility="public"}}
-        <article class="post-full leaflet-map-template">
-            <div id="map" style="height: 100vh;"></div>
-            <div class="map-data-container">{{content}}</div>
-        </article>
-    {{else}}
-        {{!-- For members-only posts, check if user is a member --}}
-        {{#has visibility="members"}}
-            {{#if @member}}
-                <article class="post-full leaflet-map-template">
-                    <div id="map" style="height: 100vh;"></div>
-                    <div class="map-data-container">{{content}}</div>
-                </article>
-            {{else}}
-                <div class="map-access-message">
-                    <h2>This map is available to members</h2>
-                    <p>Sign up or log in to view this map.</p>
-                    <div class="map-access-cta">
-                        <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                        <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                    </div>
-                </div>
-            {{/if}}
-        {{else}}
-            {{!-- For paid-members-only posts, check if user is a paid member --}}
-            {{#has visibility="paid"}}
-                {{#if @member.paid}}
-                    <article class="post-full leaflet-map-template">
-                        <div id="map" style="height: 100vh;"></div>
-                        <div class="map-data-container">{{content}}</div>
-                    </article>
-                {{else}}
-                    <div class="map-access-message">
-                        <h2>This map is available to paid members</h2>
-                        <p>Upgrade your membership to view this map.</p>
-                        <div class="map-access-cta">
-                            {{#if @member}}
-                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
-                            {{else}}
-                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                            {{/if}}
-                        </div>
-                    </div>
-                {{/if}}
-            {{else}}
-                {{!-- Default case, just show the map --}}
-                <article class="post-full leaflet-map-template">
-                    <div id="map" style="height: 100vh;"></div>
-                    <div class="map-data-container">{{content}}</div>
-                </article>
-            {{/has}}
-        {{/has}}
-    {{/has}}
+{{!-- Map container --}}
+<div id="map"></div>
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
+{{!-- Hidden container for map data --}}
+<div class="map-data-container">{{content}}</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Only initialize the map if the map element exists
-  // (it won't exist for members/paid content if the user doesn't have access)
-  const mapElement = document.getElementById('map');
-  if (!mapElement) return;
-
-  const imageUrl = "{{feature_image}}";
-
-  const img = new Image();
-  img.onload = function () {
-    const w = this.naturalWidth;
-    const h = this.naturalHeight;
-
-    // Full image bounds
-    const imageBounds = [[0, 0], [h, w]];
-
-    // Create the map
-    const map = L.map("map", {
-      crs: L.CRS.Simple,
-      preferCanvas: true,
-      minZoom: -5,
-      maxZoom: 2,
-      zoomSnap: 0,
-      zoomDelta: 0.25,
-      maxBounds: imageBounds
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if user has access to the map
+        const hasAccess = true; // Replace with your access check logic
+        
+        if (!hasAccess) {
+            showAccessMessage();
+            return;
+        }
+        
+        // Initialize map
+        initializeMap();
     });
-
-    // Add the image
-    L.imageOverlay(imageUrl, imageBounds).addTo(map);
-
-    // Get viewport height and calculate scale to fit height
-    const viewportHeight = window.innerHeight;
-    const scale = viewportHeight / h;
-    const zoom = Math.log2(scale);
-
-    // Clamp to allowed zooms
-    const clampedZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
-
-    map.setView([h / 2, w / 2], clampedZoom);
     
-    // Process map data from post content
-    processMapData(map, h, w);
-  };
-
-  img.src = imageUrl;
-  
-  /**
-   * Process map data from post content
-   * Looks for JSON data in the post content and adds markers and other overlays to the map
-   */
-  function processMapData(map, imageHeight, imageWidth) {
-    const mapDataContainer = document.querySelector('.map-data-container');
-    if (!mapDataContainer) return;
+    function showAccessMessage() {
+        // Create access message container
+        const mapContainer = document.getElementById('map');
+        const accessMessage = document.createElement('div');
+        accessMessage.className = 'map-access-message';
+        
+        // Determine message based on user status (member, free, non-member)
+        const isMember = false; // Replace with your member check
+        const isFree = false; // Replace with your free tier check
+        
+        let title, message, ctaButtons;
+        
+        if (isMember && !isFree) {
+            // Paid member who needs to upgrade
+            title = 'Upgrade Required';
+            message = 'This map is available to premium members only. Please upgrade your membership to access this exclusive content.';
+            ctaButtons = `
+                <div class="map-access-cta">
+                    <a href="/upgrade/" class="map-upgrade-button">Upgrade Membership</a>
+                </div>
+            `;
+        } else if (isMember) {
+            // Free member who needs to upgrade
+            title = 'Upgrade Required';
+            message = 'This map is available to premium members only. Please upgrade your membership to access this exclusive content.';
+            ctaButtons = `
+                <div class="map-access-cta">
+                    <a href="/upgrade/" class="map-upgrade-button">Upgrade Membership</a>
+                </div>
+            `;
+        } else {
+            // Non-member who needs to sign up
+            title = 'Members Only Content';
+            message = 'This interactive map is available exclusively to our members. Sign up for free or log in to access this content.';
+            ctaButtons = `
+                <div class="map-access-cta">
+                    <a href="/signup/" class="map-signup-button">Sign Up Free</a>
+                    <a href="/signin/" class="map-signin-button">Sign In</a>
+                </div>
+            `;
+        }
+        
+        // Set content
+        accessMessage.innerHTML = `
+            <h2>${title}</h2>
+            <p>${message}</p>
+            ${ctaButtons}
+        `;
+        
+        // Replace map with access message
+        mapContainer.parentNode.replaceChild(accessMessage, mapContainer);
+    }
     
-    try {
-      // Find all pre elements that might contain JSON data
-      const preElements = mapDataContainer.querySelectorAll('pre');
-      
-      preElements.forEach(pre => {
+    function initializeMap() {
+        // Parse map data from hidden container
+        const mapDataContainer = document.querySelector('.map-data-container');
+        let mapData;
+        
         try {
-          // Try to parse the content as JSON
-          const content = pre.textContent.trim();
-          if (!content.startsWith('{') && !content.startsWith('[')) return;
-          
-          const mapData = JSON.parse(content);
-          
-          // Process the map data
-          if (mapData) {
+            // Try to parse as JSON first
+            mapData = JSON.parse(mapDataContainer.textContent.trim());
+        } catch (e) {
+            // If not valid JSON, try to extract from HTML content
+            const mapDataMatch = mapDataContainer.textContent.match(/```json\s*([\s\S]*?)\s*```/);
+            if (mapDataMatch && mapDataMatch[1]) {
+                try {
+                    mapData = JSON.parse(mapDataMatch[1].trim());
+                } catch (e) {
+                    console.error('Failed to parse map data:', e);
+                    showError('Invalid map data format');
+                    return;
+                }
+            } else {
+                console.error('No map data found');
+                showError('No map data found');
+                return;
+            }
+        }
+        
+        // Set default map options
+        const defaultOptions = {
+            center: [37.7749, -122.4194], // Default to San Francisco
+            zoom: 13,
+            minZoom: 3,
+            maxZoom: 18
+        };
+        
+        // Merge with custom options if provided
+        const mapOptions = mapData.options ? { ...defaultOptions, ...mapData.options } : defaultOptions;
+        
+        // Initialize the map
+        const map = L.map('map', mapOptions);
+        
+        // Add tile layer (base map)
+        const tileLayerUrl = mapData.tileLayer?.url || 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        const tileLayerOptions = mapData.tileLayer?.options || {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        };
+        
+        L.tileLayer(tileLayerUrl, tileLayerOptions).addTo(map);
+        
+        // Process map elements if they exist
+        if (mapData) {
             // Process markers
             if (mapData.markers && Array.isArray(mapData.markers)) {
-              mapData.markers.forEach(marker => {
-                if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                  // Convert coordinates to match the image coordinate system if needed
-                  const y = marker.position[0];
-                  const x = marker.position[1];
-                  
-                  let markerOptions = {};
-                  
-                  // Apply custom icon if specified
-                  if (marker.icon) {
-                    markerOptions.icon = L.icon(marker.icon);
-                  } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                    // Use predefined custom icon if iconType is specified
-                    markerOptions.icon = window.customIcons[marker.iconType];
-                  }
-                  
-                  // Create the marker
-                  const m = L.marker([y, x], markerOptions).addTo(map);
-                  
-                  // Add popup if specified
-                  if (marker.popup) {
-                    m.bindPopup(marker.popup);
-                  }
-                  
-                  // Add tooltip if specified
-                  if (marker.tooltip) {
-                    m.bindTooltip(marker.tooltip);
-                  }
-                }
-              });
+                mapData.markers.forEach(marker => {
+                    if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
+                        const options = marker.options || {};
+                        
+                        // Create marker
+                        const m = L.marker(marker.position, options).addTo(map);
+                        
+                        // Add popup if specified
+                        if (marker.popup) {
+                            m.bindPopup(marker.popup);
+                        }
+                        
+                        // Add tooltip if specified
+                        if (marker.tooltip) {
+                            m.bindTooltip(marker.tooltip);
+                        }
+                    }
+                });
             }
             
             // Process polylines
             if (mapData.polylines && Array.isArray(mapData.polylines)) {
-              mapData.polylines.forEach(polyline => {
-                if (polyline.points && Array.isArray(polyline.points)) {
-                  const options = polyline.options || {};
-                  L.polyline(polyline.points, options).addTo(map);
-                }
-              });
+                mapData.polylines.forEach(polyline => {
+                    if (polyline.points && Array.isArray(polyline.points) && polyline.points.length >= 2) {
+                        const options = polyline.options || {};
+                        L.polyline(polyline.points, options).addTo(map);
+                    }
+                });
             }
             
             // Process polygons
             if (mapData.polygons && Array.isArray(mapData.polygons)) {
-              mapData.polygons.forEach(polygon => {
-                if (polygon.points && Array.isArray(polygon.points)) {
-                  const options = polygon.options || {};
-                  L.polygon(polygon.points, options).addTo(map);
-                }
-              });
+                mapData.polygons.forEach(polygon => {
+                    if (polygon.points && Array.isArray(polygon.points) && polygon.points.length >= 3) {
+                        const options = polygon.options || {};
+                        L.polygon(polygon.points, options).addTo(map);
+                    }
+                });
             }
             
             // Process circles
@@ -397,35 +355,33 @@ document.addEventListener("DOMContentLoaded", function () {
             
             // Process rectangles
             if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
-              mapData.rectangles.forEach(rectangle => {
-                if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                  const options = rectangle.options || {};
-                  L.rectangle(rectangle.bounds, options).addTo(map);
-                }
-              });
+                mapData.rectangles.forEach(rectangle => {
+                    if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2 &&
+                        Array.isArray(rectangle.bounds[0]) && rectangle.bounds[0].length === 2 &&
+                        Array.isArray(rectangle.bounds[1]) && rectangle.bounds[1].length === 2) {
+                        const options = rectangle.options || {};
+                        L.rectangle(rectangle.bounds, options).addTo(map);
+                    }
+                });
             }
             
-            // Process custom view settings
-            if (mapData.view) {
-              if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
-                const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
-                map.setView(mapData.view.center, zoom);
-              }
+            // Process GeoJSON
+            if (mapData.geoJSON) {
+                L.geoJSON(mapData.geoJSON, mapData.geoJSONOptions || {}).addTo(map);
             }
-          }
-        } catch (e) {
-          console.error('Error parsing map data JSON:', e);
         }
-      });
-    } catch (e) {
-      console.error('Error processing map data:', e);
     }
-  }
-});
-
-// Enable debug info with a query parameter
-if (window.location.search.includes('debug=true')) {
-  document.querySelector('.debug-info').style.display = 'block';
-}
+    
+    function showError(message) {
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #ff5555; text-align: center; padding: 20px;">
+                <div>
+                    <h2>Map Error</h2>
+                    <p>${message}</p>
+                </div>
+            </div>
+        `;
+    }
 </script>
-{{/post}}
+
