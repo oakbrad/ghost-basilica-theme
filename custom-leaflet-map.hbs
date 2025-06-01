@@ -250,6 +250,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const mapElement = document.getElementById('map');
   if (!mapElement) return;
 
+  // Get video overlay URL and opacity from meta tags if they exist
+  const videoUrlMeta = document.querySelector('meta[name="custom:video_url"]');
+  const videoOpacityMeta = document.querySelector('meta[name="custom:video_opacity"]');
+  
+  const videoUrl = videoUrlMeta ? videoUrlMeta.content : null;
+  const videoOpacity = videoOpacityMeta ? parseFloat(videoOpacityMeta.content) : 0.5; // Default opacity 0.5 if not specified
+
   const imageUrl = "{{feature_image}}";
 
   const img = new Image();
@@ -273,6 +280,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add the image
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
+    
+    // Add video overlay if URL is provided
+    if (videoUrl) {
+      // Create video element
+      const video = document.createElement('video');
+      video.src = videoUrl;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true; // Must be muted for autoplay to work in most browsers
+      
+      // Create video overlay with the specified opacity
+      const videoOverlay = L.videoOverlay(video, imageBounds, {
+        opacity: videoOpacity,
+        autoplay: true,
+        loop: true
+      }).addTo(map);
+    }
 
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
