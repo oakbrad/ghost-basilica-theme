@@ -179,7 +179,7 @@ Keep this template as lightweight as you can!
             <p>You might be interested in these posts</p>
         </div>
         <div class="random-post-feed">
-            {{!-- Get random posts using the sort parameter with random --}}
+            {{!-- Get random posts using the order parameter with random --}}
             {{#get "posts" limit="3" include="tags,authors" order="random" as |random_posts|}}
                 {{#foreach random_posts}}
                     {{> "post-card"}}
