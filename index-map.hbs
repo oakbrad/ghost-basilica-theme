@@ -167,9 +167,9 @@ into the {body} of the default.hbs template --}}
 </div>
 </main>
 
-{{!-- Script for random quotes - placed at the end of the body --}}
+{{!-- Simple script for random quotes --}}
 <script>
-    // Define an array of quotes with their authors and links
+    // Array of quotes
     const quotes = [
         {
             text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
@@ -198,28 +198,11 @@ into the {body} of the default.hbs template --}}
         }
     ];
 
-    // Function to select a random quote
-    function setRandomQuote() {
-        // Select a random quote from the array
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        const selectedQuote = quotes[randomIndex];
-        
-        // Get the elements
-        const quoteText = document.getElementById('quote-text');
-        const quoteAuthor = document.getElementById('quote-author');
-        const quoteLink = document.getElementById('quote-link');
-        
-        // Update the elements if they exist
-        if (quoteText) quoteText.textContent = selectedQuote.text;
-        if (quoteAuthor) quoteAuthor.textContent = selectedQuote.author;
-        if (quoteLink) quoteLink.href = selectedQuote.link;
-    }
-
-    // Run the function when the DOM is fully loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setRandomQuote);
-    } else {
-        // DOM is already loaded, run the function directly
-        setRandomQuote();
-    }
+    // Set random quote on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const quote = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quote-text').textContent = quote.text;
+        document.getElementById('quote-author').textContent = quote.author;
+        document.getElementById('quote-link').href = quote.link;
+    });
 </script>
