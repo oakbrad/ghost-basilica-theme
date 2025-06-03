@@ -32,8 +32,9 @@ into the {body} of the default.hbs template --}}
         left: 0;
         right: 0;
         height: 200px;
-        background: linear-gradient(to bottom, rgba(241, 241, 241, 0) 0%, #f1f1f1 100%);
-        z-index: 5;
+        background: linear-gradient(to bottom, rgba(21, 23, 26, 0) 0%, #151719 100%);
+        z-index: 10;
+        pointer-events: none;
     }
 
 </style>
@@ -69,7 +70,7 @@ into the {body} of the default.hbs template --}}
 </div>
 
 {{!-- The main content area --}}
-<main id="site-main" class="site-main outer">
+<main id="site-main" class="site-main outer" style="background-color: #151719; color: #fff;">
 <div class="inner posts">
     <div class="post-card-header"><h1>Explore Pyora</h1></div>
     <div class="post-feed">
