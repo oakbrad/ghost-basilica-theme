@@ -111,7 +111,6 @@ into the {body} of the default.hbs template --}}
         z-index: 1;
         pointer-events: none;
     }
-`
 </style>
 
 <div class="site-header-content outer{{#match @custom.header_style "Left aligned"}} left-aligned{{/match}}{{#unless @custom.show_publication_cover}}{{#match @custom.header_style "Hidden"}} no-content{{/match}}{{/unless}}">
@@ -155,9 +154,56 @@ into the {body} of the default.hbs template --}}
 
     {{!-- Quote block that spans full width --}}
     <div class="map-quote-block">
-        <p>Even a blind dwarf navigator is worth more than ten sailors with a compass.</p>
-        <p class="credit-quote-block"><a href=https://lore.dungeon.church/doc/strezza-pvL6kQtaEA target="_new">Captain Strezza</a></p>
+        {{!-- Array of quotes with their respective authors and links --}}
+        {{#contentFor "scripts"}}
+        <script>
+            // Define an array of quotes with their authors and links
+            const quotes = [
+                {
+                    text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
+                    author: "Captain Strezza",
+                    link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
+                },
+                {
+                    text: "The sea doesn't care about your plans. Neither do I.",
+                    author: "Captain Strezza",
+                    link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
+                },
+                {
+                    text: "In Pyora, the land shapes the people as much as the people shape the land.",
+                    author: "Elder Thorne",
+                    link: "https://lore.dungeon.church/doc/elder-thorne"
+                },
+                {
+                    text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
+                    author: "Archmage Vellian",
+                    link: "https://lore.dungeon.church/doc/archmage-vellian"
+                },
+                {
+                    text: "The greatest treasures are not found in ancient tombs, but in the stories we tell about them.",
+                    author: "Bard Lysander",
+                    link: "https://lore.dungeon.church/doc/bard-lysander"
+                }
+            ];
+
+            // Function to select a random quote when the page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                // Select a random quote from the array
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                const selectedQuote = quotes[randomIndex];
+                
+                // Update the quote text and author in the DOM
+                document.getElementById('quote-text').textContent = selectedQuote.text;
+                document.getElementById('quote-author').textContent = selectedQuote.author;
+                document.getElementById('quote-link').href = selectedQuote.link;
+            });
+        </script>
+        {{/contentFor}}
+        
+        <p id="quote-text">Even a blind dwarf navigator is worth more than ten sailors with a compass.</p>
+        <p class="credit-quote-block"><a id="quote-link" href="https://lore.dungeon.church/doc/strezza-pvL6kQtaEA" target="_new"><span id="quote-author">Captain Strezza</span></a></p>
     </div>
+    
     <div class="post-feed">
         {{#foreach posts from="4"}}
             {{> "post-card"}}
