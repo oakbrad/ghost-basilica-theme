@@ -52,6 +52,26 @@ into the {body} of the default.hbs template --}}
         z-index: 100;
         pointer-events: none;
     }
+    /* Featured map posts section */
+    .featured-map-posts {
+        margin-bottom: 40px;
+    }
+    /* Quote block styling */
+    .map-quote-block {
+        width: 100%;
+        padding: 40px 20px;
+        margin: 30px 0;
+        background-color: #1d1e22;
+        border-left: 5px solid #3eb0ef;
+        font-size: 1.8rem;
+        line-height: 1.6;
+        font-style: italic;
+        text-align: center;
+    }
+    .map-quote-block p {
+        max-width: 800px;
+        margin: 0 auto;
+    }
 </style>
 
 <div class="site-header-content outer{{#match @custom.header_style "Left aligned"}} left-aligned{{/match}}{{#unless @custom.show_publication_cover}}{{#match @custom.header_style "Hidden"}} no-content{{/match}}{{/unless}}">
@@ -59,7 +79,7 @@ into the {body} of the default.hbs template --}}
 {{!-- Use responsive image from the Pyora map post --}}
 {{#get "posts" filter="slug:pyora" limit="1"}}
   {{#foreach posts}}
-    {{!-- 2) Now `this.feature_image` holds that post’s featured image URL --}}
+    {{!-- 2) Now `this.feature_image` holds that post's featured image URL --}}
     {{#if feature_image}}
      <img class="site-header-cover"
                 srcset="{{img_url feature_image size="s"}} 300w,
@@ -86,6 +106,25 @@ into the {body} of the default.hbs template --}}
 <main id="site-main" class="site-main outer">
 <div class="inner posts">
     <div class="post-card-header"><h1 class="content-title-header">Explore Pyora</h1></div>
+    
+    {{!-- Featured section with 3 most recent map posts --}}
+    <div class="featured-map-posts">
+        <h2>Recent Explorations</h2>
+        <div class="post-feed">
+            {{#get "posts" filter="tag:map" limit="3" include="tags" as |recent_maps|}}
+                {{#foreach recent_maps}}
+                    {{> "post-card"}}
+                {{/foreach}}
+            {{/get}}
+        </div>
+    </div>
+    
+    {{!-- Quote block that spans full width --}}
+    <div class="map-quote-block">
+        <p>"The world of Pyora awaits, with countless mysteries to uncover and adventures to embark upon. Every map tells a story, every location holds secrets, and every journey transforms the traveler."</p>
+    </div>
+    
+    {{!-- Regular grid of map posts --}}
     <div class="post-feed">
         {{#foreach posts}}
             {{!-- The tag below includes the markup for each post - partials/post-card.hbs --}}
@@ -97,3 +136,4 @@ into the {body} of the default.hbs template --}}
 
 </div>
 </main>
+
