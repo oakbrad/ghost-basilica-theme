@@ -154,52 +154,6 @@ into the {body} of the default.hbs template --}}
 
     {{!-- Quote block that spans full width --}}
     <div class="map-quote-block">
-        {{!-- Array of quotes with their respective authors and links --}}
-        {{#contentFor "scripts"}}
-        <script>
-            // Define an array of quotes with their authors and links
-            const quotes = [
-                {
-                    text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
-                    author: "Captain Strezza",
-                    link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
-                },
-                {
-                    text: "The sea doesn't care about your plans. Neither do I.",
-                    author: "Captain Strezza",
-                    link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
-                },
-                {
-                    text: "In Pyora, the land shapes the people as much as the people shape the land.",
-                    author: "Elder Thorne",
-                    link: "https://lore.dungeon.church/doc/elder-thorne"
-                },
-                {
-                    text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
-                    author: "Archmage Vellian",
-                    link: "https://lore.dungeon.church/doc/archmage-vellian"
-                },
-                {
-                    text: "The greatest treasures are not found in ancient tombs, but in the stories we tell about them.",
-                    author: "Bard Lysander",
-                    link: "https://lore.dungeon.church/doc/bard-lysander"
-                }
-            ];
-
-            // Function to select a random quote when the page loads
-            document.addEventListener('DOMContentLoaded', function() {
-                // Select a random quote from the array
-                const randomIndex = Math.floor(Math.random() * quotes.length);
-                const selectedQuote = quotes[randomIndex];
-                
-                // Update the quote text and author in the DOM
-                document.getElementById('quote-text').textContent = selectedQuote.text;
-                document.getElementById('quote-author').textContent = selectedQuote.author;
-                document.getElementById('quote-link').href = selectedQuote.link;
-            });
-        </script>
-        {{/contentFor}}
-        
         <p id="quote-text">Even a blind dwarf navigator is worth more than ten sailors with a compass.</p>
         <p class="credit-quote-block"><a id="quote-link" href="https://lore.dungeon.church/doc/strezza-pvL6kQtaEA" target="_new"><span id="quote-author">Captain Strezza</span></a></p>
     </div>
@@ -212,3 +166,60 @@ into the {body} of the default.hbs template --}}
 
 </div>
 </main>
+
+{{!-- Script for random quotes - placed at the end of the body --}}
+<script>
+    // Define an array of quotes with their authors and links
+    const quotes = [
+        {
+            text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
+            author: "Captain Strezza",
+            link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
+        },
+        {
+            text: "The sea doesn't care about your plans. Neither do I.",
+            author: "Captain Strezza",
+            link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
+        },
+        {
+            text: "In Pyora, the land shapes the people as much as the people shape the land.",
+            author: "Elder Thorne",
+            link: "https://lore.dungeon.church/doc/elder-thorne"
+        },
+        {
+            text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
+            author: "Archmage Vellian",
+            link: "https://lore.dungeon.church/doc/archmage-vellian"
+        },
+        {
+            text: "The greatest treasures are not found in ancient tombs, but in the stories we tell about them.",
+            author: "Bard Lysander",
+            link: "https://lore.dungeon.church/doc/bard-lysander"
+        }
+    ];
+
+    // Function to select a random quote
+    function setRandomQuote() {
+        // Select a random quote from the array
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        const selectedQuote = quotes[randomIndex];
+        
+        // Get the elements
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        const quoteLink = document.getElementById('quote-link');
+        
+        // Update the elements if they exist
+        if (quoteText) quoteText.textContent = selectedQuote.text;
+        if (quoteAuthor) quoteAuthor.textContent = selectedQuote.author;
+        if (quoteLink) quoteLink.href = selectedQuote.link;
+    }
+
+    // Run the function when the DOM is fully loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setRandomQuote);
+    } else {
+        // DOM is already loaded, run the function directly
+        setRandomQuote();
+    }
+</script>
