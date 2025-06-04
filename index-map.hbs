@@ -20,10 +20,11 @@ into the {body} of the default.hbs template --}}
         transform: translate(-50%, -50%);
         z-index: 200;
         font-family: 'Waning Star', serif;
-        font-size: 6rem;
+        line-height: 1;
+        font-size: 10rem;
         color: #fff;
         text-align: center;
-        text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+        text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.75);
         pointer-events: none;
     }
     .post-card-tags,
@@ -31,14 +32,8 @@ into the {body} of the default.hbs template --}}
     .post-card-excerpt {
         display: none;
     }
-    .content-title-header {
-        padding-top: 15px;
-        padding-bottom: 0px;
-        text-align: center;
-        color: #fff;
-    }
     .post-feed {
-        padding-top: 10px !important;
+        padding-top: 50px !important;
     }
     .post-card-header {
         text-align: center;
@@ -101,7 +96,7 @@ into the {body} of the default.hbs template --}}
         padding-bottom: 0em;
     }
     .map-quote-block::before {
-        content: """;               /* Unicode opening double-quote */
+        content: "“";               /* Unicode opening double-quote */
         position: absolute;
         top: 5px;                 /* nudge upward or adjust as needed */
         left: 20px;                 /* nudge inward from left edge */
@@ -114,7 +109,7 @@ into the {body} of the default.hbs template --}}
     }
 
     .map-quote-block::after {
-        content: """;               /* Unicode closing double-quote */
+        content: "”";               /* Unicode closing double-quote */
         position: absolute;
         bottom: -20px;              /* slight nudge downward */
         right: 20px;                /* slight nudge inward from right edge */
@@ -160,7 +155,7 @@ into the {body} of the default.hbs template --}}
 {{!-- The main content area --}}
 <main id="site-main" class="site-main outer">
 <div class="inner posts">
-    <div class="post-card-header"><h1 class="content-title-header">Explore Pyora</h1></div>
+    <div class="post-card-header"><!-- removed header --></div>
     <div class="post-feed">
         {{#foreach posts limit="3"}}
             {{!-- The tag below includes the markup for each post - partials/post-card.hbs --}}
