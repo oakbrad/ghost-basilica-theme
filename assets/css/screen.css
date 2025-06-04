@@ -61,7 +61,13 @@ production stylesheet in assets/built/screen.css
 
 /* DUNGEON CHURCH FONT */
     /* Waning Star used with Permission */
-  @import url('/assets/ws.woff2');
+@font-face {
+  font-family: 'Waning Star';
+  src: url('/assets/ws.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
     .post-card-title {
         font-family: "Waning Star"
     }
