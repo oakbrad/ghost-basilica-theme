@@ -32,6 +32,13 @@
         padding-top: 0 !important;
     }
 
+    /* Hide subscription buttons in embed mode */
+    .embed-mode .footer-cta,
+    .embed-mode [data-portal="signup"],
+    .embed-mode [data-portal] {
+        display: none !important;
+    }
+
     .leaflet-overlay-pane video {
       z-index: 1 !important;
     }
@@ -481,4 +488,3 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 {{/post}}
-
