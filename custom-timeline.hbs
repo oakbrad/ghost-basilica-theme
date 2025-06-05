@@ -44,7 +44,6 @@ The Sheet
     flex: 1;
     height: calc(100vh - 88px); /* Adjust header height if needed */
     width: 100%;
-    background-color: var(--color-darkmode) !important;
   }
 
   /* When in embed mode, make timeline full height */
@@ -70,7 +69,7 @@ The Sheet
   #timeline-embed {
     height: 100%;
     width: 100%;
-    background-color: var(--color-darkmode) !important;
+
   }
 
   /* Styling for access message */
@@ -139,7 +138,7 @@ The Sheet
   }
 
   /* Main timeline container */
-  .tl-timeline {
+  .tl-timenav {
     background-color: var(--color-darkmode) !important;
     color: #fff;
     font-family: var(--font-sans);
@@ -177,35 +176,35 @@ The Sheet
   }
 
   /* Individual slides */
-.tl-slide .tl-slide-content {
-  position: relative;
-  background-color: rgba(21, 23, 26, 0.2);
-  border: 0px solid rgba(200,200,200, .5);
-  border-width: 1px 0 !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0px;
-  box-shadow: 0 0px 30px rgba(0, 0, 0, 0.5);
-  overflow: hidden; /* needed for the pseudo-element */
-}
-/* Add sheen with a pseudo-element */
-.tl-slide .tl-slide-content::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.15) 20%,
-    rgba(255, 255, 255, 0.05) 40%,
-    transparent 60%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
+  .tl-slide .tl-slide-content {
+    position: relative;
+    background-color: rgba(21, 23, 26, 0.2);
+    border: 0px solid rgba(200,200,200, .5);
+    border-width: 1px 0 !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 0px;
+    box-shadow: 0 0px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden; /* needed for the pseudo-element */
+  }
+  /* Add sheen with a pseudo-element */
+  .tl-slide .tl-slide-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.15) 20%,
+      rgba(255, 255, 255, 0.05) 40%,
+      transparent 60%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
 
   /* Slide text content */
   .tl-text-content-container {
@@ -236,8 +235,8 @@ The Sheet
   /* Timeline navigation */
   .tl-timeaxis-background,
   .tl-timegroup-message {
-    background-color: rgba(21, 23, 26, 0.8);
-    color: #fff;
+    background-color: var(--color-darkmode) !important;
+    color: #000 !important;
   }
 
   /* Hide menu bar */
@@ -346,9 +345,9 @@ The Sheet
     border-top: 1px solid var(--color-border);
   }
 
-  /* Timeline time spans */
+  /* Timeline time spans (underneath the marker flag)  */
   .tl-timemarker .tl-timemarker-timespan {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.0) !important;
   }
 
   /* Fix for mobile timeline issues - z-index fixes only */
