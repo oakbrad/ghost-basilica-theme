@@ -388,10 +388,52 @@ The Sheet
   Embed mode: <span id="debug-embed-mode">No</span>
 </div>
 
+{{!-- Fallback access control using Handlebars templates --}}
 {{#post}}
   {{!-- We'll use a JavaScript-based approach to handle embed mode and visibility --}}
   <div id="timeline-container" class="timeline-container">
     {{!-- This div will be populated by JavaScript based on embed mode and visibility --}}
+    
+    {{!-- Fallback content if JavaScript fails --}}
+    {{#has visibility="public"}}
+      <div id="timeline-embed-fallback"></div>
+    {{else}}
+      {{#has visibility="members"}}
+        {{#if @member}}
+          <div id="timeline-embed-fallback"></div>
+        {{else}}
+          <div class="timeline-access-message">
+            <h2>This timeline is available to members</h2>
+            <p>Sign up or log in to view this timeline.</p>
+            <div class="timeline-access-cta">
+              <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+              <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+            </div>
+          </div>
+        {{/if}}
+      {{else}}
+        {{#has visibility="paid"}}
+          {{#if @member.paid}}
+            <div id="timeline-embed-fallback"></div>
+          {{else}}
+            <div class="timeline-access-message">
+              <h2>This timeline is available to paid members</h2>
+              <p>Upgrade your membership to view this timeline.</p>
+              <div class="timeline-access-cta">
+                {{#if @member}}
+                  <a href="#/portal/account/plans" class="timeline-upgrade-button">Upgrade now</a>
+                {{else}}
+                  <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+                  <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+                {{/if}}
+              </div>
+            </div>
+          {{/if}}
+        {{else}}
+          <div id="timeline-embed-fallback"></div>
+        {{/has}}
+      {{/has}}
+    {{/has}}
   </div>
 
   {{!-- For members-only access message template --}}
@@ -518,13 +560,22 @@ The Sheet
     // Only initialize the timeline if the timeline-embed element exists
     // (it won't exist for members/paid content if the user doesn't have access)
     const timelineEmbed = document.getElementById('timeline-embed');
-    if (!timelineEmbed) return;
+    const timelineEmbedFallback = document.getElementById('timeline-embed-fallback');
+    
+    // Use either the main timeline embed or the fallback
+    const embedElement = timelineEmbed || timelineEmbedFallback;
+    
+    if (!embedElement) {
+      console.log("No timeline embed element found - access likely restricted");
+      return;
+    }
 
     const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
     const sheetUrl = metaTag ? metaTag.content : null;
 
     if (sheetUrl) {
-      window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
+      console.log("Initializing timeline with sheet URL:", sheetUrl);
+      window.timeline = new TL.Timeline(embedElement.id, sheetUrl, {
         timenav_position: "bottom",
         initial_zoom: 4,
         scale_factor: 2,
@@ -535,7 +586,8 @@ The Sheet
         lang: "/assets/timelinejs/timeline-locale.json",
       });
     } else {
-      timelineEmbed.innerHTML = "Missing timeline URL.";
+      console.error("Missing timeline URL");
+      embedElement.innerHTML = "Missing timeline URL.";
     }
   });
 
@@ -553,13 +605,20 @@ The Sheet
   const waitForTimeline = setInterval(() => {
     // Only run if timeline-embed exists
     const timelineEmbed = document.getElementById('timeline-embed');
-    if (!timelineEmbed) {
+    const timelineEmbedFallback = document.getElementById('timeline-embed-fallback');
+    
+    // Use either the main timeline embed or the fallback
+    const embedElement = timelineEmbed || timelineEmbedFallback;
+    
+    if (!embedElement) {
+      console.log("No timeline embed element found - clearing interval");
       clearInterval(waitForTimeline);
       return;
     }
 
     const ticksReady = document.querySelectorAll('.tl-timeaxis-tick');
     if (ticksReady.length > 0) {
+      console.log("Timeline ticks found, removing BCE ticks");
       clearInterval(waitForTimeline);
       removeBCETicks();
 
