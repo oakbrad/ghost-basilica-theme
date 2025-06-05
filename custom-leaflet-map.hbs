@@ -30,6 +30,15 @@
       display: none !important;
     }
 
+    /* Ensure header and dropdown menus are above map elements */
+    .gh-head {
+        z-index: 2000 !important; /* Higher than map elements */
+    }
+    
+    .gh-dropdown {
+        z-index: 2001 !important; /* Higher than gh-head to ensure dropdowns appear on top */
+    }
+
     /* Leaflet tooltip styling */
     .leaflet-tooltip {
         background-color: rgba(21, 23, 26, 0.9) !important;
