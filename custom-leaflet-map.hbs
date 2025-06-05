@@ -17,6 +17,26 @@
         z-index: 1;
     }
 
+    /* When in embed mode, make map full height */
+    .embed-mode #map {
+        height: 100vh !important;
+    }
+
+    /* Hide header in embed mode */
+    .embed-mode .gh-head {
+        display: none !important;
+    }
+
+    /* Adjust body padding in embed mode */
+    .embed-mode .site-content {
+        padding-top: 0 !important;
+    }
+
+    /* Hide subscription buttons in embed mode */
+    .embed-mode .gh-portal-triggerbtn-iframe {
+        display: none !important;
+    }
+
     .leaflet-overlay-pane video {
       z-index: 1 !important;
     }
@@ -260,6 +280,14 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  // Check for embed parameter in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const embedParam = urlParams.get('embed');
+  
+  if (embedParam === 'true') {
+    document.body.classList.add('embed-mode');
+  }
+
   // Only initialize the map if the map element exists
   // (it won't exist for members/paid content if the user doesn't have access)
   const mapElement = document.getElementById('map');
@@ -450,11 +478,11 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error('Error processing map data:', e);
     }
   }
+  
+  // Enable debug info with a query parameter
+  if (window.location.search.includes('debug=true')) {
+    document.querySelector('.debug-info').style.display = 'block';
+  }
 });
-
-// Enable debug info with a query parameter
-if (window.location.search.includes('debug=true')) {
-  document.querySelector('.debug-info').style.display = 'block';
-}
 </script>
 {{/post}}
