@@ -12,69 +12,6 @@ The Sheet
 -->
 {{!< default}}
 
-<article class="timeline-container">
-  {{!-- Debug information to check post data structure --}}
-  <div class="debug-info" style="display: none;">
-    Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
-    Visibility: {{post.visibility}}<br>
-    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
-  </div>
-
-  {{!-- Check post visibility and render accordingly --}}
-  {{#post}}
-    {{!-- For public posts, render the timeline for everyone --}}
-    {{#has visibility="public"}}
-      <div id="timeline-embed"></div>
-    {{else}}
-      {{!-- For members-only posts, check if user is a member --}}
-      {{#has visibility="members"}}
-        {{#if @member}}
-          <div id="timeline-embed"></div>
-        {{else}}
-          <div class="timeline-access-message">
-            <h2>This timeline is available to members</h2>
-            <p>Sign up or log in to view this timeline.</p>
-            <div class="timeline-access-cta">
-              <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
-              <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
-            </div>
-          </div>
-        {{/if}}
-      {{else}}
-        {{!-- For paid-members-only posts, check if user is a paid member --}}
-        {{#has visibility="paid"}}
-          {{#if @member.paid}}
-            <div id="timeline-embed"></div>
-          {{else}}
-            <div class="timeline-access-message">
-              <h2>This timeline is available to paid members</h2>
-              <p>Upgrade your membership to view this timeline.</p>
-              <div class="timeline-access-cta">
-                {{#if @member}}
-                  <a href="#/portal/account/plans" class="timeline-upgrade-button">Upgrade now</a>
-                {{else}}
-                  <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
-                  <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
-                {{/if}}
-              </div>
-            </div>
-          {{/if}}
-        {{else}}
-          {{!-- Default case, just show the timeline --}}
-          <div id="timeline-embed"></div>
-        {{/has}}
-      {{/has}}
-    {{/has}}
-  {{else}}
-    {{!-- If no post context, show the timeline --}}
-    <div id="timeline-embed"></div>
-  {{/post}}
-</article>
-
-<link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
-<script src="/assets/timelinejs/js/timeline.js"></script>
-
 <style>
   html, body {
     margin: 0;
@@ -107,6 +44,26 @@ The Sheet
     flex: 1;
     height: calc(100vh - 88px); /* Adjust header height if needed */
     width: 100%;
+  }
+
+  /* When in embed mode, make timeline full height */
+  .embed-mode .timeline-container {
+    height: 100vh !important;
+  }
+
+  /* Hide header in embed mode */
+  .embed-mode .gh-head {
+    display: none !important;
+  }
+
+  /* Adjust body padding in embed mode */
+  .embed-mode .site-content {
+    padding-top: 0 !important;
+  }
+
+  /* Hide subscription buttons in embed mode */
+  .embed-mode .gh-portal-triggerbtn-iframe {
+    display: none !important;
   }
 
   #timeline-embed {
@@ -420,11 +377,117 @@ The Sheet
       flex-direction: column;
     }
   }
-
 </style>
+
+{{!-- Debug information to check post data structure --}}
+<div class="debug-info" style="display: none;">
+  Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
+  Visibility: {{post.visibility}}<br>
+  Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
+  Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}<br>
+  Embed mode: <span id="debug-embed-mode">No</span>
+</div>
+
+{{#post}}
+  {{!-- We'll use a JavaScript-based approach to handle embed mode and visibility --}}
+  <div id="timeline-container" class="timeline-container">
+    {{!-- This div will be populated by JavaScript based on embed mode and visibility --}}
+  </div>
+
+  {{!-- For members-only access message template --}}
+  <div id="members-access-template" style="display: none;">
+    <div class="timeline-access-message">
+      <h2>This timeline is available to members</h2>
+      <p>Sign up or log in to view this timeline.</p>
+      <div class="timeline-access-cta">
+        <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+        <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+      </div>
+    </div>
+  </div>
+
+  {{!-- For paid-members-only access message template --}}
+  <div id="paid-access-template" style="display: none;">
+    <div class="timeline-access-message">
+      <h2>This timeline is available to paid members</h2>
+      <p>Upgrade your membership to view this timeline.</p>
+      <div class="timeline-access-cta">
+        {{#if @member}}
+          <a href="#/portal/account/plans" class="timeline-upgrade-button">Upgrade now</a>
+        {{else}}
+          <a href="#/portal/signup" class="timeline-signup-button">Sign up now</a>
+          <a href="#/portal/signin" class="timeline-signin-button">Log in</a>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  {{!-- Timeline template --}}
+  <div id="timeline-template" style="display: none;">
+    <div id="timeline-embed"></div>
+  </div>
+{{/post}}
+
+<link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
+<script src="/assets/timelinejs/js/timeline.js"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Check for embed parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const embedParam = urlParams.get('embed');
+    const isEmbedMode = (embedParam === 'true');
+    
+    // Update debug info
+    if (isEmbedMode) {
+      document.body.classList.add('embed-mode');
+      const debugEmbedMode = document.getElementById('debug-embed-mode');
+      if (debugEmbedMode) {
+        debugEmbedMode.textContent = 'Yes';
+      }
+    }
+    
+    // Get post visibility and member status
+    const postVisibility = "{{visibility}}";
+    const isMember = {{#if @member}}true{{else}}false{{/if}};
+    const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
+    
+    // Get container elements
+    const timelineContainer = document.getElementById('timeline-container');
+    const timelineTemplate = document.getElementById('timeline-template');
+    const membersAccessTemplate = document.getElementById('members-access-template');
+    const paidAccessTemplate = document.getElementById('paid-access-template');
+    
+    // Determine what to show based on embed mode and visibility
+    let templateToShow;
+    
+    if (isEmbedMode) {
+      // In embed mode, always show the timeline regardless of visibility
+      templateToShow = timelineTemplate;
+    } else {
+      // Not in embed mode, check visibility
+      if (postVisibility === "public") {
+        templateToShow = timelineTemplate;
+      } else if (postVisibility === "members") {
+        templateToShow = isMember ? timelineTemplate : membersAccessTemplate;
+      } else if (postVisibility === "paid") {
+        templateToShow = isPaidMember ? timelineTemplate : paidAccessTemplate;
+      } else {
+        // Default case
+        templateToShow = timelineTemplate;
+      }
+    }
+    
+    // Show the selected template
+    if (templateToShow && timelineContainer) {
+      timelineContainer.innerHTML = templateToShow.innerHTML;
+    }
+    
+    // Enable debug info with a query parameter
+    if (window.location.search.includes('debug=true')) {
+      document.querySelector('.debug-info').style.display = 'block';
+    }
+
     // Only initialize the timeline if the timeline-embed element exists
     // (it won't exist for members/paid content if the user doesn't have access)
     const timelineEmbed = document.getElementById('timeline-embed');
@@ -480,10 +543,5 @@ The Sheet
       }
     }
   }, 200);
-
-  // Enable debug info with a query parameter
-  if (window.location.search.includes('debug=true')) {
-    document.querySelector('.debug-info').style.display = 'block';
-  }
 </script>
 
