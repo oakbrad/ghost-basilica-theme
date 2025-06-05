@@ -45,6 +45,13 @@ into the {body} of the default.hbs template --}}
     .post-card-image-link {
         margin-bottom: 5px !important;
     }
+    /* Post card image hover animation */
+    .post-card-image {
+        transition: transform 0.3s ease-in-out;
+    }
+    .post-card-image-link:hover .post-card-image {
+        transform: rotate(1deg) scale(1.02);
+    }
     /* Map header container positioning */
     .map-header-container {
         position: relative;
@@ -96,7 +103,7 @@ into the {body} of the default.hbs template --}}
         padding-bottom: 0em;
     }
     .map-quote-block::before {
-        content: "“";               /* Unicode opening double-quote */
+        content: """;               /* Unicode opening double-quote */
         position: absolute;
         top: 5px;                 /* nudge upward or adjust as needed */
         left: 20px;                 /* nudge inward from left edge */
@@ -109,7 +116,7 @@ into the {body} of the default.hbs template --}}
     }
 
     .map-quote-block::after {
-        content: "”";               /* Unicode closing double-quote */
+        content: """;               /* Unicode closing double-quote */
         position: absolute;
         bottom: -20px;              /* slight nudge downward */
         right: 20px;                /* slight nudge inward from right edge */
@@ -202,4 +209,3 @@ into the {body} of the default.hbs template --}}
         document.getElementById('quote-link').href = quote.link;
     });
 </script>
-
