@@ -111,6 +111,48 @@ $(document).ready(function () {
     // FitVids - Makes video embeds responsive
     $(".gh-content").fitVids();
 });
+
+// Debounce function to prevent excessive reloading
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
+// Function to reload the nested menu plugin
+function reloadNestedMenuPlugin() {
+    // Only apply fix in Firefox
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+        // Get existing plugin elements
+        const existingCss = document.querySelector('link[href*="nested-menu-pro.min.css"]');
+        const existingJs = document.querySelector('script[src*="nested-menu-pro.min.js"]');
+        
+        if (existingCss && existingJs) {
+            // Create and append new elements
+            const newCss = document.createElement('link');
+            newCss.rel = 'stylesheet';
+            newCss.href = existingCss.href + '?t=' + new Date().getTime();
+            
+            const newJs = document.createElement('script');
+            newJs.src = existingJs.src + '?t=' + new Date().getTime();
+            
+            // Replace old elements with new ones
+            existingCss.parentNode.replaceChild(newCss, existingCss);
+            existingJs.parentNode.replaceChild(newJs, existingJs);
+            
+            console.log('Nested menu plugin reloaded due to window resize');
+        }
+    }
+}
+
+// Add resize event listener with debounce
+window.addEventListener('resize', debounce(reloadNestedMenuPlugin, 250));
 </script>
 
 {{!-- Ghost outputs required functional scripts with this tag - it should always be the last thing before the closing body tag --}}
