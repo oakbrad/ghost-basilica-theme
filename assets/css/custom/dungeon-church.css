@@ -1,0 +1,10 @@
+/* Dungeon Church Custom Styles */
+
+/* Post card hover animation */
+.post-card {
+    transition: transform 0.3s ease-in-out;
+}
+.post-card:hover {
+    transform: rotate(1deg) scale(1.02);
+}
+
