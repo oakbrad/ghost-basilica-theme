@@ -44,6 +44,7 @@ The Sheet
     flex: 1;
     height: calc(100vh - 88px); /* Adjust header height if needed */
     width: 100%;
+    background-color: var(--color-darkmode) !important;
   }
 
   /* When in embed mode, make timeline full height */
@@ -69,6 +70,7 @@ The Sheet
   #timeline-embed {
     height: 100%;
     width: 100%;
+    background-color: var(--color-darkmode) !important;
   }
 
   /* Styling for access message */
@@ -138,7 +140,7 @@ The Sheet
 
   /* Main timeline container */
   .tl-timeline {
-    background-color: var(--color-darkmode);
+    background-color: var(--color-darkmode) !important;
     color: #fff;
     font-family: var(--font-sans);
   }
@@ -170,7 +172,7 @@ The Sheet
 
   /* Slider background - the main content area */
   .tl-slider-container-mask {
-    background: linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode));
+    background: linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode)) !important;
     width: 80%;
   }
 
@@ -492,6 +494,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const timelineEmbed = document.getElementById('timeline-embed');
   if (!timelineEmbed) return;
 
+  // Apply background styling to the timeline
+  document.querySelector('.timeline-container').style.backgroundColor = 'var(--color-darkmode)';
+  
   const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
   const sheetUrl = metaTag ? metaTag.content : null;
 
@@ -505,6 +510,21 @@ document.addEventListener("DOMContentLoaded", function () {
       use_bc: false,
       hash_bookmark: false,
       lang: "/assets/timelinejs/timeline-locale.json",
+    });
+    
+    // Apply additional styling after timeline is loaded
+    window.timeline.on('loaded', function() {
+      // Ensure background styling is applied
+      const timelineElement = document.querySelector('.tl-timeline');
+      if (timelineElement) {
+        timelineElement.style.backgroundColor = 'var(--color-darkmode)';
+      }
+      
+      // Apply styling to slider container
+      const sliderContainer = document.querySelector('.tl-slider-container-mask');
+      if (sliderContainer) {
+        sliderContainer.style.background = 'linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode))';
+      }
     });
   } else {
     timelineEmbed.innerHTML = "Missing timeline URL.";
