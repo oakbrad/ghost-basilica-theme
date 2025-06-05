@@ -50,6 +50,28 @@
       font-weight: bolder !important;
       color: var(--ghost-accent-color) !important;
     }
+    
+    /* Clickable tooltip styling */
+    .clickable-tooltip {
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    
+    .clickable-tooltip:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6) !important;
+        border-color: var(--ghost-accent-color) !important;
+    }
+    
+    /* Add subtle indicator that tooltip is clickable */
+    .clickable-tooltip::after {
+        content: "→";
+        display: inline-block;
+        margin-left: 8px;
+        color: var(--ghost-accent-color);
+        font-weight: bold;
+        opacity: 0.8;
+    }
+    
     /* Tooltip arrow styling */
     .leaflet-tooltip-top:before,
     .leaflet-tooltip-bottom:before,
@@ -387,7 +409,33 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Add tooltip if specified
                   if (marker.tooltip) {
-                    m.bindTooltip(marker.tooltip);
+                    // Create tooltip with interactive option set to true to make it clickable
+                    const tooltip = m.bindTooltip(marker.tooltip, {
+                      permanent: marker.tooltipPermanent || false,
+                      direction: marker.tooltipDirection || 'auto',
+                      interactive: true // This makes the tooltip clickable
+                    });
+                    
+                    // If a URL is provided, add click event to the tooltip
+                    if (marker.url) {
+                      // Add a click event listener to the tooltip element after it's added to the DOM
+                      m.on('tooltipopen', function(e) {
+                        const tooltipElement = e.tooltip._container;
+                        if (tooltipElement) {
+                          // Add a class to indicate it's clickable
+                          tooltipElement.classList.add('clickable-tooltip');
+                          
+                          // Add click event listener
+                          tooltipElement.addEventListener('click', function() {
+                            // Navigate to the specified URL
+                            window.location.href = marker.url;
+                          });
+                          
+                          // Optional: Add cursor style to indicate it's clickable
+                          tooltipElement.style.cursor = 'pointer';
+                        }
+                      });
+                    }
                   }
                 }
               });
@@ -416,7 +464,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Process circles
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
-                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                if (circle.center && Array.isArray(circle.center) && circle.radius) {
                   const options = circle.options || {};
                   L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
                 }

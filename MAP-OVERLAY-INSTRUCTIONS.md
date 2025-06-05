@@ -38,6 +38,9 @@ You can include any or all of these elements.
       "position": [y, x],
       "popup": "Optional popup text",
       "tooltip": "Optional tooltip text",
+      "url": "Optional URL for clickable tooltips",
+      "tooltipPermanent": false,
+      "tooltipDirection": "auto",
       "icon": {
         "iconUrl": "path/to/icon.png",
         "iconSize": [25, 41],
@@ -53,6 +56,8 @@ You can include any or all of these elements.
 ```
 
 The `icon` property is optional and follows Leaflet's [Icon options](https://leafletjs.com/reference.html#icon).
+
+For clickable tooltips that navigate to another page when clicked, add the `url` property. See [Clickable Tooltips](/MAP-CLICKABLE-TOOLTIPS.md) for more details.
 
 You can also use predefined custom icons by specifying the `iconType` property:
 
@@ -179,7 +184,8 @@ Here's a complete example that includes multiple types of overlays:
     {
       "position": [500, 300],
       "popup": "This is a marker",
-      "tooltip": "Click me!"
+      "tooltip": "Click me!",
+      "url": "/some-page"
     },
     {
       "position": [600, 400],
@@ -188,6 +194,10 @@ Here's a complete example that includes multiple types of overlays:
     {
       "position": [650, 450],
       "popup": "Red flag marker",
+      "tooltip": "Visit the Castle",
+      "url": "https://example.com/castle",
+      "tooltipPermanent": true,
+      "tooltipDirection": "top",
       "iconType": "flagred"
     }
   ],

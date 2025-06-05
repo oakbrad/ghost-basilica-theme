@@ -4,7 +4,7 @@
 ## Custom Templates
 This theme contains custom templates for visualizing RPG related information:
 * `custom-timeline.hbs` - Create [TimelineJS3](https://github.com/NUKnightLab/TimelineJS3) timelines with a linked Google Sheet.
-* `custom-leaflet-map.hbs` - Create an interactive [LeafletJS](https://leafletjs.com) map from an image. Supports markers, shapes, overlays, custom icons, etc. see additional [readme](/MAP-OVERLAY-INSTRUCTIONS.md).
+* `custom-leaflet-map.hbs` - Create an interactive [LeafletJS](https://leafletjs.com) map from an image. Supports markers, shapes, overlays, custom icons, etc. See additional instructions for [map overlays](/MAP-OVERLAY-INSTRUCTIONS.md) and [clickable tooltips](/MAP-CLICKABLE-TOOLTIPS.md).
 
 🚨 Changes to this repo are deployed onto the live production site 🚨
 
