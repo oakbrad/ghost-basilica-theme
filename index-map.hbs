@@ -167,14 +167,8 @@ into the {body} of the default.hbs template --}}
     <div class="post-card-header"><!-- removed header --></div>
 
     {{!-- Test map container - 100% width and 500px high --}}
-    <div class="test-map-container" data-overlay="Sunset_Clouds_Squar_One.webm" data-opacity="1.0">
-        {{!-- Get the first map post to use for the test --}}
-        {{#get "posts" filter="slug:pyora" limit="1"}}
-            {{#foreach posts}}
-                {{> "map" }}
-            {{/foreach}}
-        {{/get}}
-    </div>
+    {{!-- Use the new map-block partial --}}
+    {{> "map-block" overlay="Sunset_Clouds_Squar_One.webm" opacity="1.0" post_slug="pyora"}}
 
     <div class="post-feed">
         {{#foreach posts limit="3"}}

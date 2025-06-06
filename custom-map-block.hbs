@@ -1,0 +1,78 @@
+{{!< default}}
+
+<style>
+    /* Remove site footer and content */
+    .site-footer,
+    .content-title,
+    .post-full-footer,
+    .post-content {
+        display: none !important;
+    }
+    
+    /* Full-height map block for this template */
+    .map-block {
+        height: calc(100vh - 88px) !important; /* Adjust header height if needed */
+    }
+</style>
+
+{{#post}}
+    {{!-- For public posts, render the map for everyone --}}
+    {{#has visibility="public"}}
+        {{> "map-block" overlay="Sunset_Clouds_Squar_One.webm" opacity="1.0" post_slug=slug}}
+    {{else}}
+        {{!-- For members-only posts, check if user is a member --}}
+        {{#has visibility="members"}}
+            {{#if @member}}
+                {{> "map-block" overlay="Sunset_Clouds_Squar_One.webm" opacity="1.0" post_slug=slug}}
+            {{else}}
+                <div class="map-access-message">
+                    <h1>This map is available to members</h1>
+                    <p>Sign up or log in to view this map.</p>
+                    <div class="map-access-cta">
+                        <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                        <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                    </div>
+                </div>
+            {{/if}}
+        {{else}}
+            {{!-- For paid-members-only posts, check if user is a paid member --}}
+            {{#has visibility="paid"}}
+                {{#if @member.paid}}
+                    {{> "map-block" overlay="Sunset_Clouds_Squar_One.webm" opacity="1.0" post_slug=slug}}
+                {{else}}
+                    <div class="map-access-message">
+                        <h1>This map is available to tithing members</h1>
+                        <p>Upgrade your membership to view this map.</p>
+                        <div class="map-access-cta">
+                            {{#if @member}}
+                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
+                            {{else}}
+                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/if}}
+            {{!-- Fallback - just show it --}}
+            {{else}}
+                {{> "map-block" overlay="Sunset_Clouds_Squar_One.webm" opacity="1.0" post_slug=slug}}
+            {{/has}}
+        {{/has}}
+    {{/has}}
+{{/post}}
+
+<!-- Add a class to the body to identify this as the custom-map template -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('page-template-custom-map');
+});
+</script>
+
+{{!-- Debug information to check post data structure --}}
+<div class="debug-info" style="display: none;">
+    Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
+    Visibility: {{post.visibility}}<br>
+    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
+    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
+</div>
+
