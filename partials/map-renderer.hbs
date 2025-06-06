@@ -228,31 +228,20 @@ document.addEventListener("DOMContentLoaded", function () {
      * Looks for JSON data in the post content and adds markers and other overlays to the map
      */
     function processMapData(map, imageHeight, imageWidth) {
-        // First check if we have direct mapData in the container
-        const mapDataContainer = document.querySelector('.map-data-container');
+        // Get the map data container
+        const mapDataContainer = document.getElementById('map-data');
         if (!mapDataContainer) return;
         
         try {
+            // The mapData is passed directly to the partial via the mapData parameter
+            // We need to parse the HTML content to find any pre elements with JSON data
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = mapDataContainer.innerHTML;
+            
             // Find all pre elements that might contain JSON data
-            const preElements = mapDataContainer.querySelectorAll('pre');
+            const preElements = tempDiv.querySelectorAll('pre');
             
-            // If we're in a context where the post content is not directly available,
-            // try to find the post content from the current context
-            if (preElements.length === 0 && typeof post !== 'undefined' && post && post.content) {
-                // Create a temporary div to parse the post content
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = post.content;
-                
-                // Find pre elements in the post content
-                const postPreElements = tempDiv.querySelectorAll('pre');
-                if (postPreElements.length > 0) {
-                    // Process these pre elements instead
-                    processPreElements(postPreElements, map);
-                    return;
-                }
-            }
-            
-            // Process the pre elements from the map data container
+            // Process the pre elements
             processPreElements(preElements, map);
             
         } catch (e) {
