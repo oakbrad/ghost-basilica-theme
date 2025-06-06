@@ -99,6 +99,9 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  // Store the original content for embed mode
+  const originalContent = `{{content}}`;
+  
   // Check if we're in embed mode and handle restricted content
   if (window.isEmbedMode) {
     // In embed mode, we always show the map regardless of visibility
@@ -110,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       membersContent.innerHTML = `
         <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
-            <div class="map-data-container">{{content}}</div>
+            <div class="map-data-container">${originalContent}</div>
         </article>
       `;
     }
@@ -120,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
       paidContent.innerHTML = `
         <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
-            <div class="map-data-container">{{content}}</div>
+            <div class="map-data-container">${originalContent}</div>
         </article>
       `;
     }
