@@ -64,42 +64,41 @@ document.addEventListener("DOMContentLoaded", function () {
         keepAspectRatio: true
       }).addTo(map);
       
-      // Ensure video covers the entire map by setting appropriate CSS
-      videoOverlay.on('load', function() {
-        const videoElement = videoOverlay.getElement();
+      // Apply styles to video element immediately
+      const applyVideoStyles = function(videoElement) {
         if (videoElement) {
+          // Ensure video covers the entire map
           videoElement.style.objectFit = 'cover';
           videoElement.style.width = '100%';
           videoElement.style.height = '100%';
+          
+          // Force immediate display
+          videoElement.style.display = 'block';
+          videoElement.style.visibility = 'visible';
+          
+          // Disable picture-in-picture
+          videoElement.disablePictureInPicture = true;
+          videoElement.setAttribute('disablePictureInPicture', '');
         }
+      };
+      
+      // Try to apply styles immediately
+      applyVideoStyles(videoOverlay.getElement());
+      
+      // Also apply on load event
+      videoOverlay.on('load', function() {
+        applyVideoStyles(videoOverlay.getElement());
       });
       
-      // Function to disable picture-in-picture
-      function disablePiP() {
-        try {
-          const videoElement = videoOverlay.getElement();
-          if (videoElement) {
-            // Set the attribute
-            videoElement.disablePictureInPicture = true;
-            
-            // Also add the attribute directly to the DOM element
-            videoElement.setAttribute('disablePictureInPicture', '');
-            
-            // Ensure video covers the entire map
-            videoElement.style.objectFit = 'cover';
-            videoElement.style.width = '100%';
-            videoElement.style.height = '100%';
-          }
-        } catch (e) {
-          console.error("Error disabling picture-in-picture:", e);
-        }
-      }
+      // Try again after a short delay to ensure the video is loaded and visible
+      setTimeout(function() {
+        applyVideoStyles(videoOverlay.getElement());
+      }, 100);
       
-      // Try immediately
-      disablePiP();
-      
-      // Also try after a short delay to ensure the video is loaded
-      setTimeout(disablePiP, 100);
+      // Try again after map is fully loaded
+      map.on('load', function() {
+        applyVideoStyles(videoOverlay.getElement());
+      });
     }
     
     // Get viewport height and calculate scale to fit height
