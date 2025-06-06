@@ -22,8 +22,16 @@
     .leaflet-control-container {
       z-index: 1000 !important;
     }
+    
+    /* Adjust control size for smaller map height */
+    .leaflet-control-zoom a {
+      font-size: 14px !important;
+      width: 28px !important;
+      height: 28px !important;
+      line-height: 28px !important;
+    }
 
-    /* Leaflet tooltip styling */
+    /* Adjust tooltip size for smaller map */
     .leaflet-tooltip {
         background-color: rgba(21, 23, 26, 0.9) !important;
         color: #fff !important;

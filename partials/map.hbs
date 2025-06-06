@@ -47,7 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
       maxZoom: 2,
       zoomSnap: 0,
       zoomDelta: 0.25,
-      maxBounds: imageBounds
+      maxBounds: imageBounds,
+      attributionControl: false // Hide attribution for cleaner look in small map
     });
 
     // Add the image
@@ -87,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     // Get viewport height and calculate scale to fit height
-    const viewportHeight = window.innerHeight;
+    const viewportHeight = 500; // Fixed height for index page
     const scale = viewportHeight / h;
     const zoom = Math.log2(scale);
 
