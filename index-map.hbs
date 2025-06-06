@@ -67,6 +67,23 @@ into the {body} of the default.hbs template --}}
         margin-bottom: 50px;
     }
 
+    /* Ensure the map fills the width and maintains aspect ratio */
+    .index-map-container .leaflet-map-template,
+    .index-map-container .leaflet-container {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    /* Ensure the image overlay fills the container */
+    .index-map-container .leaflet-image-layer {
+        width: 100% !important;
+    }
+    
+    /* Ensure the map is centered horizontally */
+    .index-map-container .leaflet-map-pane {
+        width: 100% !important;
+    }
+
     /* blockquote */
     .map-quote-block {
         position: relative;

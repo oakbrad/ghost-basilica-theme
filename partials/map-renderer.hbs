@@ -15,6 +15,12 @@
         height: 100vh !important;
     }
 
+    /* For index page map container */
+    .index-map-container #map {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
     /* Hide header in embed mode */
     .embed-mode .gh-head {
         display: none !important;
@@ -207,9 +213,23 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(disablePiP, 100);
         }
         
-        // Get viewport height and calculate scale to fit height
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        const scale = viewportHeight / h;
+        
+        // Calculate scale to fit width or height, whichever is more constraining
+        // For index page, prioritize width
+        let scale;
+        if (document.querySelector('.index-map-container')) {
+            // For index page, prioritize width
+            scale = viewportWidth / w;
+        } else {
+            // For other pages, use the smaller scale to ensure the image fits
+            const scaleWidth = viewportWidth / w;
+            const scaleHeight = viewportHeight / h;
+            scale = Math.min(scaleWidth, scaleHeight);
+        }
+        
         const zoom = Math.log2(scale);
 
         // Clamp to allowed zooms
@@ -337,4 +357,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
-
