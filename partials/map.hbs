@@ -61,8 +61,18 @@ document.addEventListener("DOMContentLoaded", function () {
         loop: true,
         muted: true,
         opacity: opacity,
-        keepAspectRatio: false
+        keepAspectRatio: true
       }).addTo(map);
+      
+      // Ensure video covers the entire map by setting appropriate CSS
+      videoOverlay.on('load', function() {
+        const videoElement = videoOverlay.getElement();
+        if (videoElement) {
+          videoElement.style.objectFit = 'cover';
+          videoElement.style.width = '100%';
+          videoElement.style.height = '100%';
+        }
+      });
       
       // Function to disable picture-in-picture
       function disablePiP() {
@@ -74,6 +84,11 @@ document.addEventListener("DOMContentLoaded", function () {
             
             // Also add the attribute directly to the DOM element
             videoElement.setAttribute('disablePictureInPicture', '');
+            
+            // Ensure video covers the entire map
+            videoElement.style.objectFit = 'cover';
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
           }
         } catch (e) {
           console.error("Error disabling picture-in-picture:", e);
