@@ -155,12 +155,7 @@ window.isEmbedMode = getUrlParameter('embed') === 'true';
 {{#post}}
     {{!-- Check if embed=true is in the URL first, otherwise use normal access logic --}}
     <script>
-        // Simple function to check for URL parameters
-        function isEmbedMode() {
-            return window.location.search.indexOf('embed=true') !== -1;
-        }
-        
-        if (isEmbedMode()) {
+        if (window.location.search.indexOf('embed=true') !== -1) {
             // If embed=true, render the map directly
             document.write(`{{> "map"}}`);
         } else {
