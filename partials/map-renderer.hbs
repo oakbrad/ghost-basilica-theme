@@ -20,6 +20,21 @@
         width: 100% !important;
         height: 100% !important;
     }
+    
+    /* Ensure the map fills the width in index page */
+    .index-map-container .leaflet-container {
+        width: 100% !important;
+    }
+    
+    /* Make sure the image overlay fills the container */
+    .index-map-container .leaflet-image-layer {
+        width: 100% !important;
+    }
+    
+    /* Ensure the map pane is properly sized */
+    .index-map-container .leaflet-map-pane {
+        width: 100% !important;
+    }
 
     /* Hide header in embed mode */
     .embed-mode .gh-head {
@@ -178,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Add the image
-        L.imageOverlay(imageUrl, imageBounds).addTo(map);
+        const imageOverlay = L.imageOverlay(imageUrl, imageBounds).addTo(map);
         
         // Add video overlay (ie. clouds) if videoUrl is provided
         if (videoUrl) {
@@ -217,12 +232,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         
-        // Calculate scale to fit width or height, whichever is more constraining
-        // For index page, prioritize width
+        // Check if we're in the index page
+        const isIndexPage = document.querySelector('.index-map-container') !== null;
+        
+        // Calculate scale based on context
         let scale;
-        if (document.querySelector('.index-map-container')) {
-            // For index page, prioritize width
-            scale = viewportWidth / w;
+        if (isIndexPage) {
+            // For index page, prioritize width and make it fill horizontally
+            scale = viewportWidth / w * 1.2; // Slightly larger to ensure full width coverage
         } else {
             // For other pages, use the smaller scale to ensure the image fits
             const scaleWidth = viewportWidth / w;
@@ -235,7 +252,24 @@ document.addEventListener("DOMContentLoaded", function () {
         // Clamp to allowed zooms
         const clampedZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
 
+        // Set the view to center of the map
         map.setView([h / 2, w / 2], clampedZoom);
+        
+        // For index page, ensure the map is properly sized and centered
+        if (isIndexPage) {
+            // Force a resize after a short delay to ensure proper rendering
+            setTimeout(() => {
+                map.invalidateSize();
+                
+                // Ensure the map is centered
+                map.setView([h / 2, w / 2], clampedZoom);
+                
+                // Make sure the image overlay covers the full width
+                if (imageOverlay && imageOverlay._image) {
+                    imageOverlay._image.style.width = '100%';
+                }
+            }, 100);
+        }
         
         // Process map data from post content
         processMapData(map, h, w);
@@ -322,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         // Process circles
                         if (mapData.circles && Array.isArray(mapData.circles)) {
                             mapData.circles.forEach(circle => {
-                                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                                if (circle.center && Array.isArray(circle.center) && circle.radius) {
                                     const options = circle.options || {};
                                     L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
                                 }
