@@ -3,6 +3,23 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
+<!-- Custom styles for video overlay -->
+<style>
+  .leaflet-image-layer.leaflet-interactive.leaflet-video-layer {
+    z-index: 400 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  .leaflet-video-layer video {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+</style>
+
 <!-- MAP CONTAINTER -->
         <article class="post-full leaflet-map-template">
             <div id="map" style="height: 100vh;"></div>
@@ -55,50 +72,31 @@ document.addEventListener("DOMContentLoaded", function () {
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
     
     // Add video overlay (ie. clouds) only if videoUrl exists
+    let videoOverlay = null;
     if (videoUrl) {
-      const videoOverlay = L.videoOverlay(videoUrl, imageBounds, {
-        autoplay: true,
-        loop: true,
-        muted: true,
+      // Create a video element first to have more control
+      const videoElement = document.createElement('video');
+      videoElement.autoplay = true;
+      videoElement.loop = true;
+      videoElement.muted = true;
+      videoElement.style.objectFit = 'cover';
+      videoElement.style.width = '100%';
+      videoElement.style.height = '100%';
+      videoElement.style.display = 'block';
+      videoElement.style.visibility = 'visible';
+      videoElement.disablePictureInPicture = true;
+      videoElement.setAttribute('disablePictureInPicture', '');
+      videoElement.src = videoUrl;
+      
+      // Create the video overlay with our prepared video element
+      videoOverlay = L.videoOverlay(videoElement, imageBounds, {
         opacity: opacity,
-        keepAspectRatio: true
+        keepAspectRatio: true,
+        interactive: true
       }).addTo(map);
       
-      // Apply styles to video element immediately
-      const applyVideoStyles = function(videoElement) {
-        if (videoElement) {
-          // Ensure video covers the entire map
-          videoElement.style.objectFit = 'cover';
-          videoElement.style.width = '100%';
-          videoElement.style.height = '100%';
-          
-          // Force immediate display
-          videoElement.style.display = 'block';
-          videoElement.style.visibility = 'visible';
-          
-          // Disable picture-in-picture
-          videoElement.disablePictureInPicture = true;
-          videoElement.setAttribute('disablePictureInPicture', '');
-        }
-      };
-      
-      // Try to apply styles immediately
-      applyVideoStyles(videoOverlay.getElement());
-      
-      // Also apply on load event
-      videoOverlay.on('load', function() {
-        applyVideoStyles(videoOverlay.getElement());
-      });
-      
-      // Try again after a short delay to ensure the video is loaded and visible
-      setTimeout(function() {
-        applyVideoStyles(videoOverlay.getElement());
-      }, 100);
-      
-      // Try again after map is fully loaded
-      map.on('load', function() {
-        applyVideoStyles(videoOverlay.getElement());
-      });
+      // Add a class to the video overlay container for CSS targeting
+      videoOverlay.getElement().parentNode.classList.add('leaflet-video-layer');
     }
     
     // Get viewport height and calculate scale to fit height
@@ -111,9 +109,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
     map.setView([h / 2, w / 2], clampedZoom);
     
+    // Force map redraw after a short delay to ensure everything is loaded
+    setTimeout(function() {
+      map.invalidateSize();
+      
+      // If we have a video overlay, make sure it's visible
+      if (videoOverlay) {
+        const videoElement = videoOverlay.getElement();
+        if (videoElement) {
+          // Force video to be visible
+          videoElement.style.display = 'block';
+          videoElement.style.visibility = 'visible';
+          videoElement.style.objectFit = 'cover';
+          videoElement.style.width = '100%';
+          videoElement.style.height = '100%';
+          
+          // Force parent container to be visible
+          const container = videoElement.parentNode;
+          if (container) {
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.zIndex = '400';
+          }
+        }
+      }
+    }, 100);
+    
     // Process map data from post content
     processMapData(map, h, w);
-
   };
 
   img.src = imageUrl;
