@@ -228,124 +228,130 @@ document.addEventListener("DOMContentLoaded", function () {
      * Looks for JSON data in the post content and adds markers and other overlays to the map
      */
     function processMapData(map, imageHeight, imageWidth) {
-        // First try to get data from the map-data container (passed via mapData parameter)
+        // Check if mapData is provided directly to the partial
         const mapDataContainer = document.getElementById('map-data');
         
-        // If that doesn't exist or is empty, look for any .map-data-container in the document
-        // This ensures compatibility with both the partial and the original template
-        const allMapDataContainers = document.querySelectorAll('.map-data-container');
-        
-        // Process all potential data containers
-        const containers = mapDataContainer && mapDataContainer.textContent.trim() 
-            ? [mapDataContainer] 
-            : allMapDataContainers;
-        
-        if (!containers || containers.length === 0) {
-            console.warn('No map data containers found');
+        // If mapData is provided and not empty, use it
+        if (mapDataContainer && mapDataContainer.textContent.trim()) {
+            processMapDataContainer(mapDataContainer, map);
             return;
         }
         
+        // Otherwise, look for map data in any .map-data-container in the document
+        // This is the fallback for compatibility with the original template
+        const allMapDataContainers = document.querySelectorAll('.map-data-container');
+        if (allMapDataContainers && allMapDataContainers.length > 0) {
+            allMapDataContainers.forEach(container => {
+                processMapDataContainer(container, map);
+            });
+        } else {
+            console.warn('No map data containers found');
+        }
+    }
+    
+    /**
+     * Process a single map data container
+     */
+    function processMapDataContainer(container, map) {
         try {
-            containers.forEach(container => {
-                // Find all pre elements that might contain JSON data
-                const preElements = container.querySelectorAll('pre');
-                
-                preElements.forEach(pre => {
-                    try {
-                        // Try to parse the content as JSON
-                        const content = pre.textContent.trim();
-                        if (!content.startsWith('{') && !content.startsWith('[')) return;
-                        
-                        const mapData = JSON.parse(content);
-                        
-                        // Process the map data
-                        if (mapData) {
-                            // Process markers
-                            if (mapData.markers && Array.isArray(mapData.markers)) {
-                                mapData.markers.forEach(marker => {
-                                    if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                                        // Convert coordinates to match the image coordinate system if needed
-                                        const y = marker.position[0];
-                                        const x = marker.position[1];
-                                        
-                                        let markerOptions = {};
-                                        
-                                        // Apply custom icon if specified
-                                        if (marker.icon) {
-                                            markerOptions.icon = L.icon(marker.icon);
-                                        } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                                            // Use predefined custom icon if iconType is specified
-                                            markerOptions.icon = window.customIcons[marker.iconType];
-                                        }
-                                        
-                                        // Create the marker
-                                        const m = L.marker([y, x], markerOptions).addTo(map);
-                                        
-                                        // Add popup if specified
-                                        if (marker.popup) {
-                                            m.bindPopup(marker.popup);
-                                        }
-                                        
-                                        // Add tooltip if specified
-                                        if (marker.tooltip) {
-                                            m.bindTooltip(marker.tooltip);
-                                        }
+            // Find all pre elements that might contain JSON data
+            const preElements = container.querySelectorAll('pre');
+            
+            preElements.forEach(pre => {
+                try {
+                    // Try to parse the content as JSON
+                    const content = pre.textContent.trim();
+                    if (!content.startsWith('{') && !content.startsWith('[')) return;
+                    
+                    const mapData = JSON.parse(content);
+                    
+                    // Process the map data
+                    if (mapData) {
+                        // Process markers
+                        if (mapData.markers && Array.isArray(mapData.markers)) {
+                            mapData.markers.forEach(marker => {
+                                if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
+                                    // Convert coordinates to match the image coordinate system if needed
+                                    const y = marker.position[0];
+                                    const x = marker.position[1];
+                                    
+                                    let markerOptions = {};
+                                    
+                                    // Apply custom icon if specified
+                                    if (marker.icon) {
+                                        markerOptions.icon = L.icon(marker.icon);
+                                    } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
+                                        // Use predefined custom icon if iconType is specified
+                                        markerOptions.icon = window.customIcons[marker.iconType];
                                     }
-                                });
-                            }
-                            
-                            // Process polylines
-                            if (mapData.polylines && Array.isArray(mapData.polylines)) {
-                                mapData.polylines.forEach(polyline => {
-                                    if (polyline.points && Array.isArray(polyline.points)) {
-                                        const options = polyline.options || {};
-                                        L.polyline(polyline.points, options).addTo(map);
+                                    
+                                    // Create the marker
+                                    const m = L.marker([y, x], markerOptions).addTo(map);
+                                    
+                                    // Add popup if specified
+                                    if (marker.popup) {
+                                        m.bindPopup(marker.popup);
                                     }
-                                });
-                            }
-                            
-                            // Process polygons
-                            if (mapData.polygons && Array.isArray(mapData.polygons)) {
-                                mapData.polygons.forEach(polygon => {
-                                    if (polygon.points && Array.isArray(polygon.points)) {
-                                        const options = polygon.options || {};
-                                        L.polygon(polygon.points, options).addTo(map);
+                                    
+                                    // Add tooltip if specified
+                                    if (marker.tooltip) {
+                                        m.bindTooltip(marker.tooltip);
                                     }
-                                });
-                            }
-                            
-                            // Process circles
-                            if (mapData.circles && Array.isArray(mapData.circles)) {
-                                mapData.circles.forEach(circle => {
-                                    if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
-                                        const options = circle.options || {};
-                                        L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
-                                    }
-                                });
-                            }
-                            
-                            // Process rectangles
-                            if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
-                                mapData.rectangles.forEach(rectangle => {
-                                    if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                                        const options = rectangle.options || {};
-                                        L.rectangle(rectangle.bounds, options).addTo(map);
-                                    }
-                                });
-                            }
-                            
-                            // Process custom view settings
-                            if (mapData.view) {
-                                if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
-                                    const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
-                                    map.setView(mapData.view.center, zoom);
                                 }
+                            });
+                        }
+                        
+                        // Process polylines
+                        if (mapData.polylines && Array.isArray(mapData.polylines)) {
+                            mapData.polylines.forEach(polyline => {
+                                if (polyline.points && Array.isArray(polyline.points)) {
+                                    const options = polyline.options || {};
+                                    L.polyline(polyline.points, options).addTo(map);
+                                }
+                            });
+                        }
+                        
+                        // Process polygons
+                        if (mapData.polygons && Array.isArray(mapData.polygons)) {
+                            mapData.polygons.forEach(polygon => {
+                                if (polygon.points && Array.isArray(polygon.points)) {
+                                    const options = polygon.options || {};
+                                    L.polygon(polygon.points, options).addTo(map);
+                                }
+                            });
+                        }
+                        
+                        // Process circles
+                        if (mapData.circles && Array.isArray(mapData.circles)) {
+                            mapData.circles.forEach(circle => {
+                                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                                    const options = circle.options || {};
+                                    L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
+                                }
+                            });
+                        }
+                        
+                        // Process rectangles
+                        if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
+                            mapData.rectangles.forEach(rectangle => {
+                                if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
+                                    const options = rectangle.options || {};
+                                    L.rectangle(rectangle.bounds, options).addTo(map);
+                                }
+                            });
+                        }
+                        
+                        // Process custom view settings
+                        if (mapData.view) {
+                            if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
+                                const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
+                                map.setView(mapData.view.center, zoom);
                             }
                         }
-                    } catch (e) {
-                        console.error('Error parsing map data JSON:', e);
                     }
-                });
+                } catch (e) {
+                    console.error('Error parsing map data JSON:', e);
+                }
             });
         } catch (e) {
             console.error('Error processing map data:', e);
