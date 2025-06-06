@@ -1,0 +1,87 @@
+/* embed-mode.css - Hide Ghost elements for embedded views */
+
+/* Hide Ghost header, navigation, and footer */
+.gh-head,
+.gh-foot,
+.site-header,
+.site-footer,
+.gh-nav,
+.gh-navigation,
+.gh-navbar,
+.gh-header,
+.gh-canvas-header,
+.gh-canvas-title,
+.gh-article-header,
+.gh-article-footer,
+.gh-post-header,
+.gh-post-footer,
+.content-title,
+.post-full-header,
+.post-full-footer,
+.post-full-meta,
+.post-full-content > *:not(#map),
+.subscribe-form,
+.gh-subscribe-form,
+.gh-signin,
+.gh-signup,
+.gh-auth-form,
+.gh-portal-triggerbtn,
+.gh-head-actions,
+.gh-burger,
+.gh-btn-group,
+.gh-btn,
+.gh-portal-close,
+.gh-portal-closeicon,
+.gh-portal-powered,
+.gh-portal-logo {
+    display: none !important;
+}
+
+/* Adjust body and main content area for full screen */
+body.embed-mode {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.gh-main,
+.site-main,
+.gh-content,
+.gh-canvas,
+.gh-article,
+.gh-page,
+.post-full,
+.post-content,
+.post {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Make map container fill the entire viewport */
+.embed-mode #map {
+    height: 100vh !important;
+    width: 100vw !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1 !important;
+}
+
+/* Hide any other potential overlays */
+.embed-mode .gh-portal,
+.embed-mode .gh-notifications,
+.embed-mode .gh-member-feedback,
+.embed-mode .gh-feedback,
+.embed-mode .gh-comments,
+.embed-mode .gh-comment-form {
+    display: none !important;
+}
+
+/* Ensure proper sizing for Leaflet map */
+.embed-mode .leaflet-container {
+    height: 100vh !important;
+    width: 100vw !important;
+}
+

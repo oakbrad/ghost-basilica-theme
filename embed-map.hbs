@@ -1,0 +1,43 @@
+{{!< default}}
+
+{{!-- Load the embed-mode CSS to hide Ghost elements --}}
+<link rel="stylesheet" href="{{asset 'embed-mode.css'}}">
+
+<style>
+    /* Map specific styles for embed view */
+    #map {
+        background-color: var(--color-darkmode);
+        height: 100vh !important;
+        width: 100vw !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+
+    /* Map data container - hidden by default */
+    .map-data-container {
+        display: none;
+    }
+</style>
+
+<!-- Add classes to the body to identify this as the embed-map template -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('page-template-embed-map', 'embed-mode');
+});
+</script>
+
+{{!-- Debug information to check post data structure --}}
+<div class="debug-info" style="display: none;">
+    Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
+    Visibility: {{post.visibility}}<br>
+    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
+    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
+</div>
+
+{{#post}}
+    {{!-- For now, we're just including the map without access logic --}}
+    {{> "map"}}
+{{/post}}
+
