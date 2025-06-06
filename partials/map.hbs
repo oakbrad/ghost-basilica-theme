@@ -5,7 +5,7 @@
 
 <!-- MAP CONTAINTER -->
         <article class="post-full leaflet-map-template">
-            <div id="map" style="height: 100vh;"></div>
+            <div id="map"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
 
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loop: true,
         muted: true,
         opacity: opacity,
-        keepAspectRatio: false
+        keepAspectRatio: true
       }).addTo(map);
       
       // Function to disable picture-in-picture
