@@ -117,6 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<!-- Script to check for embed parameter in URL -->
+<script>
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+// Store the embed status in a global variable that can be accessed later
+window.isEmbedMode = getUrlParameter('embed') === 'true';
+</script>
+
 {{!-- Debug information to check post data structure --}}
 <div class="debug-info" style="display: none;">
     Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
@@ -126,47 +139,96 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 {{#post}}
-    {{!-- For public posts, render the map for everyone --}}
-    {{#has visibility="public"}}
-        {{> "map"}}
-    {{else}}
-        {{!-- For members-only posts, check if user is a member --}}
-        {{#has visibility="members"}}
-            {{#if @member}}
-                {{> "map"}}
+    {{!-- Check if embed=true is in the URL first --}}
+    <script>
+    // Function to check for URL parameters
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+    
+    // Check if embed=true is in the URL
+    var isEmbedMode = getUrlParameter('embed') === 'true';
+    
+    // If in embed mode, hide any access restriction elements that might be shown
+    if (isEmbedMode) {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Embed mode detected - bypassing access checks');
+            // Hide any access message elements that might be displayed
+            var accessMessages = document.querySelectorAll('.map-access-message');
+            if (accessMessages) {
+                accessMessages.forEach(function(element) {
+                    element.style.display = 'none';
+                });
+            }
+        });
+    }
+    </script>
+
+    {{!-- If embed=true OR normal access conditions are met, show the map --}}
+    <div id="embed-check" style="display:none;" data-embed-mode="false"></div>
+    <script>
+        // Set the embed mode data attribute for server-side access
+        document.addEventListener('DOMContentLoaded', function() {
+            var embedCheck = document.getElementById('embed-check');
+            if (getUrlParameter('embed') === 'true') {
+                embedCheck.setAttribute('data-embed-mode', 'true');
+            }
+        });
+    </script>
+
+    {{!-- Render map if embed=true parameter is present --}}
+    <script>
+        if (getUrlParameter('embed') === 'true') {
+            document.write(`{{> "map"}}`);
+        } else {
+            // Otherwise, proceed with normal access logic
+            {{#has visibility="public"}}
+                document.write(`{{> "map"}}`);
             {{else}}
-                    <div class="map-access-message">
-                        <h1>This map is available to members</h1>
-                        <p>Sign up or log in to view this map.</p>
-                        <div class="map-access-cta">
-                            <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                            <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                        </div>
-                    </div>
-            {{/if}}
-        {{else}}
-            {{!-- For paid-members-only posts, check if user is a paid member --}}
-            {{#has visibility="paid"}}
-                {{#if @member.paid}}
-                    {{> "map"}}
+                {{#has visibility="members"}}
+                    {{#if @member}}
+                        document.write(`{{> "map"}}`);
+                    {{else}}
+                        document.write(`
+                            <div class="map-access-message">
+                                <h1>This map is available to members</h1>
+                                <p>Sign up or log in to view this map.</p>
+                                <div class="map-access-cta">
+                                    <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                    <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                                </div>
+                            </div>
+                        `);
+                    {{/if}}
                 {{else}}
-                    <div class="map-access-message">
-                        <h1>This map is available to tithing members</h1>
-                        <p>Upgrade your membership to view this map.</p>
-                        <div class="map-access-cta">
-                            {{#if @member}}
-                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
-                            {{else}}
-                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                            {{/if}}
-                        </div>
-                    </div>
-                {{/if}}
-            {{!-- Fallback - just show it --}}
-            {{else}}
-                {{> "map"}}
+                    {{#has visibility="paid"}}
+                        {{#if @member.paid}}
+                            document.write(`{{> "map"}}`);
+                        {{else}}
+                            document.write(`
+                                <div class="map-access-message">
+                                    <h1>This map is available to tithing members</h1>
+                                    <p>Upgrade your membership to view this map.</p>
+                                    <div class="map-access-cta">
+                                        {{#if @member}}
+                                            <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
+                                        {{else}}
+                                            <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                            <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            `);
+                        {{/if}}
+                    {{!-- Fallback - just show it --}}
+                    {{else}}
+                        document.write(`{{> "map"}}`);
+                    {{/has}}
+                {{/has}}
             {{/has}}
-        {{/has}}
-    {{/has}}
+        }
+    </script>
 {{/post}}
