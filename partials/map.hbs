@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
+      // Use the same bounds as the image to make the video cover the entire map
       const videoOverlay = L.videoOverlay(videoUrl, imageBounds, {
         autoplay: true,
         loop: true,
@@ -74,6 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
             
             // Also add the attribute directly to the DOM element
             videoElement.setAttribute('disablePictureInPicture', '');
+            
+            // Ensure the video covers the entire map area
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover';
           }
         } catch (e) {
           console.error("Error disabling picture-in-picture:", e);
@@ -85,6 +91,21 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Also try after a short delay to ensure the video is loaded
       setTimeout(disablePiP, 100);
+      
+      // Add event listener to ensure video stays properly sized when map is zoomed
+      map.on('zoom', function() {
+        try {
+          const videoElement = videoOverlay.getElement();
+          if (videoElement) {
+            // Ensure the video maintains its position and scale
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover';
+          }
+        } catch (e) {
+          console.error("Error adjusting video on zoom:", e);
+        }
+      });
     }
     
     // Get viewport height and calculate scale to fit height
