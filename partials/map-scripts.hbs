@@ -23,6 +23,32 @@ function processMapData(map, imageHeight, imageWidth) {
         if (preElements.length === 0) {
             console.warn('No pre elements found in map data container');
             console.log('Map data container content:', mapDataContainer.innerHTML);
+            
+            // Try to find JSON data in the content even if it's not in pre tags
+            const content = mapDataContainer.innerHTML;
+            const jsonRegex = /\{[\s\S]*?\}/g;
+            const jsonMatches = content.match(jsonRegex);
+            
+            if (jsonMatches && jsonMatches.length > 0) {
+                console.log("Found potential JSON data:", jsonMatches.length);
+                
+                // Try to parse each match as JSON
+                jsonMatches.forEach((jsonString, index) => {
+                    try {
+                        const mapData = JSON.parse(jsonString);
+                        console.log(`Successfully parsed JSON match #${index}:`, mapData);
+                        
+                        // Process the map data
+                        processMapDataObject(map, mapData);
+                    } catch (e) {
+                        console.log(`Failed to parse JSON match #${index}:`, e);
+                    }
+                });
+            } else {
+                console.warn("No JSON data found in content");
+            }
+            
+            return;
         }
         
         preElements.forEach(pre => {
@@ -38,95 +64,103 @@ function processMapData(map, imageHeight, imageWidth) {
                 console.log('Successfully parsed map data:', mapData);
                 
                 // Process the map data
-                if (mapData) {
-                    // Process markers
-                    if (mapData.markers && Array.isArray(mapData.markers)) {
-                        mapData.markers.forEach(marker => {
-                            if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                                // Convert coordinates to match the image coordinate system if needed
-                                const y = marker.position[0];
-                                const x = marker.position[1];
-                                
-                                let markerOptions = {};
-                                
-                                // Apply custom icon if specified
-                                if (marker.icon) {
-                                    markerOptions.icon = L.icon(marker.icon);
-                                } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                                    // Use predefined custom icon if iconType is specified
-                                    markerOptions.icon = window.customIcons[marker.iconType];
-                                }
-                                
-                                // Create the marker
-                                const m = L.marker([y, x], markerOptions).addTo(map);
-                                
-                                // Add popup if specified
-                                if (marker.popup) {
-                                    m.bindPopup(marker.popup);
-                                }
-                                
-                                // Add tooltip if specified
-                                if (marker.tooltip) {
-                                    m.bindTooltip(marker.tooltip);
-                                }
-                            }
-                        });
-                    }
-                    
-                    // Process polylines
-                    if (mapData.polylines && Array.isArray(mapData.polylines)) {
-                        mapData.polylines.forEach(polyline => {
-                            if (polyline.points && Array.isArray(polyline.points)) {
-                                const options = polyline.options || {};
-                                L.polyline(polyline.points, options).addTo(map);
-                            }
-                        });
-                    }
-                    
-                    // Process polygons
-                    if (mapData.polygons && Array.isArray(mapData.polygons)) {
-                        mapData.polygons.forEach(polygon => {
-                            if (polygon.points && Array.isArray(polygon.points)) {
-                                const options = polygon.options || {};
-                                L.polygon(polygon.points, options).addTo(map);
-                            }
-                        });
-                    }
-                    
-                    // Process circles
-                    if (mapData.circles && Array.isArray(mapData.circles)) {
-                        mapData.circles.forEach(circle => {
-                            if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
-                                const options = circle.options || {};
-                                L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
-                            }
-                        });
-                    }
-                    
-                    // Process rectangles
-                    if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
-                        mapData.rectangles.forEach(rectangle => {
-                            if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                                const options = rectangle.options || {};
-                                L.rectangle(rectangle.bounds, options).addTo(map);
-                            }
-                        });
-                    }
-                    
-                    // Process custom view settings
-                    if (mapData.view) {
-                        if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
-                            const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
-                            map.setView(mapData.view.center, zoom);
-                        }
-                    }
-                }
+                processMapDataObject(map, mapData);
             } catch (e) {
                 console.error('Error parsing map data JSON:', e);
             }
         });
     } catch (e) {
         console.error('Error processing map data:', e);
+    }
+}
+
+/**
+ * Process a map data object and add its elements to the map
+ */
+function processMapDataObject(map, mapData) {
+    if (!mapData) return;
+    
+    // Process markers
+    if (mapData.markers && Array.isArray(mapData.markers)) {
+        console.log("Processing markers:", mapData.markers.length);
+        mapData.markers.forEach(marker => {
+            if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
+                // Convert coordinates to match the image coordinate system if needed
+                const y = marker.position[0];
+                const x = marker.position[1];
+                
+                let markerOptions = {};
+                
+                // Apply custom icon if specified
+                if (marker.icon) {
+                    markerOptions.icon = L.icon(marker.icon);
+                } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
+                    // Use predefined custom icon if iconType is specified
+                    markerOptions.icon = window.customIcons[marker.iconType];
+                }
+                
+                // Create the marker
+                const m = L.marker([y, x], markerOptions).addTo(map);
+                
+                // Add popup if specified
+                if (marker.popup) {
+                    m.bindPopup(marker.popup);
+                }
+                
+                // Add tooltip if specified
+                if (marker.tooltip) {
+                    m.bindTooltip(marker.tooltip);
+                }
+            }
+        });
+    }
+    
+    // Process polylines
+    if (mapData.polylines && Array.isArray(mapData.polylines)) {
+        mapData.polylines.forEach(polyline => {
+            if (polyline.points && Array.isArray(polyline.points)) {
+                const options = polyline.options || {};
+                L.polyline(polyline.points, options).addTo(map);
+            }
+        });
+    }
+    
+    // Process polygons
+    if (mapData.polygons && Array.isArray(mapData.polygons)) {
+        mapData.polygons.forEach(polygon => {
+            if (polygon.points && Array.isArray(polygon.points)) {
+                const options = polygon.options || {};
+                L.polygon(polygon.points, options).addTo(map);
+            }
+        });
+    }
+    
+    // Process circles
+    if (mapData.circles && Array.isArray(mapData.circles)) {
+        mapData.circles.forEach(circle => {
+            if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                const options = circle.options || {};
+                L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
+            }
+        });
+    }
+    
+    // Process rectangles
+    if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
+        mapData.rectangles.forEach(rectangle => {
+            if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
+                const options = rectangle.options || {};
+                L.rectangle(rectangle.bounds, options).addTo(map);
+            }
+        });
+    }
+    
+    // Process custom view settings
+    if (mapData.view) {
+        if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
+            const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
+            map.setView(mapData.view.center, zoom);
+        }
     }
 }
 
