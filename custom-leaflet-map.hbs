@@ -7,9 +7,10 @@
 <div class="debug-info" style="display: none;">
     Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
     Visibility: {{post.visibility}}<br>
-    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}<br>
-    Embed mode: <span id="debug-embed-mode">No</span>
+    Member exists: {{#if @member}}Yes{{else}}No{{/if}}<br>
+    Member paid: {{#if @member.paid}}Yes{{else}}No{{/if}}<br>
+    Embed mode: <span id="debug-embed-mode">No</span><br>
+    URL: {{url}}
 </div>
 
 {{#post}}
@@ -28,36 +29,33 @@
             if (debugEmbedMode) {
                 debugEmbedMode.textContent = 'Yes';
             }
+            
+            // Hide header and footer in embed mode
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.querySelector('.gh-head');
+                const footer = document.querySelector('.gh-foot');
+                if (header) header.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+            });
         }
-        
-        // Store the embed mode in a global variable for later use
-        window.isEmbedMode = isEmbedMode;
     </script>
 
-    {{!-- For embed mode, always show the map regardless of visibility --}}
-    {{#if @member}}
-        {{!-- Store member status for JavaScript --}}
-        <script>window.isMember = true; window.isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};</script>
-    {{else}}
-        <script>window.isMember = false; window.isPaidMember = false;</script>
-    {{/if}}
-
-    {{!-- Store the post content in a hidden div for embed mode --}}
-    <div id="original-content" style="display: none;">{{content}}</div>
-    
-    {{!-- Store the post visibility for JavaScript --}}
-    <script>window.postVisibility = "{{visibility}}";</script>
-
-    {{!-- For public posts, render the map for everyone --}}
-    {{#has visibility="public"}}
+    {{!-- Check URL parameters for embed mode --}}
+    {{#if (match @url "embed=true")}}
+        {{!-- In embed mode, always show the map regardless of visibility --}}
         <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
     {{else}}
-        {{!-- For members-only posts, check if user is a member or if in embed mode --}}
-        {{#has visibility="members"}}
-            <div id="members-content">
+        {{!-- Not in embed mode, check visibility --}}
+        {{#has visibility="public"}}
+            <article class="post-full leaflet-map-template map-template">
+                <div id="map" style="height: 100vh;"></div>
+                <div class="map-data-container">{{content}}</div>
+            </article>
+        {{else}}
+            {{#has visibility="members"}}
                 {{#if @member}}
                     <article class="post-full leaflet-map-template map-template">
                         <div id="map" style="height: 100vh;"></div>
@@ -73,11 +71,8 @@
                         </div>
                     </div>
                 {{/if}}
-            </div>
-        {{else}}
-            {{!-- For paid-members-only posts, check if user is a paid member or if in embed mode --}}
-            {{#has visibility="paid"}}
-                <div id="paid-content">
+            {{else}}
+                {{#has visibility="paid"}}
                     {{#if @member.paid}}
                         <article class="post-full leaflet-map-template map-template">
                             <div id="map" style="height: 100vh;"></div>
@@ -97,77 +92,22 @@
                             </div>
                         </div>
                     {{/if}}
-                </div>
-            {{else}}
-                {{!-- Default case, just show the map --}}
-                <article class="post-full leaflet-map-template map-template">
-                    <div id="map" style="height: 100vh;"></div>
-                    <div class="map-data-container">{{content}}</div>
-                </article>
+                {{else}}
+                    <article class="post-full leaflet-map-template map-template">
+                        <div id="map" style="height: 100vh;"></div>
+                        <div class="map-data-container">{{content}}</div>
+                    </article>
+                {{/has}}
             {{/has}}
         {{/has}}
-    {{/has}}
+    {{/if}}
 
 {{!-- Include common map scripts --}}
 {{> map-scripts}}
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if we're in embed mode and handle restricted content
-  if (window.isEmbedMode) {
-    console.log("Embed mode detected");
-    console.log("Post visibility:", window.postVisibility);
-    console.log("Member status:", window.isMember, "Paid member:", window.isPaidMember);
-    
-    // Get the original content
-    const originalContent = document.getElementById('original-content').innerHTML;
-    console.log("Original content length:", originalContent.length);
-    
-    // Create the map HTML with the original content
-    const mapHtml = `
-      <article class="post-full leaflet-map-template map-template">
-          <div id="map" style="height: 100vh;"></div>
-          <div class="map-data-container">${originalContent}</div>
-      </article>
-    `;
-    
-    // In embed mode, we always show the map regardless of visibility
-    if (window.postVisibility === "members") {
-      const membersContent = document.getElementById('members-content');
-      if (membersContent) {
-        console.log("Replacing members-only content with map");
-        membersContent.innerHTML = mapHtml;
-      }
-    } else if (window.postVisibility === "paid") {
-      const paidContent = document.getElementById('paid-content');
-      if (paidContent) {
-        console.log("Replacing paid-only content with map");
-        paidContent.innerHTML = mapHtml;
-      }
-    }
-    
-    // Force the map to be visible in embed mode
-    setTimeout(function() {
-      // Check if we need to create a map container
-      if (!document.querySelector('.map-data-container')) {
-        console.log("No map container found, creating one");
-        
-        // Find the main content area
-        const mainContent = document.querySelector('.site-content') || document.body;
-        
-        // Create a new map container
-        const mapContainer = document.createElement('div');
-        mapContainer.innerHTML = mapHtml;
-        
-        // Replace the main content with the map
-        mainContent.innerHTML = '';
-        mainContent.appendChild(mapContainer);
-      }
-    }, 100);
-  }
-
   // Only initialize the map if the map element exists
-  // (it won't exist for members/paid content if the user doesn't have access)
   const mapElement = document.getElementById('map');
   if (!mapElement) {
     console.warn("No map element found");
