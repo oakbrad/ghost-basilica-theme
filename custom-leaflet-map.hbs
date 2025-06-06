@@ -1,210 +1,7 @@
 {{!< default}}
 
-<style>
-    /* Remove site footer and content */
-    .site-footer,
-    .content-title,
-    .post-full-footer,
-    .post-content {
-        display: none !important;
-    }
-    /* Match map style to Ghost */
-    #map {
-        background-color: var(--color-darkmode);
-        flex: 1 !important;
-        height: calc(100vh - 88px) !important;/* Adjust header height if needed */
-        width: 100% !important;
-        z-index: 1;
-    }
-
-    /* When in embed mode, make map full height */
-    .embed-mode #map {
-        height: 100vh !important;
-    }
-
-    /* Hide header in embed mode */
-    .embed-mode .gh-head {
-        display: none !important;
-    }
-
-    /* Adjust body padding in embed mode */
-    .embed-mode .site-content {
-        padding-top: 0 !important;
-    }
-
-    /* Hide subscription buttons in embed mode */
-    .embed-mode .gh-portal-triggerbtn-iframe {
-        display: none !important;
-    }
-
-    .leaflet-overlay-pane video {
-      z-index: 1 !important;
-    }
-
-    /* Hide picture-in-picture button */
-    .leaflet-overlay-pane video::-webkit-media-controls-picture-in-picture-button {
-      display: none !important;
-    }
-    
-    /* For Firefox */
-    .leaflet-overlay-pane video::-moz-picture-in-picture-button {
-      display: none !important;
-    }
-
-    /* Leaflet tooltip styling */
-    .leaflet-tooltip {
-        background-color: rgba(21, 23, 26, 0.9) !important;
-        color: #fff !important;
-        font-family: var(--font-sans) !important;
-        font-size: 2em !important;
-        padding: 8px 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.5) !important;
-        border-radius: 4px !important;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        width: 400px !important;
-        white-space: normal !important;
-    }
-    .leaflet-tooltip b {
-      text-transform: uppercase !important;
-      font-weight: bolder !important;
-      color: var(--ghost-accent-color) !important;
-    }
-    /* Tooltip arrow styling */
-    .leaflet-tooltip-top:before,
-    .leaflet-tooltip-bottom:before,
-    .leaflet-tooltip-left:before,
-    .leaflet-tooltip-right:before {
-        border-color: transparent;
-    }
-    
-    .leaflet-tooltip-bottom:before {
-        border-bottom-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-top:before {
-        border-top-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-left:before {
-        border-left-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-right:before {
-        border-right-color: var(--ghost-accent-color) !important;
-    }
-
-    /* Leaflet popup styling */
-    .leaflet-popup-content-wrapper {
-        background-color: rgba(21, 23, 26, 0.9)  !important;
-        border-left: 4px solid var(--ghost-accent-color)  !important;
-        color: #fff  !important;
-        font-family: var(--font-sans)  !important;
-        border-radius: 4px  !important;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5)  !important;
-        backdrop-filter: blur(20px)  !important;
-        -webkit-backdrop-filter: blur(20px)  !important;
-    }
-
-    .leaflet-popup-content {
-        color: #fff !important;
-        margin: 12px  !important;
-    }
-
-    /* Styling for access message */
-    .map-access-message {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        text-align: center;
-        padding: 2rem;
-        background: linear-gradient(to bottom right, #3f3f3f, var(--color-darkmode));
-        color: #fff;
-    }
-
-    .map-access-message h2 {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: #fff;
-    }
-
-    .map-access-message p {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        max-width: 600px;
-    }
-
-    .map-access-cta {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .map-signup-button,
-    .map-signin-button,
-    .map-upgrade-button {
-        display: inline-block;
-        padding: 0.8rem 1.5rem;
-        border-radius: 4px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .map-signup-button,
-    .map-upgrade-button {
-        background-color: var(--ghost-accent-color);
-        color: #fff;
-    }
-
-    .map-signin-button {
-        background-color: transparent;
-        border: 1px solid #fff;
-        color: #fff;
-    }
-
-    .map-signup-button:hover,
-    .map-upgrade-button:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-
-    .map-signin-button:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-    }
-
-    /* Mobile adjustments */
-    @media only screen and (max-width: 768px) {
-        .map-access-message h2 {
-            font-size: 1.8rem;
-        }
-
-        .map-access-message p {
-            font-size: 1rem;
-        }
-
-        .map-access-cta {
-            flex-direction: column;
-        }
-        
-        /* Mobile tooltip adjustments */
-        .leaflet-tooltip {
-            width: auto !important;
-
-            padding: 6px 10px !important;
-            white-space: normal !important;
-        }
-    }
-
-    /* Map data container - hidden by default */
-    .map-data-container {
-        display: none;
-    }
-</style>
+{{!-- Include common map styles --}}
+{{> map-styles}}
 
 {{!-- Debug information to check post data structure --}}
 <div class="debug-info" style="display: none;">
@@ -239,7 +36,7 @@
 
     {{!-- For public posts, render the map for everyone --}}
     {{#has visibility="public"}}
-        <article class="post-full leaflet-map-template">
+        <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
@@ -248,7 +45,7 @@
         {{#has visibility="members"}}
             <div id="members-content">
                 {{#if @member}}
-                    <article class="post-full leaflet-map-template">
+                    <article class="post-full leaflet-map-template map-template">
                         <div id="map" style="height: 100vh;"></div>
                         <div class="map-data-container">{{content}}</div>
                     </article>
@@ -268,7 +65,7 @@
             {{#has visibility="paid"}}
                 <div id="paid-content">
                     {{#if @member.paid}}
-                        <article class="post-full leaflet-map-template">
+                        <article class="post-full leaflet-map-template map-template">
                             <div id="map" style="height: 100vh;"></div>
                             <div class="map-data-container">{{content}}</div>
                         </article>
@@ -289,7 +86,7 @@
                 </div>
             {{else}}
                 {{!-- Default case, just show the map --}}
-                <article class="post-full leaflet-map-template">
+                <article class="post-full leaflet-map-template map-template">
                     <div id="map" style="height: 100vh;"></div>
                     <div class="map-data-container">{{content}}</div>
                 </article>
@@ -297,12 +94,8 @@
         {{/has}}
     {{/has}}
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
+{{!-- Include common map scripts --}}
+{{> map-scripts}}
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -315,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (membersContent) {
       // Replace members-only content with the map
       membersContent.innerHTML = `
-        <article class="post-full leaflet-map-template">
+        <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
@@ -325,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (paidContent) {
       // Replace paid-only content with the map
       paidContent.innerHTML = `
-        <article class="post-full leaflet-map-template">
+        <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
@@ -372,27 +165,11 @@ document.addEventListener("DOMContentLoaded", function () {
       keepAspectRatio: false
     }).addTo(map);
     
-    // Function to disable picture-in-picture
-    function disablePiP() {
-      try {
-        const videoElement = videoOverlay.getElement();
-        if (videoElement) {
-          // Set the attribute
-          videoElement.disablePictureInPicture = true;
-          
-          // Also add the attribute directly to the DOM element
-          videoElement.setAttribute('disablePictureInPicture', '');
-        }
-      } catch (e) {
-        console.error("Error disabling picture-in-picture:", e);
-      }
-    }
-    
-    // Try immediately
-    disablePiP();
+    // Disable picture-in-picture
+    disablePiP(videoOverlay);
     
     // Also try after a short delay to ensure the video is loaded
-    setTimeout(disablePiP, 100);
+    setTimeout(function() { disablePiP(videoOverlay); }, 100);
     
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
@@ -406,123 +183,9 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Process map data from post content
     processMapData(map, h, w);
-
   };
 
   img.src = imageUrl;
-  
-  /**
-   * Process map data from post content
-   * Looks for JSON data in the post content and adds markers and other overlays to the map
-   */
-  function processMapData(map, imageHeight, imageWidth) {
-    const mapDataContainer = document.querySelector('.map-data-container');
-    if (!mapDataContainer) return;
-    
-    try {
-      // Find all pre elements that might contain JSON data
-      const preElements = mapDataContainer.querySelectorAll('pre');
-      
-      preElements.forEach(pre => {
-        try {
-          // Try to parse the content as JSON
-          const content = pre.textContent.trim();
-          if (!content.startsWith('{') && !content.startsWith('[')) return;
-          
-          const mapData = JSON.parse(content);
-          
-          // Process the map data
-          if (mapData) {
-            // Process markers
-            if (mapData.markers && Array.isArray(mapData.markers)) {
-              mapData.markers.forEach(marker => {
-                if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                  // Convert coordinates to match the image coordinate system if needed
-                  const y = marker.position[0];
-                  const x = marker.position[1];
-                  
-                  let markerOptions = {};
-                  
-                  // Apply custom icon if specified
-                  if (marker.icon) {
-                    markerOptions.icon = L.icon(marker.icon);
-                  } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                    // Use predefined custom icon if iconType is specified
-                    markerOptions.icon = window.customIcons[marker.iconType];
-                  }
-                  
-                  // Create the marker
-                  const m = L.marker([y, x], markerOptions).addTo(map);
-                  
-                  // Add popup if specified
-                  if (marker.popup) {
-                    m.bindPopup(marker.popup);
-                  }
-                  
-                  // Add tooltip if specified
-                  if (marker.tooltip) {
-                    m.bindTooltip(marker.tooltip);
-                  }
-                }
-              });
-            }
-            
-            // Process polylines
-            if (mapData.polylines && Array.isArray(mapData.polylines)) {
-              mapData.polylines.forEach(polyline => {
-                if (polyline.points && Array.isArray(polyline.points)) {
-                  const options = polyline.options || {};
-                  L.polyline(polyline.points, options).addTo(map);
-                }
-              });
-            }
-            
-            // Process polygons
-            if (mapData.polygons && Array.isArray(mapData.polygons)) {
-              mapData.polygons.forEach(polygon => {
-                if (polygon.points && Array.isArray(polygon.points)) {
-                  const options = polygon.options || {};
-                  L.polygon(polygon.points, options).addTo(map);
-                }
-              });
-            }
-            
-            // Process circles
-            if (mapData.circles && Array.isArray(mapData.circles)) {
-              mapData.circles.forEach(circle => {
-                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
-                  const options = circle.options || {};
-                  L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
-                }
-              });
-            }
-            
-            // Process rectangles
-            if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
-              mapData.rectangles.forEach(rectangle => {
-                if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                  const options = rectangle.options || {};
-                  L.rectangle(rectangle.bounds, options).addTo(map);
-                }
-              });
-            }
-            
-            // Process custom view settings
-            if (mapData.view) {
-              if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
-                const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
-                map.setView(mapData.view.center, zoom);
-              }
-            }
-          }
-        } catch (e) {
-          console.error('Error parsing map data JSON:', e);
-        }
-      });
-    } catch (e) {
-      console.error('Error processing map data:', e);
-    }
-  }
 });
 
 // Enable debug info with a query parameter

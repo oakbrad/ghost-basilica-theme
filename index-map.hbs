@@ -2,6 +2,8 @@
 {{!-- The tag above means: insert everything in this file
 into the {body} of the default.hbs template --}}
 
+{{!-- Include common map styles --}}
+{{> map-styles}}
 
 <style>
     .map-description {
@@ -65,91 +67,6 @@ into the {body} of the default.hbs template --}}
         max-width: 100vw;
         transform: translateX(-50%);
         margin-bottom: 50px;
-    }
-
-    /* Map data container - hidden by default */
-    .map-data-container {
-        display: none;
-    }
-
-    /* Leaflet tooltip styling */
-    .leaflet-tooltip {
-        background-color: rgba(21, 23, 26, 0.9) !important;
-        color: #fff !important;
-        font-family: var(--font-sans) !important;
-        font-size: 2em !important;
-        padding: 8px 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.5) !important;
-        border-radius: 4px !important;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        width: 400px !important;
-        white-space: normal !important;
-    }
-    .leaflet-tooltip b {
-      text-transform: uppercase !important;
-      font-weight: bolder !important;
-      color: var(--ghost-accent-color) !important;
-    }
-    /* Tooltip arrow styling */
-    .leaflet-tooltip-top:before,
-    .leaflet-tooltip-bottom:before,
-    .leaflet-tooltip-left:before,
-    .leaflet-tooltip-right:before {
-        border-color: transparent;
-    }
-    
-    .leaflet-tooltip-bottom:before {
-        border-bottom-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-top:before {
-        border-top-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-left:before {
-        border-left-color: var(--ghost-accent-color) !important;
-    }
-    
-    .leaflet-tooltip-right:before {
-        border-right-color: var(--ghost-accent-color) !important;
-    }
-
-    /* Leaflet popup styling */
-    .leaflet-popup-content-wrapper {
-        background-color: rgba(21, 23, 26, 0.9)  !important;
-        border-left: 4px solid var(--ghost-accent-color)  !important;
-        color: #fff  !important;
-        font-family: var(--font-sans)  !important;
-        border-radius: 4px  !important;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5)  !important;
-        backdrop-filter: blur(20px)  !important;
-        -webkit-backdrop-filter: blur(20px)  !important;
-    }
-
-    .leaflet-popup-content {
-        color: #fff !important;
-        margin: 12px  !important;
-    }
-
-    /* Fix z-index issues */
-    .leaflet-overlay-pane {
-        z-index: 90 !important;
-    }
-
-    .leaflet-overlay-pane video {
-        z-index: 1 !important;
-    }
-
-    /* Hide picture-in-picture button */
-    .leaflet-overlay-pane video::-webkit-media-controls-picture-in-picture-button {
-        display: none !important;
-    }
-    
-    /* For Firefox */
-    .leaflet-overlay-pane video::-moz-picture-in-picture-button {
-        display: none !important;
     }
 
     /* blockquote */
@@ -235,6 +152,9 @@ into the {body} of the default.hbs template --}}
         <div class="map-gradient-fade"></div>
       </div>
 
+      {{!-- Include common map scripts --}}
+      {{> map-scripts}}
+
       <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Only initialize the map if the map element exists
@@ -275,27 +195,11 @@ into the {body} of the default.hbs template --}}
             keepAspectRatio: false
           }).addTo(map);
           
-          // Function to disable picture-in-picture
-          function disablePiP() {
-            try {
-              const videoElement = videoOverlay.getElement();
-              if (videoElement) {
-                // Set the attribute
-                videoElement.disablePictureInPicture = true;
-                
-                // Also add the attribute directly to the DOM element
-                videoElement.setAttribute('disablePictureInPicture', '');
-              }
-            } catch (e) {
-              console.error("Error disabling picture-in-picture:", e);
-            }
-          }
-          
-          // Try immediately
-          disablePiP();
+          // Disable picture-in-picture
+          disablePiP(videoOverlay);
           
           // Also try after a short delay to ensure the video is loaded
-          setTimeout(disablePiP, 100);
+          setTimeout(function() { disablePiP(videoOverlay); }, 100);
           
           // Get viewport height and calculate scale to fit height
           const viewportHeight = window.innerHeight;
@@ -315,159 +219,6 @@ into the {body} of the default.hbs template --}}
         };
 
         img.src = imageUrl;
-        
-        /**
-         * Fix z-index issues with Leaflet layers
-         */
-        function fixZIndexIssues() {
-          // Ensure the overlay pane has a lower z-index than our custom overlays
-          const overlayPane = document.querySelector('.leaflet-overlay-pane');
-          if (overlayPane) {
-            overlayPane.style.zIndex = '90';
-          }
-          
-          // Ensure the map container has a position relative for proper stacking context
-          const mapContainer = document.querySelector('.index-map-container');
-          if (mapContainer) {
-            mapContainer.style.position = 'relative';
-          }
-          
-          // Ensure the explore overlay and gradient fade are above the map
-          const exploreOverlay = document.querySelector('.explore-pyora-overlay');
-          if (exploreOverlay) {
-            exploreOverlay.style.zIndex = '200';
-          }
-          
-          const gradientFade = document.querySelector('.map-gradient-fade');
-          if (gradientFade) {
-            gradientFade.style.zIndex = '100';
-          }
-        }
-        
-        /**
-         * Process map data from post content
-         * Looks for JSON data in the post content and adds markers and other overlays to the map
-         */
-        function processMapData(map, imageHeight, imageWidth) {
-          const mapDataContainer = document.querySelector('.map-data-container');
-          if (!mapDataContainer) {
-            console.warn('No map data container found');
-            return;
-          }
-          
-          try {
-            // Find all pre elements that might contain JSON data
-            const preElements = mapDataContainer.querySelectorAll('pre');
-            
-            if (preElements.length === 0) {
-              console.warn('No pre elements found in map data container');
-              console.log('Map data container content:', mapDataContainer.innerHTML);
-            }
-            
-            preElements.forEach(pre => {
-              try {
-                // Try to parse the content as JSON
-                const content = pre.textContent.trim();
-                if (!content.startsWith('{') && !content.startsWith('[')) {
-                  console.warn('Pre element does not contain JSON data:', content.substring(0, 50) + '...');
-                  return;
-                }
-                
-                const mapData = JSON.parse(content);
-                console.log('Successfully parsed map data:', mapData);
-                
-                // Process the map data
-                if (mapData) {
-                  // Process markers
-                  if (mapData.markers && Array.isArray(mapData.markers)) {
-                    mapData.markers.forEach(marker => {
-                      if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                        // Convert coordinates to match the image coordinate system if needed
-                        const y = marker.position[0];
-                        const x = marker.position[1];
-                        
-                        let markerOptions = {};
-                        
-                        // Apply custom icon if specified
-                        if (marker.icon) {
-                          markerOptions.icon = L.icon(marker.icon);
-                        } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                          // Use predefined custom icon if iconType is specified
-                          markerOptions.icon = window.customIcons[marker.iconType];
-                        }
-                        
-                        // Create the marker
-                        const m = L.marker([y, x], markerOptions).addTo(map);
-                        
-                        // Add popup if specified
-                        if (marker.popup) {
-                          m.bindPopup(marker.popup);
-                        }
-                        
-                        // Add tooltip if specified
-                        if (marker.tooltip) {
-                          m.bindTooltip(marker.tooltip);
-                        }
-                      }
-                    });
-                  }
-                  
-                  // Process polylines
-                  if (mapData.polylines && Array.isArray(mapData.polylines)) {
-                    mapData.polylines.forEach(polyline => {
-                      if (polyline.points && Array.isArray(polyline.points)) {
-                        const options = polyline.options || {};
-                        L.polyline(polyline.points, options).addTo(map);
-                      }
-                    });
-                  }
-                  
-                  // Process polygons
-                  if (mapData.polygons && Array.isArray(mapData.polygons)) {
-                    mapData.polygons.forEach(polygon => {
-                      if (polygon.points && Array.isArray(polygon.points)) {
-                        const options = polygon.options || {};
-                        L.polygon(polygon.points, options).addTo(map);
-                      }
-                    });
-                  }
-                  
-                  // Process circles
-                  if (mapData.circles && Array.isArray(mapData.circles)) {
-                    mapData.circles.forEach(circle => {
-                      if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
-                        const options = circle.options || {};
-                        L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
-                      }
-                    });
-                  }
-                  
-                  // Process rectangles
-                  if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
-                    mapData.rectangles.forEach(rectangle => {
-                      if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                        const options = rectangle.options || {};
-                        L.rectangle(rectangle.bounds, options).addTo(map);
-                      }
-                    });
-                  }
-                  
-                  // Process custom view settings
-                  if (mapData.view) {
-                    if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
-                      const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
-                      map.setView(mapData.view.center, zoom);
-                    }
-                  }
-                }
-              } catch (e) {
-                console.error('Error parsing map data JSON:', e);
-              }
-            });
-          } catch (e) {
-            console.error('Error processing map data:', e);
-          }
-        }
       });
       </script>
     {{/foreach}}
@@ -497,11 +248,6 @@ into the {body} of the default.hbs template --}}
 
 </div>
 </main>
-
-{{!-- Load Leaflet dependencies --}}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
 
 {{!-- Simple script for random quotes --}}
 <script>
