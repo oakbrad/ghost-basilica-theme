@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const overlayMeta = document.querySelector('meta[name="custom:overlay"]');
   const overlayFileName = overlayMeta ? overlayMeta.getAttribute('content') : null;
   const videoUrl = overlayFileName ? `/assets/images/overlays/${overlayFileName}` : null;
+  
+  // Get opacity from meta tag if it exists, otherwise default to 0.6
+  const opacityMeta = document.querySelector('meta[name="custom:opacity"]');
+  const opacity = opacityMeta ? parseFloat(opacityMeta.getAttribute('content')) : 0.6;
 
   const img = new Image();
   img.onload = function () {
@@ -56,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         autoplay: true,
         loop: true,
         muted: true,
-        opacity: 0.6,
+        opacity: opacity,
         keepAspectRatio: false
       }).addTo(map);
       
