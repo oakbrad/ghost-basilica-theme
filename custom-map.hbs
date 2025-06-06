@@ -139,49 +139,17 @@ window.isEmbedMode = getUrlParameter('embed') === 'true';
 </div>
 
 {{#post}}
-    {{!-- Check if embed=true is in the URL first --}}
     <script>
-    // Function to check for URL parameters
-    function getUrlParameter(name) {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    }
-    
-    // Check if embed=true is in the URL
-    var isEmbedMode = getUrlParameter('embed') === 'true';
-    
-    // If in embed mode, hide any access restriction elements that might be shown
-    if (isEmbedMode) {
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Embed mode detected - bypassing access checks');
-            // Hide any access message elements that might be displayed
-            var accessMessages = document.querySelectorAll('.map-access-message');
-            if (accessMessages) {
-                accessMessages.forEach(function(element) {
-                    element.style.display = 'none';
-                });
-            }
-        });
+    // Simple function to check for URL parameters
+    function isEmbedMode() {
+        return window.location.search.indexOf('embed=true') !== -1;
     }
     </script>
 
-    {{!-- If embed=true OR normal access conditions are met, show the map --}}
-    <div id="embed-check" style="display:none;" data-embed-mode="false"></div>
+    {{!-- Check if embed=true is in the URL first, otherwise use normal access logic --}}
     <script>
-        // Set the embed mode data attribute for server-side access
-        document.addEventListener('DOMContentLoaded', function() {
-            var embedCheck = document.getElementById('embed-check');
-            if (getUrlParameter('embed') === 'true') {
-                embedCheck.setAttribute('data-embed-mode', 'true');
-            }
-        });
-    </script>
-
-    {{!-- Render map if embed=true parameter is present --}}
-    <script>
-        if (getUrlParameter('embed') === 'true') {
+        if (isEmbedMode()) {
+            // If embed=true, render the map directly
             document.write(`{{> "map"}}`);
         } else {
             // Otherwise, proceed with normal access logic
