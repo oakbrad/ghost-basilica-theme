@@ -1,4 +1,4 @@
-    .leaflet-overlay-pane video {
+.leaflet-overlay-pane video {
       z-index: 1 !important;
     }
 
@@ -10,6 +10,17 @@
     /* For Firefox */
     .leaflet-overlay-pane video::-moz-picture-in-picture-button {
       display: none !important;
+    }
+
+    /* Make sure the map container takes full width */
+    .leaflet-container {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Ensure the map controls are visible */
+    .leaflet-control-container {
+      z-index: 1000 !important;
     }
 
     /* Leaflet tooltip styling */
