@@ -100,48 +100,73 @@
 </div>
 
 {{#post}}
-    {{!-- We'll use a JavaScript-based approach to handle embed mode --}}
-    <div id="map-container">
-        {{!-- This div will be populated by JavaScript based on embed mode and visibility --}}
-    </div>
-
-    {{!-- For members-only access message template --}}
-    <div id="members-access-template" style="display: none;">
-        <div class="map-access-message">
-            <h2>This map is available to members</h2>
-            <p>Sign up or log in to view this map.</p>
-            <div class="map-access-cta">
-                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                <a href="#/portal/signin" class="map-signin-button">Log in</a>
-            </div>
-        </div>
-    </div>
-
-    {{!-- For paid-members-only access message template --}}
-    <div id="paid-access-template" style="display: none;">
-        <div class="map-access-message">
-            <h2>This map is available to paid members</h2>
-            <p>Upgrade your membership to view this map.</p>
-            <div class="map-access-cta">
-                {{#if @member}}
-                    <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
-                {{else}}
-                    <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                    <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                {{/if}}
-            </div>
-        </div>
-    </div>
-
-    {{!-- Map template --}}
-    <div id="map-template" style="display: none;">
+    {{!-- For public posts, render the map for everyone --}}
+    {{#has visibility="public"}}
         {{> map-renderer 
             imageUrl=feature_image 
             videoUrl="/assets/images/overlays/Daytime_Clouds_Squar_One.webm"
             isEmbedMode=false
             mapData=content
+            skipLeafletLoad=false
         }}
-    </div>
+    {{else}}
+        {{!-- For members-only posts, check if user is a member --}}
+        {{#has visibility="members"}}
+            {{#if @member}}
+                {{> map-renderer 
+                    imageUrl=feature_image 
+                    videoUrl="/assets/images/overlays/Daytime_Clouds_Squar_One.webm"
+                    isEmbedMode=false
+                    mapData=content
+                    skipLeafletLoad=false
+                }}
+            {{else}}
+                <div class="map-access-message">
+                    <h2>This map is available to members</h2>
+                    <p>Sign up or log in to view this map.</p>
+                    <div class="map-access-cta">
+                        <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                        <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                    </div>
+                </div>
+            {{/if}}
+        {{else}}
+            {{!-- For paid-members-only posts, check if user is a paid member --}}
+            {{#has visibility="paid"}}
+                {{#if @member.paid}}
+                    {{> map-renderer 
+                        imageUrl=feature_image 
+                        videoUrl="/assets/images/overlays/Daytime_Clouds_Squar_One.webm"
+                        isEmbedMode=false
+                        mapData=content
+                        skipLeafletLoad=false
+                    }}
+                {{else}}
+                    <div class="map-access-message">
+                        <h2>This map is available to paid members</h2>
+                        <p>Upgrade your membership to view this map.</p>
+                        <div class="map-access-cta">
+                            {{#if @member}}
+                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
+                            {{else}}
+                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/if}}
+            {{else}}
+                {{!-- Default case, just show the map --}}
+                {{> map-renderer 
+                    imageUrl=feature_image 
+                    videoUrl="/assets/images/overlays/Daytime_Clouds_Squar_One.webm"
+                    isEmbedMode=false
+                    mapData=content
+                    skipLeafletLoad=false
+                }}
+            {{/has}}
+        {{/has}}
+    {{/has}}
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -150,68 +175,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const embedParam = urlParams.get('embed');
     const isEmbedMode = (embedParam === 'true');
     
-    // Update debug info
+    // Update debug info and add embed-mode class if needed
     if (isEmbedMode) {
         document.body.classList.add('embed-mode');
         const debugEmbedMode = document.getElementById('debug-embed-mode');
         if (debugEmbedMode) {
             debugEmbedMode.textContent = 'Yes';
-        }
-    }
-    
-    // Get post visibility and member status
-    const postVisibility = "{{visibility}}";
-    const isMember = {{#if @member}}true{{else}}false{{/if}};
-    const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
-    
-    // Get container elements
-    const mapContainer = document.getElementById('map-container');
-    const mapTemplate = document.getElementById('map-template');
-    const membersAccessTemplate = document.getElementById('members-access-template');
-    const paidAccessTemplate = document.getElementById('paid-access-template');
-    
-    // Determine what to show based on embed mode and visibility
-    let templateToShow;
-    
-    if (isEmbedMode) {
-        // In embed mode, always show the map regardless of visibility
-        templateToShow = mapTemplate;
-    } else {
-        // Not in embed mode, check visibility
-        if (postVisibility === "public") {
-            templateToShow = mapTemplate;
-        } else if (postVisibility === "members") {
-            templateToShow = isMember ? mapTemplate : membersAccessTemplate;
-        } else if (postVisibility === "paid") {
-            templateToShow = isPaidMember ? mapTemplate : paidAccessTemplate;
-        } else {
-            // Default case
-            templateToShow = mapTemplate;
-        }
-    }
-    
-    // Show the selected template
-    if (templateToShow && mapContainer) {
-        mapContainer.innerHTML = templateToShow.innerHTML;
-        
-        // If we're showing the map and in embed mode, update the isEmbedMode parameter
-        if (templateToShow === mapTemplate && isEmbedMode) {
-            // Find the script in the map container and update the isEmbedMode value
-            const scripts = mapContainer.querySelectorAll('script');
-            scripts.forEach(script => {
-                const scriptContent = script.textContent;
-                if (scriptContent.includes('isEmbedMode')) {
-                    // Replace false with true in the isEmbedMode variable
-                    const updatedScript = scriptContent.replace('const isEmbedMode = false', 'const isEmbedMode = true');
-                    
-                    // Create a new script element with the updated content
-                    const newScript = document.createElement('script');
-                    newScript.textContent = updatedScript;
-                    
-                    // Replace the old script with the new one
-                    script.parentNode.replaceChild(newScript, script);
-                }
-            });
         }
     }
     

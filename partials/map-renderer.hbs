@@ -124,10 +124,9 @@
 {{!-- Map container --}}
 <article class="post-full leaflet-map-template">
     <div id="map" style="height: 100vh;"></div>
+    {{!-- Map data container - hidden, will be populated by the parent template --}}
+    <div class="map-data-container">{{mapData}}</div>
 </article>
-
-{{!-- Map data container - hidden, will be populated by the parent template --}}
-<div id="map-data" class="map-data-container" style="display: none;">{{mapData}}</div>
 
 {{!-- Load Leaflet dependencies if not already loaded --}}
 {{#unless skipLeafletLoad}}
@@ -228,34 +227,12 @@ document.addEventListener("DOMContentLoaded", function () {
      * Looks for JSON data in the post content and adds markers and other overlays to the map
      */
     function processMapData(map, imageHeight, imageWidth) {
-        // Check if mapData is provided directly to the partial
-        const mapDataContainer = document.getElementById('map-data');
+        const mapDataContainer = document.querySelector('.map-data-container');
+        if (!mapDataContainer) return;
         
-        // If mapData is provided and not empty, use it
-        if (mapDataContainer && mapDataContainer.textContent.trim()) {
-            processMapDataContainer(mapDataContainer, map);
-            return;
-        }
-        
-        // Otherwise, look for map data in any .map-data-container in the document
-        // This is the fallback for compatibility with the original template
-        const allMapDataContainers = document.querySelectorAll('.map-data-container');
-        if (allMapDataContainers && allMapDataContainers.length > 0) {
-            allMapDataContainers.forEach(container => {
-                processMapDataContainer(container, map);
-            });
-        } else {
-            console.warn('No map data containers found');
-        }
-    }
-    
-    /**
-     * Process a single map data container
-     */
-    function processMapDataContainer(container, map) {
         try {
             // Find all pre elements that might contain JSON data
-            const preElements = container.querySelectorAll('pre');
+            const preElements = mapDataContainer.querySelectorAll('pre');
             
             preElements.forEach(pre => {
                 try {
