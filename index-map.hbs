@@ -78,13 +78,15 @@ into the {body} of the default.hbs template --}}
         font-style: italic;
         text-align: center;
         overflow: hidden;           /* clip anything that goes outside */
+    }
 
     .map-quote-block p {
         position: relative;         /* bring above pseudo-elements */
         z-index: 2;
         max-width: 800px;
         margin: 0 auto 0.5em;
-    
+    }
+
     .credit-quote-block {
         position: relative;         /* above pseudo-elements too */
         z-index: 2;
@@ -95,9 +97,11 @@ into the {body} of the default.hbs template --}}
         margin-top: 1em;
         padding-bottom: 0em;
         font-family: 'Waning Star', serif;
+    }
 
     .credit-quote-block i {
         color: rgba(255, 255, 255, 0.4); /* very low-opacity white */
+    }
 
     .map-quote-block::before {
         content: "\201c";               /* Unicode opening double-quote */
@@ -110,7 +114,7 @@ into the {body} of the default.hbs template --}}
         color: rgba(255, 255, 255, 0.4); /* very low-opacity white */
         z-index: 1;                 /* sit behind the <p> text (which is z-index:2) */
         pointer-events: none;       /* never capture clicks */
-
+    }
 
     .map-quote-block::after {
         content: "\201d";               /* Unicode closing double-quote */
@@ -123,6 +127,7 @@ into the {body} of the default.hbs template --}}
         color: rgba(255, 255, 255, 0.4);
         z-index: 1;
         pointer-events: none;
+    }
 
 </style>
 
@@ -166,7 +171,7 @@ into the {body} of the default.hbs template --}}
         {{!-- Get the first map post to use for the test --}}
         {{#get "posts" filter="slug:pyora" limit="1"}}
             {{#foreach posts}}
-                {{> "map" overlay_file="clouds.mp4" opacity="0.6"}}
+                {{> "map" }}
             {{/foreach}}
         {{/get}}
     </div>
