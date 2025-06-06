@@ -15,12 +15,21 @@
 </div>
 
 {{#post}}
+    {{!-- Store the post content in a hidden div for embed mode --}}
+    <div id="original-content" style="display: none;">{{{content}}}</div>
+    
     {{!-- Check for embed mode first --}}
     <script>
         // Check for embed parameter in URL
         const urlParams = new URLSearchParams(window.location.search);
         const embedParam = urlParams.get('embed');
         const isEmbedMode = (embedParam === 'true');
+        
+        // Store in window for access in other scripts
+        window.isEmbedMode = isEmbedMode;
+        window.postVisibility = "{{visibility}}";
+        window.isMember = {{#if @member}}true{{else}}false{{/if}};
+        window.isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
         
         // Add embed-mode class if needed
         if (isEmbedMode) {
@@ -46,30 +55,21 @@
         {{!-- In embed mode, always show the map regardless of visibility --}}
         <article class="post-full leaflet-map-template map-template">
             <div id="map" style="height: 100vh;"></div>
-            <div class="map-data-container">
-                {{!-- Ensure content is properly rendered --}}
-                {{{content}}}
-            </div>
+            <div class="map-data-container" style="display: none;">{{{content}}}</div>
         </article>
     {{else}}
         {{!-- Not in embed mode, check visibility --}}
         {{#has visibility="public"}}
             <article class="post-full leaflet-map-template map-template">
                 <div id="map" style="height: 100vh;"></div>
-                <div class="map-data-container">
-                    {{!-- Ensure content is properly rendered --}}
-                    {{{content}}}
-                </div>
+                <div class="map-data-container" style="display: none;">{{{content}}}</div>
             </article>
         {{else}}
             {{#has visibility="members"}}
                 {{#if @member}}
                     <article class="post-full leaflet-map-template map-template">
                         <div id="map" style="height: 100vh;"></div>
-                        <div class="map-data-container">
-                            {{!-- Ensure content is properly rendered --}}
-                            {{{content}}}
-                        </div>
+                        <div class="map-data-container" style="display: none;">{{{content}}}</div>
                     </article>
                 {{else}}
                     <div class="map-access-message">
@@ -86,10 +86,7 @@
                     {{#if @member.paid}}
                         <article class="post-full leaflet-map-template map-template">
                             <div id="map" style="height: 100vh;"></div>
-                            <div class="map-data-container">
-                                {{!-- Ensure content is properly rendered --}}
-                                {{{content}}}
-                            </div>
+                            <div class="map-data-container" style="display: none;">{{{content}}}</div>
                         </article>
                     {{else}}
                         <div class="map-access-message">
@@ -108,21 +105,27 @@
                 {{else}}
                     <article class="post-full leaflet-map-template map-template">
                         <div id="map" style="height: 100vh;"></div>
-                        <div class="map-data-container">
-                            {{!-- Ensure content is properly rendered --}}
-                            {{{content}}}
-                        </div>
+                        <div class="map-data-container" style="display: none;">{{{content}}}</div>
                     </article>
                 {{/has}}
             {{/has}}
         {{/has}}
     {{/if}}
 
-{{!-- Include common map scripts --}}
-{{> map-scripts}}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("DOM loaded, initializing map");
+  console.log("Embed mode:", window.isEmbedMode);
+  console.log("Post visibility:", window.postVisibility);
+  console.log("Member status:", window.isMember, "Paid member:", window.isPaidMember);
+  
   // Only initialize the map if the map element exists
   const mapElement = document.getElementById('map');
   if (!mapElement) {
@@ -164,11 +167,27 @@ document.addEventListener("DOMContentLoaded", function () {
       keepAspectRatio: false
     }).addTo(map);
     
-    // Disable picture-in-picture
-    disablePiP(videoOverlay);
+    // Function to disable picture-in-picture
+    function disablePiP() {
+      try {
+        const videoElement = videoOverlay.getElement();
+        if (videoElement) {
+          // Set the attribute
+          videoElement.disablePictureInPicture = true;
+          
+          // Also add the attribute directly to the DOM element
+          videoElement.setAttribute('disablePictureInPicture', '');
+        }
+      } catch (e) {
+        console.error("Error disabling picture-in-picture:", e);
+      }
+    }
+    
+    // Try immediately
+    disablePiP();
     
     // Also try after a short delay to ensure the video is loaded
-    setTimeout(function() { disablePiP(videoOverlay); }, 100);
+    setTimeout(disablePiP, 100);
     
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
@@ -182,83 +201,179 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Process map data from post content
     processMapData(map, h, w);
-    
-    // Log debug info
-    console.log("Map initialized with dimensions:", w, "x", h);
-    console.log("Map data container:", document.querySelector('.map-data-container'));
-    
-    // Check if we have map data
+  };
+
+  img.src = imageUrl;
+  
+  /**
+   * Process map data from post content
+   * Looks for JSON data in the post content and adds markers and other overlays to the map
+   */
+  function processMapData(map, imageHeight, imageWidth) {
+    // First try to get the content from the map-data-container
     const mapDataContainer = document.querySelector('.map-data-container');
-    if (mapDataContainer) {
-      const preElements = mapDataContainer.querySelectorAll('pre');
-      console.log("Found pre elements:", preElements.length);
+    // Also try the original-content div as a backup
+    const originalContent = document.getElementById('original-content');
+    
+    let contentElement = mapDataContainer || originalContent;
+    
+    if (!contentElement) {
+      console.warn('No content container found');
+      return;
+    }
+    
+    console.log("Using content from:", contentElement.id || 'map-data-container');
+    
+    try {
+      // Get the content as text
+      const contentText = contentElement.innerHTML;
+      console.log("Content length:", contentText.length);
       
-      if (preElements.length === 0) {
-        console.warn("No pre elements found in map data container");
-        console.log("Map data container content:", mapDataContainer.innerHTML);
+      // Try to find JSON data in the content
+      // First, look for JSON objects with markers array
+      const markerJsonRegex = /\{\s*"markers"\s*:\s*\[[\s\S]*?\]\s*\}/g;
+      const markerJsonMatches = contentText.match(markerJsonRegex);
+      
+      if (markerJsonMatches && markerJsonMatches.length > 0) {
+        console.log("Found potential marker JSON data:", markerJsonMatches.length);
         
-        // Try to find JSON data in the content even if it's not in pre tags
-        const content = mapDataContainer.innerHTML;
-        const jsonRegex = /\{[\s\S]*?\}/g;
-        const jsonMatches = content.match(jsonRegex);
+        // Try to parse each match as JSON
+        markerJsonMatches.forEach((jsonString, index) => {
+          try {
+            const mapData = JSON.parse(jsonString);
+            console.log(`Successfully parsed marker JSON match #${index}:`, mapData);
+            
+            // Process the map data
+            processMapDataObject(map, mapData);
+          } catch (e) {
+            console.log(`Failed to parse marker JSON match #${index}:`, e);
+          }
+        });
+      } else {
+        console.warn("No marker JSON data found, trying general JSON pattern");
         
-        if (jsonMatches && jsonMatches.length > 0) {
-          console.log("Found potential JSON data:", jsonMatches.length);
+        // Try a more general JSON regex
+        const generalJsonRegex = /\{[\s\S]*?\}/g;
+        const generalJsonMatches = contentText.match(generalJsonRegex);
+        
+        if (generalJsonMatches && generalJsonMatches.length > 0) {
+          console.log("Found potential general JSON data:", generalJsonMatches.length);
           
           // Try to parse each match as JSON
-          jsonMatches.forEach((jsonString, index) => {
+          generalJsonMatches.forEach((jsonString, index) => {
             try {
               const mapData = JSON.parse(jsonString);
-              console.log(`Successfully parsed JSON match #${index}:`, mapData);
               
-              // Process the map data
-              if (mapData.markers && Array.isArray(mapData.markers)) {
-                console.log("Processing markers:", mapData.markers.length);
-                mapData.markers.forEach(marker => {
-                  if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
-                    // Convert coordinates to match the image coordinate system if needed
-                    const y = marker.position[0];
-                    const x = marker.position[1];
-                    
-                    let markerOptions = {};
-                    
-                    // Apply custom icon if specified
-                    if (marker.icon) {
-                      markerOptions.icon = L.icon(marker.icon);
-                    } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
-                      // Use predefined custom icon if iconType is specified
-                      markerOptions.icon = window.customIcons[marker.iconType];
-                    }
-                    
-                    // Create the marker
-                    const m = L.marker([y, x], markerOptions).addTo(map);
-                    
-                    // Add popup if specified
-                    if (marker.popup) {
-                      m.bindPopup(marker.popup);
-                    }
-                    
-                    // Add tooltip if specified
-                    if (marker.tooltip) {
-                      m.bindTooltip(marker.tooltip);
-                    }
-                  }
-                });
+              // Check if this looks like map data
+              if (mapData.markers || mapData.polylines || mapData.polygons || mapData.circles || mapData.rectangles || mapData.view) {
+                console.log(`Successfully parsed general JSON match #${index} as map data:`, mapData);
+                
+                // Process the map data
+                processMapDataObject(map, mapData);
               }
             } catch (e) {
-              console.log(`Failed to parse JSON match #${index}:`, e);
+              // Ignore parsing errors for general JSON
             }
           });
         } else {
           console.warn("No JSON data found in content");
+          console.log("Content preview:", contentText.substring(0, 200) + "...");
         }
       }
-    } else {
-      console.warn("No map data container found");
+    } catch (e) {
+      console.error('Error processing map data:', e);
     }
-  };
-
-  img.src = imageUrl;
+  }
+  
+  /**
+   * Process a map data object and add its elements to the map
+   */
+  function processMapDataObject(map, mapData) {
+    if (!mapData) return;
+    
+    // Process markers
+    if (mapData.markers && Array.isArray(mapData.markers)) {
+      console.log("Processing markers:", mapData.markers.length);
+      mapData.markers.forEach(marker => {
+        if (marker.position && Array.isArray(marker.position) && marker.position.length === 2) {
+          // Convert coordinates to match the image coordinate system if needed
+          const y = marker.position[0];
+          const x = marker.position[1];
+          
+          let markerOptions = {};
+          
+          // Apply custom icon if specified
+          if (marker.icon) {
+            markerOptions.icon = L.icon(marker.icon);
+          } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
+            // Use predefined custom icon if iconType is specified
+            markerOptions.icon = window.customIcons[marker.iconType];
+          }
+          
+          // Create the marker
+          const m = L.marker([y, x], markerOptions).addTo(map);
+          
+          // Add popup if specified
+          if (marker.popup) {
+            m.bindPopup(marker.popup);
+          }
+          
+          // Add tooltip if specified
+          if (marker.tooltip) {
+            m.bindTooltip(marker.tooltip);
+          }
+        }
+      });
+    }
+    
+    // Process polylines
+    if (mapData.polylines && Array.isArray(mapData.polylines)) {
+      mapData.polylines.forEach(polyline => {
+        if (polyline.points && Array.isArray(polyline.points)) {
+          const options = polyline.options || {};
+          L.polyline(polyline.points, options).addTo(map);
+        }
+      });
+    }
+    
+    // Process polygons
+    if (mapData.polygons && Array.isArray(mapData.polygons)) {
+      mapData.polygons.forEach(polygon => {
+        if (polygon.points && Array.isArray(polygon.points)) {
+          const options = polygon.options || {};
+          L.polygon(polygon.points, options).addTo(map);
+        }
+      });
+    }
+    
+    // Process circles
+    if (mapData.circles && Array.isArray(mapData.circles)) {
+      mapData.circles.forEach(circle => {
+        if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+          const options = circle.options || {};
+          L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
+        }
+      });
+    }
+    
+    // Process rectangles
+    if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
+      mapData.rectangles.forEach(rectangle => {
+        if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
+          const options = rectangle.options || {};
+          L.rectangle(rectangle.bounds, options).addTo(map);
+        }
+      });
+    }
+    
+    // Process custom view settings
+    if (mapData.view) {
+      if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
+        const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
+        map.setView(mapData.view.center, zoom);
+      }
+    }
+  }
 });
 
 // Enable debug info with a query parameter
