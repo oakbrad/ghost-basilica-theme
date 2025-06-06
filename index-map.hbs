@@ -46,14 +46,14 @@ into the {body} of the default.hbs template --}}
     /* Map container styles */
     .index-map-container {
         position: relative;
-        height: 80vh;
+        height: 400px;
         width: 100%;
         overflow: hidden;
     }
 
     /* Override some map-renderer styles for the index page */
     .index-map-container #map {
-        height: 80vh !important;
+        height: 100% !important;
         width: 100% !important;
     }
 
@@ -122,7 +122,8 @@ into the {body} of the default.hbs template --}}
     }
 </style>
 
-<div class="site-header-content outer{{#match @custom.header_style "Left aligned"}} left-aligned{{/match}}{{#unless @custom.show_publication_cover}}{{#match @custom.header_style "Hidden"}} no-content{{/match}}{{/unless}}">
+{{!-- The main content area --}}
+<main id="site-main" class="site-main outer">
 
 {{!-- Use the interactive map partial with the Pyora map post --}}
 {{#get "posts" filter="slug:pyora" limit="1"}}
@@ -138,15 +139,10 @@ into the {body} of the default.hbs template --}}
       
       <!-- Add the Explore Pyora overlay text -->
       <div class="explore-pyora-overlay">Explore Pyora</div>
-      <div class="map-gradient-fade"></div>
     </div>
   {{/foreach}}
 {{/get}}
 
-</div>
-
-{{!-- The main content area --}}
-<main id="site-main" class="site-main outer">
 <div class="inner posts">
     <div class="post-card-header"><!-- removed header --></div>
     <div class="post-feed">
