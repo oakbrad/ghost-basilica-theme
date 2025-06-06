@@ -17,6 +17,15 @@
         z-index: 1;
     }
 
+    /* Embed mode styles - hide Ghost header and make map fullscreen */
+    .embed-mode .gh-head {
+        display: none !important;
+    }
+    
+    .embed-mode #map {
+        height: 100vh !important;
+    }
+
     /* Styling for access message */
     .map-access-message {
         display: flex;
@@ -114,6 +123,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('page-template-custom-map');
+    
+    // Check for embed mode and add class if needed
+    if (window.location.search.indexOf('embed=true') !== -1) {
+        document.body.classList.add('embed-mode');
+    }
 });
 </script>
 
@@ -139,15 +153,13 @@ window.isEmbedMode = getUrlParameter('embed') === 'true';
 </div>
 
 {{#post}}
-    <script>
-    // Simple function to check for URL parameters
-    function isEmbedMode() {
-        return window.location.search.indexOf('embed=true') !== -1;
-    }
-    </script>
-
     {{!-- Check if embed=true is in the URL first, otherwise use normal access logic --}}
     <script>
+        // Simple function to check for URL parameters
+        function isEmbedMode() {
+            return window.location.search.indexOf('embed=true') !== -1;
+        }
+        
         if (isEmbedMode()) {
             // If embed=true, render the map directly
             document.write(`{{> "map"}}`);
