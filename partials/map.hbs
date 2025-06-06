@@ -56,48 +56,51 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
-      // Use the same bounds as the image to make the video cover the entire map
-      const videoOverlay = L.videoOverlay(videoUrl, imageBounds, {
-        autoplay: true,
-        loop: true,
-        muted: true,
+      console.log("Adding video overlay:", videoUrl);
+      
+      // Create a video element first to ensure it loads properly
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
+      video.disablePictureInPicture = true;
+      video.setAttribute('disablePictureInPicture', '');
+      video.src = videoUrl;
+      
+      // Add the video overlay using the created video element
+      const videoOverlay = L.videoOverlay(video, imageBounds, {
         opacity: opacity,
-        keepAspectRatio: false
+        interactive: false
       }).addTo(map);
       
-      // Function to disable picture-in-picture
-      function disablePiP() {
+      // Make sure the video is visible and covers the entire map
+      setTimeout(function() {
         try {
           const videoElement = videoOverlay.getElement();
           if (videoElement) {
-            // Set the attribute
-            videoElement.disablePictureInPicture = true;
-            
-            // Also add the attribute directly to the DOM element
-            videoElement.setAttribute('disablePictureInPicture', '');
-            
-            // Ensure the video covers the entire map area
+            console.log("Video element found, applying styles");
             videoElement.style.width = '100%';
             videoElement.style.height = '100%';
             videoElement.style.objectFit = 'cover';
+            
+            // Force the video to play
+            videoElement.play().catch(e => console.error("Error playing video:", e));
+          } else {
+            console.error("Video element not found");
           }
         } catch (e) {
-          console.error("Error disabling picture-in-picture:", e);
+          console.error("Error setting up video:", e);
         }
-      }
-      
-      // Try immediately
-      disablePiP();
-      
-      // Also try after a short delay to ensure the video is loaded
-      setTimeout(disablePiP, 100);
+      }, 500);
       
       // Add event listener to ensure video stays properly sized when map is zoomed
       map.on('zoom', function() {
         try {
           const videoElement = videoOverlay.getElement();
           if (videoElement) {
-            // Ensure the video maintains its position and scale
             videoElement.style.width = '100%';
             videoElement.style.height = '100%';
             videoElement.style.objectFit = 'cover';

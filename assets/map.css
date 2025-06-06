@@ -1,11 +1,6 @@
 .leaflet-overlay-pane video {
       z-index: 1 !important;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
+      /* Ensure video is visible */
     }
 
     /* Hide picture-in-picture button */
@@ -78,3 +73,4 @@
         color: #fff !important;
         margin: 12px  !important;
     }
+
