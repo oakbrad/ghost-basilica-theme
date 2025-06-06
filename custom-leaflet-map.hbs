@@ -34,8 +34,19 @@
         window.isEmbedMode = isEmbedMode;
     </script>
 
+    {{!-- For embed mode, always show the map regardless of visibility --}}
+    {{#if @member}}
+        {{!-- Store member status for JavaScript --}}
+        <script>window.isMember = true; window.isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};</script>
+    {{else}}
+        <script>window.isMember = false; window.isPaidMember = false;</script>
+    {{/if}}
+
     {{!-- Store the post content in a hidden div for embed mode --}}
     <div id="original-content" style="display: none;">{{content}}</div>
+    
+    {{!-- Store the post visibility for JavaScript --}}
+    <script>window.postVisibility = "{{visibility}}";</script>
 
     {{!-- For public posts, render the map for everyone --}}
     {{#has visibility="public"}}
@@ -104,12 +115,13 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Check if we're in embed mode and handle restricted content
   if (window.isEmbedMode) {
+    console.log("Embed mode detected");
+    console.log("Post visibility:", window.postVisibility);
+    console.log("Member status:", window.isMember, "Paid member:", window.isPaidMember);
+    
     // Get the original content
     const originalContent = document.getElementById('original-content').innerHTML;
-    
-    // In embed mode, we always show the map regardless of visibility
-    const membersContent = document.getElementById('members-content');
-    const paidContent = document.getElementById('paid-content');
+    console.log("Original content length:", originalContent.length);
     
     // Create the map HTML with the original content
     const mapHtml = `
@@ -119,18 +131,48 @@ document.addEventListener("DOMContentLoaded", function () {
       </article>
     `;
     
-    // Replace members-only or paid-only content with the map
-    if (membersContent) {
-      membersContent.innerHTML = mapHtml;
-    } else if (paidContent) {
-      paidContent.innerHTML = mapHtml;
+    // In embed mode, we always show the map regardless of visibility
+    if (window.postVisibility === "members") {
+      const membersContent = document.getElementById('members-content');
+      if (membersContent) {
+        console.log("Replacing members-only content with map");
+        membersContent.innerHTML = mapHtml;
+      }
+    } else if (window.postVisibility === "paid") {
+      const paidContent = document.getElementById('paid-content');
+      if (paidContent) {
+        console.log("Replacing paid-only content with map");
+        paidContent.innerHTML = mapHtml;
+      }
     }
+    
+    // Force the map to be visible in embed mode
+    setTimeout(function() {
+      // Check if we need to create a map container
+      if (!document.querySelector('.map-data-container')) {
+        console.log("No map container found, creating one");
+        
+        // Find the main content area
+        const mainContent = document.querySelector('.site-content') || document.body;
+        
+        // Create a new map container
+        const mapContainer = document.createElement('div');
+        mapContainer.innerHTML = mapHtml;
+        
+        // Replace the main content with the map
+        mainContent.innerHTML = '';
+        mainContent.appendChild(mapContainer);
+      }
+    }, 100);
   }
 
   // Only initialize the map if the map element exists
   // (it won't exist for members/paid content if the user doesn't have access)
   const mapElement = document.getElementById('map');
-  if (!mapElement) return;
+  if (!mapElement) {
+    console.warn("No map element found");
+    return;
+  }
 
   const imageUrl = "{{feature_image}}";
   const videoUrl = "/assets/images/overlays/Daytime_Clouds_Squar_One.webm"
