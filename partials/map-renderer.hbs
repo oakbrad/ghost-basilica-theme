@@ -226,19 +226,30 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function processMapData(map, imageHeight, imageWidth) {
         const mapDataContainer = document.querySelector('.map-data-container');
-        if (!mapDataContainer) return;
+        if (!mapDataContainer) {
+            console.warn('No map data container found');
+            return;
+        }
         
         try {
             // Find all pre elements that might contain JSON data
             const preElements = mapDataContainer.querySelectorAll('pre');
             
+            if (preElements.length === 0) {
+                console.warn('No pre elements found in map data container');
+            }
+            
             preElements.forEach(pre => {
                 try {
                     // Try to parse the content as JSON
                     const content = pre.textContent.trim();
-                    if (!content.startsWith('{') && !content.startsWith('[')) return;
+                    if (!content.startsWith('{') && !content.startsWith('[')) {
+                        console.warn('Pre element does not contain JSON data:', content.substring(0, 50) + '...');
+                        return;
+                    }
                     
                     const mapData = JSON.parse(content);
+                    console.log('Successfully parsed map data:', mapData);
                     
                     // Process the map data
                     if (mapData) {

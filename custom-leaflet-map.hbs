@@ -17,6 +17,26 @@
         z-index: 1;
     }
 
+    /* When in embed mode, make map full height */
+    .embed-mode #map {
+        height: 100vh !important;
+    }
+
+    /* Hide header in embed mode */
+    .embed-mode .gh-head {
+        display: none !important;
+    }
+
+    /* Adjust body padding in embed mode */
+    .embed-mode .site-content {
+        padding-top: 0 !important;
+    }
+
+    /* Hide subscription buttons in embed mode */
+    .embed-mode .gh-portal-triggerbtn-iframe {
+        display: none !important;
+    }
+
     .leaflet-overlay-pane video {
       z-index: 1 !important;
     }
@@ -191,10 +211,32 @@
     Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
     Visibility: {{post.visibility}}<br>
     Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
+    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}<br>
+    Embed mode: <span id="debug-embed-mode">No</span>
 </div>
 
 {{#post}}
+    {{!-- Check for embed mode first --}}
+    <script>
+        // Check for embed parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const embedParam = urlParams.get('embed');
+        const isEmbedMode = (embedParam === 'true');
+        
+        // Add embed-mode class if needed
+        if (isEmbedMode) {
+            document.body.classList.add('embed-mode');
+            // Update debug info
+            const debugEmbedMode = document.getElementById('debug-embed-mode');
+            if (debugEmbedMode) {
+                debugEmbedMode.textContent = 'Yes';
+            }
+        }
+        
+        // Store the embed mode in a global variable for later use
+        window.isEmbedMode = isEmbedMode;
+    </script>
+
     {{!-- For public posts, render the map for everyone --}}
     {{#has visibility="public"}}
         <article class="post-full leaflet-map-template">
@@ -202,45 +244,49 @@
             <div class="map-data-container">{{content}}</div>
         </article>
     {{else}}
-        {{!-- For members-only posts, check if user is a member --}}
+        {{!-- For members-only posts, check if user is a member or if in embed mode --}}
         {{#has visibility="members"}}
-            {{#if @member}}
-                <article class="post-full leaflet-map-template">
-                    <div id="map" style="height: 100vh;"></div>
-                    <div class="map-data-container">{{content}}</div>
-                </article>
-            {{else}}
-                <div class="map-access-message">
-                    <h2>This map is available to members</h2>
-                    <p>Sign up or log in to view this map.</p>
-                    <div class="map-access-cta">
-                        <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                        <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                    </div>
-                </div>
-            {{/if}}
-        {{else}}
-            {{!-- For paid-members-only posts, check if user is a paid member --}}
-            {{#has visibility="paid"}}
-                {{#if @member.paid}}
+            <div id="members-content">
+                {{#if @member}}
                     <article class="post-full leaflet-map-template">
                         <div id="map" style="height: 100vh;"></div>
                         <div class="map-data-container">{{content}}</div>
                     </article>
                 {{else}}
                     <div class="map-access-message">
-                        <h2>This map is available to paid members</h2>
-                        <p>Upgrade your membership to view this map.</p>
+                        <h2>This map is available to members</h2>
+                        <p>Sign up or log in to view this map.</p>
                         <div class="map-access-cta">
-                            {{#if @member}}
-                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
-                            {{else}}
-                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
-                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
-                            {{/if}}
+                            <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                            <a href="#/portal/signin" class="map-signin-button">Log in</a>
                         </div>
                     </div>
                 {{/if}}
+            </div>
+        {{else}}
+            {{!-- For paid-members-only posts, check if user is a paid member or if in embed mode --}}
+            {{#has visibility="paid"}}
+                <div id="paid-content">
+                    {{#if @member.paid}}
+                        <article class="post-full leaflet-map-template">
+                            <div id="map" style="height: 100vh;"></div>
+                            <div class="map-data-container">{{content}}</div>
+                        </article>
+                    {{else}}
+                        <div class="map-access-message">
+                            <h2>This map is available to paid members</h2>
+                            <p>Upgrade your membership to view this map.</p>
+                            <div class="map-access-cta">
+                                {{#if @member}}
+                                    <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
+                                {{else}}
+                                    <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                    <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                                {{/if}}
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
             {{else}}
                 {{!-- Default case, just show the map --}}
                 <article class="post-full leaflet-map-template">
@@ -260,6 +306,33 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  // Check if we're in embed mode and handle restricted content
+  if (window.isEmbedMode) {
+    // In embed mode, we always show the map regardless of visibility
+    const membersContent = document.getElementById('members-content');
+    const paidContent = document.getElementById('paid-content');
+    
+    if (membersContent) {
+      // Replace members-only content with the map
+      membersContent.innerHTML = `
+        <article class="post-full leaflet-map-template">
+            <div id="map" style="height: 100vh;"></div>
+            <div class="map-data-container">{{content}}</div>
+        </article>
+      `;
+    }
+    
+    if (paidContent) {
+      // Replace paid-only content with the map
+      paidContent.innerHTML = `
+        <article class="post-full leaflet-map-template">
+            <div id="map" style="height: 100vh;"></div>
+            <div class="map-data-container">{{content}}</div>
+        </article>
+      `;
+    }
+  }
+
   // Only initialize the map if the map element exists
   // (it won't exist for members/paid content if the user doesn't have access)
   const mapElement = document.getElementById('map');
