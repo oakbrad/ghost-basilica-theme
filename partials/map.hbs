@@ -56,7 +56,20 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
-      const videoOverlay = L.videoOverlay(videoUrl, imageBounds, {
+      // Calculate the maximum dimension (width or height) of the map
+      const maxDimension = Math.max(w, h);
+      
+      // Calculate offsets to center the square overlay
+      const xOffset = (maxDimension - w) / 2;
+      const yOffset = (maxDimension - h) / 2;
+      
+      // Create square bounds centered on the map
+      const videoBounds = [
+        [-yOffset, -xOffset],
+        [h + yOffset, w + xOffset]
+      ];
+      
+      const videoOverlay = L.videoOverlay(videoUrl, videoBounds, {
         autoplay: true,
         loop: true,
         muted: true,
