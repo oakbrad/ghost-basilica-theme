@@ -1,5 +1,8 @@
 {{!< default}}
 
+<link rel="stylesheet" href="{{asset "embed.css"}}">
+<script src="{{asset "embed.js"}}"></script>
+
 <style>
     /* Remove site footer and content */
     .site-footer,
@@ -15,19 +18,6 @@
         height: calc(100vh - 88px) !important;/* Adjust header height if needed */
         width: 100% !important;
         z-index: 1;
-    }
-
-    /* Embed mode styles */
-    .embed-mode .gh-head {
-        display: none !important;
-    }
-    
-    .embed-mode #map {
-        height: 100vh !important;
-    }
-    
-    .embed-mode .map-access-message {
-        height: 100vh !important;
     }
 
     /* Styling for access message */
@@ -127,34 +117,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('page-template-custom-map');
-    
-    // Check if page is being loaded in an iframe
-        (function(){
-        const inIframe = window.self !== window.top;
-        let allowed = false;
-
-        if (inIframe) {
-            try {
-            const host = window.parent.location.hostname;
-            // adjust these to whatever you actually want to allow:
-            allowed = (
-                host === 'dungeon.church'
-                || host === 'lore.dungeon.church'
-                || host.endsWith('.dungeon.church')
-            );
-            console.log('Embed parent host:', host, '→ allowed?', allowed);
-            } catch (_err) {
-            // cross-origin parent: you can’t read .location
-            console.warn('Cannot read parent domain (cross-origin)');
-            }
-        }
-
-        if (inIframe && allowed) {
-            document.documentElement.classList.add('embed-mode');
-            console.log('→ embed-mode class applied');
-        }
-        })();
-        });
+});
 </script>
 
 {{!-- Debug information to check post data structure --}}
@@ -210,3 +173,4 @@ document.addEventListener('DOMContentLoaded', function() {
         {{/has}}
     {{/has}}
 {{/post}}
+
