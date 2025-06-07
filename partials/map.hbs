@@ -235,8 +235,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Add cursor style to indicate clickable marker
                     m.getElement().style.cursor = 'pointer';
                     
-                    // Add the marker-clickable class to make it glow
-                    m.getElement().classList.add('marker-clickable');
+                    // Add the marker-clickable class to the icon element
+                    // This is the correct way to access the icon element in Leaflet
+                    if (m._icon) {
+                      m._icon.classList.add('marker-clickable');
+                    }
                   }
                 }
               });
