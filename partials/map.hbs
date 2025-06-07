@@ -76,8 +76,14 @@ document.addEventListener("DOMContentLoaded", function () {
       maxZoom: 2,
       zoomSnap: 0,
       zoomDelta: 0.25,
-      maxBounds: imageBounds
+      maxBounds: imageBounds,
+      zoomControl: false // defaults to left
     });
+    
+    // Re-add zoom on right side
+    L.control.zoom({
+      position: 'topright'
+    }).addTo(map);
 
     // Add the image
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
