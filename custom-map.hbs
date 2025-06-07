@@ -129,43 +129,32 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('page-template-custom-map');
     
     // Check if page is being loaded in an iframe
-    (function(){
-        let inIframe = false;
-        let allowedDomain = false;
-        
-        try {
-            inIframe = window.self !== window.top;
-            
-            // Only proceed if we're in an iframe
-            if (inIframe) {
-                try {
-                    // Try to get the parent domain - this will throw an error if cross-origin
-                    const parentDomain = window.parent.location.hostname;
-                    
-                    // Check if the parent domain is under dungeon.church TLD
-                    allowedDomain = parentDomain === 'dungeon.church' || 
-                                    parentDomain.endsWith('.dungeon.church');
-                    
-                    console.log('Parent domain:', parentDomain, 'Allowed:', allowedDomain);
-                } catch(domainError) {
-                    // Cross-origin frame, can't determine domain
-                    console.log('Cannot determine parent domain due to cross-origin restrictions');
-                    allowedDomain = false;
-                }
+        (function(){
+        const inIframe = window.self !== window.top;
+        let allowed = false;
+
+        if (inIframe) {
+            try {
+            const host = window.parent.location.hostname;
+            // adjust these to whatever you actually want to allow:
+            allowed = (
+                host === 'dungeon.church'
+                || host === 'lore.dungeon.church'
+                || host.endsWith('.dungeon.church')
+            );
+            console.log('Embed parent host:', host, '→ allowed?', allowed);
+            } catch (_err) {
+            // cross-origin parent: you can’t read .location
+            console.warn('Cannot read parent domain (cross-origin)');
             }
-        } catch(e) {
-            // most likely cross-origin frame, assume "in iframe" but not allowed domain
-            inIframe = true;
-            allowedDomain = false;
         }
-        
-        // Only add embed-mode class if in iframe AND from an allowed domain
-        if (inIframe && allowedDomain) {
+
+        if (inIframe && allowed) {
             document.documentElement.classList.add('embed-mode');
-            console.log('Embed mode activated for dungeon.church domain');
+            console.log('→ embed-mode class applied');
         }
-    })();
-});
+        })();
+        });
 </script>
 
 {{!-- Debug information to check post data structure --}}
