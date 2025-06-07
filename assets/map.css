@@ -12,6 +12,10 @@
       display: none !important;
     }
 
+    .leaflet-control-attribution {
+      display: none !important;
+    }
+
     /* Map container styling */
     #map {
       width: 100% !important;
