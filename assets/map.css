@@ -25,6 +25,29 @@
       z-index: 1;
     }
 
+    /* Map title overlay styling */
+    .map-title-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      max-width: 300px;
+      background-image: url('/assets/images/scroll-banner.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 10px 30px;
+    }
+
+    .map-title-text {
+      font-family: 'Waning Star', serif;
+      font-size: 2.4rem;
+      color: #15171a;
+      text-align: center;
+      line-height: 1.2;
+      padding: 10px;
+    }
+
     /* For the custom-map template */
     .page-template-custom-map #map {
       height: calc(100vh - 88px); /* Adjust header height if needed */
