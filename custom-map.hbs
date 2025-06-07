@@ -142,8 +142,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // If embed=true, add embed-mode class to body
     if (embedParam === 'true') {
         document.body.classList.add('embed-mode');
+        
+        // Update debug info if it exists
+        const debugEmbedMode = document.getElementById('debug-embed-mode');
+        if (debugEmbedMode) {
+            debugEmbedMode.textContent = 'Yes';
+        }
     }
 });
+
+// Enable debug info with a query parameter
+if (window.location.search.includes('debug=true')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const debugInfo = document.querySelector('.debug-info');
+        if (debugInfo) {
+            debugInfo.style.display = 'block';
+        }
+    });
+}
 </script>
 
 {{!-- Debug information to check post data structure --}}
@@ -156,52 +172,108 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 {{#post}}
-    {{!-- Check for embed mode first --}}
-    <script>
-        // This script runs immediately to determine if we're in embed mode
-        var isEmbedMode = false;
-        const urlParams = new URLSearchParams(window.location.search);
-        const embedParam = urlParams.get('embed');
-        if (embedParam === 'true') {
-            isEmbedMode = true;
-            // Update debug info
-            document.addEventListener('DOMContentLoaded', function() {
-                const debugEmbedMode = document.getElementById('debug-embed-mode');
-                if (debugEmbedMode) {
-                    debugEmbedMode.textContent = 'Yes';
-                }
-            });
-        }
-    </script>
-
-    {{!-- For embed mode, always render the map regardless of visibility --}}
-    <script>
-        if (isEmbedMode) {
-            document.write('{{> "map"}}');
-        } else {
-            {{!-- For non-embed mode, follow normal visibility rules --}}
-            {{#has visibility="public"}}
-                document.write('{{> "map"}}');
+    {{!-- Check if we should bypass access restrictions --}}
+    {{!-- This is a server-side variable that will be used in our conditional logic --}}
+    {{!-- We'll use JavaScript to check for the embed parameter and add a class to the body --}}
+    
+    {{!-- For public posts, render the map for everyone --}}
+    {{#has visibility="public"}}
+        {{> "map"}}
+    {{else}}
+        {{!-- For members-only posts, check if user is a member or if embed=true --}}
+        {{#has visibility="members"}}
+            {{#if @member}}
+                {{> "map"}}
             {{else}}
-                {{#has visibility="members"}}
-                    {{#if @member}}
-                        document.write('{{> "map"}}');
-                    {{else}}
-                        document.write('<div class="map-access-message"><h1>This map is available to members</h1><p>Sign up or log in to view this map.</p><div class="map-access-cta"><a href="#/portal/signup" class="map-signup-button">Sign up now</a><a href="#/portal/signin" class="map-signin-button">Log in</a></div></div>');
-                    {{/if}}
+                {{!-- This div will be hidden by JavaScript if embed=true --}}
+                <div class="map-access-message" id="access-message">
+                    <h1>This map is available to members</h1>
+                    <p>Sign up or log in to view this map.</p>
+                    <div class="map-access-cta">
+                        <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                        <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                    </div>
+                </div>
+                
+                {{!-- This div will be shown by JavaScript if embed=true --}}
+                <div class="map-embed-container" style="display: none;" id="map-embed-container">
+                    {{> "map"}}
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Check for embed parameter in URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const embedParam = urlParams.get('embed');
+                        
+                        // If embed=true, show the map and hide the access message
+                        if (embedParam === 'true') {
+                            const accessMessage = document.getElementById('access-message');
+                            const mapEmbedContainer = document.getElementById('map-embed-container');
+                            
+                            if (accessMessage) {
+                                accessMessage.style.display = 'none';
+                            }
+                            
+                            if (mapEmbedContainer) {
+                                mapEmbedContainer.style.display = 'block';
+                            }
+                        }
+                    });
+                </script>
+            {{/if}}
+        {{else}}
+            {{!-- For paid-members-only posts, check if user is a paid member or if embed=true --}}
+            {{#has visibility="paid"}}
+                {{#if @member.paid}}
+                    {{> "map"}}
                 {{else}}
-                    {{#has visibility="paid"}}
-                        {{#if @member.paid}}
-                            document.write('{{> "map"}}');
-                        {{else}}
-                            document.write('<div class="map-access-message"><h1>This map is available to tithing members</h1><p>Upgrade your membership to view this map.</p><div class="map-access-cta">{{#if @member}}<a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>{{else}}<a href="#/portal/signup" class="map-signup-button">Sign up now</a><a href="#/portal/signin" class="map-signin-button">Log in</a>{{/if}}</div></div>');
-                        {{/if}}
-                    {{else}}
-                        document.write('{{> "map"}}');
-                    {{/has}}
-                {{/has}}
+                    {{!-- This div will be hidden by JavaScript if embed=true --}}
+                    <div class="map-access-message" id="access-message">
+                        <h1>This map is available to tithing members</h1>
+                        <p>Upgrade your membership to view this map.</p>
+                        <div class="map-access-cta">
+                            {{#if @member}}
+                                <a href="#/portal/account/plans" class="map-upgrade-button">Upgrade now</a>
+                            {{else}}
+                                <a href="#/portal/signup" class="map-signup-button">Sign up now</a>
+                                <a href="#/portal/signin" class="map-signin-button">Log in</a>
+                            {{/if}}
+                        </div>
+                    </div>
+                    
+                    {{!-- This div will be shown by JavaScript if embed=true --}}
+                    <div class="map-embed-container" style="display: none;" id="map-embed-container">
+                        {{> "map"}}
+                    </div>
+                    
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Check for embed parameter in URL
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const embedParam = urlParams.get('embed');
+                            
+                            // If embed=true, show the map and hide the access message
+                            if (embedParam === 'true') {
+                                const accessMessage = document.getElementById('access-message');
+                                const mapEmbedContainer = document.getElementById('map-embed-container');
+                                
+                                if (accessMessage) {
+                                    accessMessage.style.display = 'none';
+                                }
+                                
+                                if (mapEmbedContainer) {
+                                    mapEmbedContainer.style.display = 'block';
+                                }
+                            }
+                        });
+                    </script>
+                {{/if}}
+            {{!-- Fallback - just show it --}}
+            {{else}}
+                {{> "map"}}
             {{/has}}
-        }
-    </script>
+        {{/has}}
+    {{/has}}
 {{/post}}
 
