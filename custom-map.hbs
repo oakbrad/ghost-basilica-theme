@@ -17,6 +17,19 @@
         z-index: 1;
     }
 
+    /* Embed mode styles */
+    .embed-mode .gh-head {
+        display: none !important;
+    }
+    
+    .embed-mode #map {
+        height: 100vh !important;
+    }
+    
+    .embed-mode .map-access-message {
+        height: 100vh !important;
+    }
+
     /* Styling for access message */
     .map-access-message {
         display: flex;
@@ -114,6 +127,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('page-template-custom-map');
+    
+    // Check if page is being loaded in an iframe
+    (function(){
+        let inIframe = false;
+        try {
+            inIframe = window.self !== window.top;
+        } catch(e) {
+            // most likely cross-origin frame, assume "in iframe"
+            inIframe = true;
+        }
+        if (inIframe) {
+            document.documentElement.classList.add('embed-mode');
+        }
+    })();
 });
 </script>
 
