@@ -3,12 +3,18 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
+<!-- Custom CSS for clickable markers -->
+<style>
+    .leaflet-marker-clickable {
+        cursor: pointer !important;
+    }
+</style>
+
 <!-- MAP CONTAINTER -->
         <article class="post-full leaflet-map-template">
             <div id="map"></div>
             <div class="map-data-container">{{content}}</div>
         </article>
-
 
 <!-- Leaflet Script -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -228,12 +234,13 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Add URL link if specified
                   if (marker.url) {
+                    // Add a class to make the marker visually clickable
+                    m.options.className = 'leaflet-marker-clickable';
+                    
+                    // Handle click event
                     m.on('click', function() {
                       window.open(marker.url, marker.target || '_blank');
                     });
-                    
-                    // Add cursor style to indicate clickable marker
-                    m.getElement().style.cursor = 'pointer';
                   }
                 }
               });
