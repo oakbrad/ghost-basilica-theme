@@ -1,0 +1,89 @@
+/* Sidenotes
+/* ---------------------------------------------------------- */
+
+/* Notes wrapper */
+.gh-notes-wrapper {
+    position: relative;
+}
+
+/* Individual sidenote */
+.gh-note {
+    position: absolute;
+    right: -320px;
+    width: 300px;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: var(--color-darkgrey);
+    padding-left: 20px;
+    border-left: 1px solid var(--color-lightgrey);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.gh-note p {
+    margin: 0 0 0.5em 0;
+}
+
+.gh-note a {
+    color: var(--color-primary);
+}
+
+/* Hide sidenotes on smaller screens */
+@media (max-width: 1349px) {
+    .gh-note {
+        display: none;
+    }
+}
+
+/* Highlight active sidenote */
+.active-sidenote {
+    background-color: var(--color-lightgrey);
+    transition: background-color 0.2s ease;
+}
+
+/* Hide the footnote backlink in sidenotes */
+.gh-note a[href^="#fnref"] {
+    display: none;
+}
+
+/* Hide the footnotes section when sidenotes are active */
+@media (min-width: 1349px) {
+    .hide-sidenotes .gh-notes-wrapper {
+        display: none;
+    }
+    
+    .post-template .footnotes {
+        display: none;
+    }
+}
+
+/* Dark mode styles */
+.dark-mode .gh-note {
+    color: var(--color-midgrey);
+    border-left-color: var(--color-darkgrey);
+}
+
+.dark-mode .active-sidenote {
+    background-color: var(--color-darkgrey);
+}
+
+.dark-mode .gh-note a {
+    color: var(--ghost-accent-color, #3eb0ef);
+}
+
+/* Auto color mode - follows system preference */
+@media (prefers-color-scheme: dark) {
+    .auto-color .gh-note {
+        color: var(--color-midgrey);
+        border-left-color: var(--color-darkgrey);
+    }
+    
+    .auto-color .active-sidenote {
+        background-color: var(--color-darkgrey);
+    }
+    
+    .auto-color .gh-note a {
+        color: var(--ghost-accent-color, #3eb0ef);
+    }
+}
+
