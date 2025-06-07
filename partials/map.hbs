@@ -242,34 +242,30 @@ document.addEventListener("DOMContentLoaded", function () {
                       
                       // Create tooltip content with mobile hint
                       const tooltipContent = `
-                        <div class="tooltip-content">${marker.tooltip} ${linkBubble}</div>
+                        <div>${marker.tooltip} ${linkBubble}</div>
                         <div class="mobile-tooltip-hint">Tap again to open link</div>
-                        <div class="tooltip-overlay" data-url="${marker.url}" data-target="${marker.target || '_blank'}"></div>
                       `;
                       
                       m.bindTooltip(tooltipContent, { 
                         permanent: false,
                         direction: 'top',
                         className: 'custom-tooltip',
-                        opacity: 1.0
+                        opacity: 1.0,
+                        interactive: true
                       });
                       
-                      // Add click handler to the overlay when tooltip opens
+                      // Make the tooltip clickable
                       m.on('tooltipopen', function() {
-                        // Find the tooltip overlay element
-                        const overlayElement = document.querySelector('.tooltip-overlay');
-                        if (overlayElement) {
-                          // Add click event listener to the overlay
-                          overlayElement.addEventListener('click', function(e) {
-                            // Prevent the click from propagating to the map
-                            e.stopPropagation();
-                            
-                            // Get URL and target from data attributes
-                            const url = this.getAttribute('data-url');
-                            const target = this.getAttribute('data-target');
-                            
+                        // Find the tooltip element
+                        const tooltipElement = document.querySelector('.leaflet-tooltip');
+                        if (tooltipElement) {
+                          // Make the tooltip clickable by changing pointer-events
+                          tooltipElement.style.pointerEvents = 'auto';
+                          
+                          // Add click event listener to the tooltip
+                          tooltipElement.addEventListener('click', function(e) {
                             // Open the URL
-                            window.open(url, target);
+                            window.open(marker.url, marker.target || '_blank');
                           });
                         }
                       });
