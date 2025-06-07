@@ -223,13 +223,78 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Add tooltip if specified
                   if (marker.tooltip) {
-                    m.bindTooltip(marker.tooltip);
+                    // If marker has a URL, append appropriate link bubble based on URL
+                    if (marker.url) {
+                      // Get the SVG content from the partial
+                      const linkSvg = `{{> "icons/link"}}`;
+                      
+                      let linkText = '';
+                      
+                      // Check URL to determine what type of link it is
+                      if (marker.url.includes('lore.dungeon.church')) {
+                        linkText = 'WIKI';
+                      } else if (marker.url.includes('dungeon.church/map')) {
+                        linkText = 'MAP';
+                      } else if (marker.url.includes('discord.')) {
+                        linkText = 'DISCORD';
+                      } else if (marker.url.includes('5e.dungeon.church') || marker.url.includes('5e.tools')) {
+                        linkText = '5eTOOLS';
+                      }
+                      
+                      // Create the bubble with the appropriate text and SVG
+                      const linkBubble = `<span class="tooltip-link-bubble">${linkText} ${linkSvg}</span>`;
+                      
+                      // Create tooltip content with mobile hint
+                      const tooltipContent = `
+                        <div>${marker.tooltip} ${linkBubble}</div>
+                        <div class="mobile-tooltip-hint">Tap again to open link</div>
+                      `;
+                      
+                      m.bindTooltip(tooltipContent, { 
+                        permanent: false,
+                        direction: 'top',
+                        className: 'custom-tooltip',
+                        opacity: 1.0
+                      });
+                    } else {
+                      m.bindTooltip(marker.tooltip);
+                    }
                   }
                   
                   // Add URL link if specified
                   if (marker.url) {
-                    m.on('click', function() {
-                      window.open(marker.url, marker.target || '_blank');
+                    // Track tooltip state for mobile two-step process
+                    let tooltipOpen = false;
+                    
+                    m.on('click', function(e) {
+                      // Detect if it's a mobile device
+                      const isMobile = window.innerWidth <= 768;
+                      
+                      if (isMobile) {
+                        // On mobile: first click opens tooltip, second click follows link
+                        if (!tooltipOpen) {
+                          // First click: open tooltip
+                          tooltipOpen = true;
+                          m.openTooltip();
+                          
+                          // Prevent default click behavior
+                          L.DomEvent.stopPropagation(e);
+                          L.DomEvent.preventDefault(e);
+                          
+                          // Close tooltip when clicking elsewhere on the map
+                          map.once('click', function() {
+                            tooltipOpen = false;
+                            m.closeTooltip();
+                          });
+                        } else {
+                          // Second click: follow the link
+                          tooltipOpen = false;
+                          window.open(marker.url, marker.target || '_blank');
+                        }
+                      } else {
+                        // On desktop: just follow the link
+                        window.open(marker.url, marker.target || '_blank');
+                      }
                     });
                     
                     // Add cursor style to indicate clickable marker
