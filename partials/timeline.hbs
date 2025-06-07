@@ -1,12 +1,12 @@
-<!-- TimelineJS style Overrides -->
+<!-- TimelineJS Component -->
+<!-- Load TimelineJS styles using Ghost asset helper -->
 <link rel="stylesheet" href="{{asset 'timeline.css'}}">
 
+<!-- Timeline container -->
 <div id="timeline-embed"></div>
 
-
-<link rel="stylesheet" href="/assets/timelinejs/css/timeline.css">
+<!-- Load TimelineJS script -->
 <script src="/assets/timelinejs/js/timeline.js"></script>
-
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -65,10 +65,5 @@
       }
     }
   }, 200);
-
-  // Enable debug info with a query parameter
-  if (window.location.search.includes('debug=true')) {
-    document.querySelector('.debug-info').style.display = 'block';
-  }
-  
 </script>
+
