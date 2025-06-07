@@ -12,6 +12,16 @@
       display: none !important;
     }
 
+    /* Clickable marker styling */
+    .clickable-marker {
+      cursor: pointer !important;
+    }
+    
+    /* Ensure all interactive elements have pointer cursor */
+    .leaflet-interactive {
+      cursor: pointer !important;
+    }
+
     /* Map container styling */
     #map {
       width: 100% !important;

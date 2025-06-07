@@ -227,25 +227,47 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Add URL link if specified
                   if (marker.url) {
+                    // Create a custom icon with the same properties but with interactivity enabled
+                    let customIcon;
+                    
+                    if (m.options.icon) {
+                      // Clone the existing icon options
+                      const iconOptions = Object.assign({}, m.options.icon.options);
+                      
+                      // Ensure the icon is interactive
+                      iconOptions.interactive = true;
+                      
+                      // Create a new icon with these options
+                      customIcon = L.icon(iconOptions);
+                    } else if (marker.iconType && window.customIcons && window.customIcons[marker.iconType]) {
+                      // Clone the custom icon
+                      const iconOptions = Object.assign({}, window.customIcons[marker.iconType].options);
+                      
+                      // Ensure the icon is interactive
+                      iconOptions.interactive = true;
+                      
+                      // Create a new icon with these options
+                      customIcon = L.icon(iconOptions);
+                    } else {
+                      // Use default icon with interactivity
+                      customIcon = new L.Icon.Default({ interactive: true });
+                    }
+                    
+                    // Apply the custom icon
+                    m.setIcon(customIcon);
+                    
                     // Handle click event to open URL
                     m.on('click', function() {
                       window.open(marker.url, marker.target || '_blank');
                     });
                     
-                    // Add a class to the marker icon element after it's added to the map
+                    // Add a class to the marker for styling
                     m.on('add', function() {
+                      // Wait for the marker to be added to the DOM
                       setTimeout(function() {
-                        try {
-                          // Get the marker's DOM element
-                          const markerElement = m._icon;
-                          if (markerElement) {
-                            // Add a custom class for styling
-                            markerElement.classList.add('clickable-marker');
-                            // Set inline style for cursor
-                            markerElement.style.cursor = 'pointer';
-                          }
-                        } catch (e) {
-                          console.error("Error setting cursor style:", e);
+                        if (m._icon) {
+                          m._icon.style.cursor = 'pointer';
+                          m._icon.classList.add('clickable-marker');
                         }
                       }, 100);
                     });
