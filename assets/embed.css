@@ -3,6 +3,7 @@
     display: none !important;
 }
 
+
 .embed-mode .site-footer {
     display: none !important;
 }
@@ -13,16 +14,3 @@
 
 .embed-mode .map-access-message {
     height: 100vh !important;
-}
-
-/* 
-Embed mode detection script is in embed.js
-To use embed mode:
-1. Include both files in your template:
-   <link rel="stylesheet" href="{{asset "embed.css"}}">
-   <script src="{{asset "embed.js"}}"></script>
-
-2. When embedding in an iframe, the embed mode will be applied automatically.
-   If you want to disable embed mode for a specific embed, add ?embed=false to the URL.
-*/
-
