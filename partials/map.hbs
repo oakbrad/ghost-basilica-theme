@@ -237,13 +237,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         linkText = 'MAP';
                       }
                       
-                      // Create the bubble with the appropriate text and SVG, wrapped in an anchor tag
-                      const linkBubble = `<a href="${marker.url}" target="${marker.target || '_blank'}" class="tooltip-link-bubble" onclick="event.stopPropagation();">${linkText} ${linkSvg}</a>`;
+                      // Create the bubble with the appropriate text and SVG
+                      const linkBubble = `<span class="tooltip-link-bubble">${linkText} ${linkSvg}</span>`;
                       
                       // Create tooltip content with mobile hint
                       const tooltipContent = `
-                        <div>${marker.tooltip} ${linkBubble}</div>
+                        <div class="tooltip-content">${marker.tooltip} ${linkBubble}</div>
                         <div class="mobile-tooltip-hint">Tap again to open link</div>
+                        <div class="tooltip-overlay" data-url="${marker.url}" data-target="${marker.target || '_blank'}"></div>
                       `;
                       
                       m.bindTooltip(tooltipContent, { 
@@ -251,6 +252,26 @@ document.addEventListener("DOMContentLoaded", function () {
                         direction: 'top',
                         className: 'custom-tooltip',
                         opacity: 1.0
+                      });
+                      
+                      // Add click handler to the overlay when tooltip opens
+                      m.on('tooltipopen', function() {
+                        // Find the tooltip overlay element
+                        const overlayElement = document.querySelector('.tooltip-overlay');
+                        if (overlayElement) {
+                          // Add click event listener to the overlay
+                          overlayElement.addEventListener('click', function(e) {
+                            // Prevent the click from propagating to the map
+                            e.stopPropagation();
+                            
+                            // Get URL and target from data attributes
+                            const url = this.getAttribute('data-url');
+                            const target = this.getAttribute('data-target');
+                            
+                            // Open the URL
+                            window.open(url, target);
+                          });
+                        }
                       });
                     } else {
                       m.bindTooltip(marker.tooltip);
