@@ -131,14 +131,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if page is being loaded in an iframe
     (function(){
         let inIframe = false;
+        let allowedDomain = false;
+        
         try {
             inIframe = window.self !== window.top;
+            
+            // Only proceed if we're in an iframe
+            if (inIframe) {
+                try {
+                    // Try to get the parent domain - this will throw an error if cross-origin
+                    const parentDomain = window.parent.location.hostname;
+                    
+                    // Check if the parent domain is under dungeon.church TLD
+                    allowedDomain = parentDomain === 'dungeon.church' || 
+                                    parentDomain.endsWith('.dungeon.church');
+                    
+                    console.log('Parent domain:', parentDomain, 'Allowed:', allowedDomain);
+                } catch(domainError) {
+                    // Cross-origin frame, can't determine domain
+                    console.log('Cannot determine parent domain due to cross-origin restrictions');
+                    allowedDomain = false;
+                }
+            }
         } catch(e) {
-            // most likely cross-origin frame, assume "in iframe"
+            // most likely cross-origin frame, assume "in iframe" but not allowed domain
             inIframe = true;
+            allowedDomain = false;
         }
-        if (inIframe) {
+        
+        // Only add embed-mode class if in iframe AND from an allowed domain
+        if (inIframe && allowedDomain) {
             document.documentElement.classList.add('embed-mode');
+            console.log('Embed mode activated for dungeon.church domain');
         }
     })();
 });
