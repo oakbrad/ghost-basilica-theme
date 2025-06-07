@@ -240,9 +240,12 @@ document.addEventListener("DOMContentLoaded", function () {
                       // Create the bubble with the appropriate text and SVG
                       const linkBubble = `<span class="tooltip-link-bubble">${linkText} ${linkSvg}</span>`;
                       
+                      // Add link symbol to tooltip text if marker has a URL
+                      const tooltipWithLinkSymbol = marker.url ? `${marker.tooltip} 🔗` : marker.tooltip;
+                      
                       // Create tooltip content with mobile hint
                       const tooltipContent = `
-                        <div>${marker.tooltip} ${linkBubble}</div>
+                        <div>${tooltipWithLinkSymbol} ${linkBubble}</div>
                         <div class="mobile-tooltip-hint">Tap again to open link</div>
                       `;
                       
