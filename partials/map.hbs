@@ -232,13 +232,22 @@ document.addEventListener("DOMContentLoaded", function () {
                       window.open(marker.url, marker.target || '_blank');
                     });
                     
-                    // Add mouseover/mouseout events to change cursor
-                    m.on('mouseover', function() {
-                      document.getElementById('map').style.cursor = 'pointer';
-                    });
-                    
-                    m.on('mouseout', function() {
-                      document.getElementById('map').style.cursor = '';
+                    // Add a class to the marker icon element after it's added to the map
+                    m.on('add', function() {
+                      setTimeout(function() {
+                        try {
+                          // Get the marker's DOM element
+                          const markerElement = m._icon;
+                          if (markerElement) {
+                            // Add a custom class for styling
+                            markerElement.classList.add('clickable-marker');
+                            // Set inline style for cursor
+                            markerElement.style.cursor = 'pointer';
+                          }
+                        } catch (e) {
+                          console.error("Error setting cursor style:", e);
+                        }
+                      }, 100);
                     });
                   }
                 }
