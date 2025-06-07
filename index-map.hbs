@@ -100,7 +100,33 @@ into the {body} of the default.hbs template --}}
         {{/foreach}}
     </div>
 
-    {{!-- Include the modular quote block partial --}}
+    {{!-- Define custom quotes array for the quote block --}}
+    <script>
+        window.customQuotes = [
+            {
+                text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
+                author: "Captain Strezza",
+                link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
+            },
+            {
+                text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
+                author: "Estelar",
+                link: "https://lore.dungeon.church/doc/estelar-the-heretic-OtEcj9hL0Z"
+            },
+            {
+                text: "Maps are for fools and mortals - the forest is written in it's own ink.",
+                author: "Mildred Magpie",
+                link: "https://lore.dungeon.church/doc/mildred-magpie-y6vemFK5Bi"
+            },
+            {
+                text: "The sea is our lifeblood, pray to Proteus the tides don't turn against us.",
+                author: "Anders Solmor",
+                link: "https://lore.dungeon.church/doc/anders-solmor-njTKn6ITMV"
+            }
+        ];
+    </script>
+    
+    {{!-- Include the modular quote block partial with custom quotes --}}
     {{> "quote-block"}}
     
     <div class="post-feed">
@@ -113,3 +139,4 @@ into the {body} of the default.hbs template --}}
 </main>
 
 {{!-- Removing the quote script as it's now in the partial --}}
+</initial_code>

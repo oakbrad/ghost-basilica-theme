@@ -6,20 +6,22 @@
     USAGE:
     {{> "quote-block"}}
     
-    To use with a custom quotes list, you can pass in your own quotes array:
-    {{> "quote-block" quotes=customQuotes}}
-    
-    The quotes array should be in the following format:
-    [
+    To use with a custom quotes list, you can define a custom quotes array in your template before including the partial:
+    ```javascript
+    <script>
+    window.customQuotes = [
         {
             text: "Your quote text here",
             author: "Author Name",
             link: "https://link-to-author-page" (optional)
         },
-        ...more quotes
-    ]
+        // more quotes...
+    ];
+    </script>
+    {{> "quote-block"}}
+    ```
     
-    If no quotes array is provided, the default quotes will be used.
+    If no custom quotes are provided, it will use the default quotes defined below.
 --}}
 
 <style>
@@ -96,8 +98,8 @@
 
 {{!-- Quote block that spans full width --}}
 <div class="map-quote-block">
-    <p id="quote-text">Even a blind dwarf navigator is worth more than ten sailors with a compass.</p>
-    <p class="credit-quote-block"><i>&mdash;</i> <a id="quote-link" href="https://lore.dungeon.church/doc/strezza-pvL6kQtaEA" target="_new"><span id="quote-author">Captain Strezza</span></a></p>
+    <p id="quote-text">Ticklecorn</p>
+    <p class="credit-quote-block"><i>&mdash;</i> <a id="quote-link" href="#" target="_new"><span id="quote-author">Meepo</span></a></p>
 </div>
 
 {{!-- Script for random quotes --}}
@@ -105,24 +107,9 @@
     // Default quotes array
     const defaultQuotes = [
         {
-            text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
-            author: "Captain Strezza",
-            link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
-        },
-        {
-            text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
-            author: "Estelar",
-            link: "https://lore.dungeon.church/doc/estelar-the-heretic-OtEcj9hL0Z"
-        },
-        {
-            text: "Maps are for fools and mortals - the forest is written in it's own ink.",
-            author: "Mildred Magpie",
-            link: "https://lore.dungeon.church/doc/mildred-magpie-y6vemFK5Bi"
-        },
-        {
-            text: "The sea is our lifeblood, pray to Proteus the tides don't turn against us.",
-            author: "Anders Solmor",
-            link: "https://lore.dungeon.church/doc/anders-solmor-njTKn6ITMV"
+            text: "Ticklecorn",
+            author: "Meepo",
+            link: "#"
         }
     ];
 
@@ -151,4 +138,3 @@
         }
     });
 </script>
-
