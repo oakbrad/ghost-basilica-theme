@@ -72,76 +72,6 @@ into the {body} of the default.hbs template --}}
         display: none;
         overflow: hidden !important;
     }
-
-    /* blockquote */
-    .map-quote-block {
-        position: relative;
-        left: 50%;
-        width: 100vw;
-        max-width: 100vw;           /* never shrink below viewport */
-        transform: translateX(-50%);
-        box-sizing: border-box;
-        padding: 60px 20px 0px;         /* more padding so big quotes have room */
-        margin: 40px 0;
-        background-color: var(--ghost-accent-color);
-        color: white;               /* ensure text is readable on accent bg */
-        font-size: 2rem;
-        line-height: 1.6;
-        font-style: italic;
-        text-align: center;
-        overflow: hidden !important;           /* clip anything that goes outside */
-    }
-
-    .map-quote-block p {
-        position: relative;         /* bring above pseudo-elements */
-        z-index: 2;
-        max-width: 800px;
-        margin: 0 auto 0.5em;
-        overflow: hidden !important;
-    }
-
-    .credit-quote-block {
-        position: relative;         /* above pseudo-elements too */
-        z-index: 2;
-        text-align: right !important;
-        font-size: 1.5em;
-        font-weight: bold;
-        font-style: normal;
-        margin-top: 1em;
-        padding-bottom: 0em;
-        font-family: 'Waning Star', serif;
-        overflow: hidden !important;
-    }
-
-    .credit-quote-block i {
-        color: rgba(255, 255, 255, 0.4); /* very low-opacity white */
-    }
-
-    .map-quote-block::before {
-        content: "\201c";               /* Unicode opening double-quote */
-        position: absolute;
-        top: 5px;                 /* nudge upward or adjust as needed */
-        left: 20px;                 /* nudge inward from left edge */
-        font-family: serif;         /* a classic serif for a dramatic look */
-        font-size: 12rem;           /* very large */
-        line-height: 1;
-        color: rgba(255, 255, 255, 0.4); /* very low-opacity white */
-        z-index: 1;                 /* sit behind the <p> text (which is z-index:2) */
-        pointer-events: none;       /* never capture clicks */
-    }
-
-    .map-quote-block::after {
-        content: "\201d";               /* Unicode closing double-quote */
-        position: absolute;
-        bottom: -20px;              /* slight nudge downward */
-        right: 20px;                /* slight nudge inward from right edge */
-        font-family: serif;
-        font-size: 12rem;
-        line-height: 1;
-        color: rgba(255, 255, 255, 0.4);
-        z-index: 1;
-        pointer-events: none;
-    }
 </style>
 
 {{!-- The main content area --}}
@@ -170,11 +100,8 @@ into the {body} of the default.hbs template --}}
         {{/foreach}}
     </div>
 
-    {{!-- Quote block that spans full width --}}
-    <div class="map-quote-block">
-        <p id="quote-text">Even a blind dwarf navigator is worth more than ten sailors with a compass.</p>
-        <p class="credit-quote-block"><i>&mdash;</i> <a id="quote-link" href="https://lore.dungeon.church/doc/strezza-pvL6kQtaEA" target="_new"><span id="quote-author">Captain Strezza</span></a></p>
-    </div>
+    {{!-- Include the modular quote block partial --}}
+    {{> "quote-block"}}
     
     <div class="post-feed">
         {{#foreach posts from="4"}}
@@ -185,38 +112,4 @@ into the {body} of the default.hbs template --}}
 </div>
 </main>
 
-{{!-- Simple script for random quotes --}}
-<script>
-    // Array of quotes
-    const quotes = [
-        {
-            text: "Even a blind dwarf navigator is worth more than ten sailors with a compass.",
-            author: "Captain Strezza",
-            link: "https://lore.dungeon.church/doc/strezza-pvL6kQtaEA"
-        },
-        {
-            text: "Magic flows like water through the veins of our world. Some merely drink from it; others learn to redirect the current.",
-            author: "Estelar",
-            link: "https://lore.dungeon.church/doc/estelar-the-heretic-OtEcj9hL0Z"
-        },
-        {
-            text: "Maps are for fools and mortals - the forest is written in it's own ink.",
-            author: "Mildred Magpie",
-            link: "https://lore.dungeon.church/doc/mildred-magpie-y6vemFK5Bi"
-        },
-        {
-            text: "The sea is our lifeblood, pray to Proteus the tides don't turn against us.",
-            author: "Anders Solmor",
-            link: "https://lore.dungeon.church/doc/anders-solmor-njTKn6ITMV"
-    
-    }];
-
-    // Set random quote on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const quote = quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById('quote-text').textContent = quote.text;
-        document.getElementById('quote-author').textContent = quote.author;
-        document.getElementById('quote-link').href = quote.link;
-    });
-</script>
-
+{{!-- Removing the quote script as it's now in the partial --}}
