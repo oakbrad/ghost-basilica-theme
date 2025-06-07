@@ -148,6 +148,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (debugEmbedMode) {
             debugEmbedMode.textContent = 'Yes';
         }
+        
+        // Force map height to 100vh in embed mode
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+            mapElement.style.height = '100vh';
+        }
+        
+        // Trigger a resize event to ensure the map renders correctly
+        setTimeout(function() {
+            window.dispatchEvent(new Event('resize'));
+        }, 100);
     }
 });
 
@@ -218,6 +229,11 @@ if (window.location.search.includes('debug=true')) {
                             if (mapEmbedContainer) {
                                 mapEmbedContainer.style.display = 'block';
                             }
+                            
+                            // Trigger a resize event to ensure the map renders correctly
+                            setTimeout(function() {
+                                window.dispatchEvent(new Event('resize'));
+                            }, 100);
                         }
                     });
                 </script>
@@ -265,6 +281,11 @@ if (window.location.search.includes('debug=true')) {
                                 if (mapEmbedContainer) {
                                     mapEmbedContainer.style.display = 'block';
                                 }
+                                
+                                // Trigger a resize event to ensure the map renders correctly
+                                setTimeout(function() {
+                                    window.dispatchEvent(new Event('resize'));
+                                }, 100);
                             }
                         });
                     </script>
