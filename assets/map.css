@@ -93,6 +93,12 @@
       text-transform: uppercase !important;
       white-space: nowrap !important;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+    }
+    
+    .tooltip-link-bubble:hover {
+      background-color: var(--ghost-accent-color) !important;
     }
     
     .tooltip-link-bubble svg {

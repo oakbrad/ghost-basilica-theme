@@ -237,8 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         linkText = 'MAP';
                       }
                       
-                      // Create the bubble with the appropriate text and SVG
-                      const linkBubble = `<span class="tooltip-link-bubble">${linkText} ${linkSvg}</span>`;
+                      // Create the bubble with the appropriate text and SVG, wrapped in an anchor tag
+                      const linkBubble = `<a href="${marker.url}" target="${marker.target || '_blank'}" class="tooltip-link-bubble" onclick="event.stopPropagation();">${linkText} ${linkSvg}</a>`;
                       
                       // Create tooltip content with mobile hint
                       const tooltipContent = `
