@@ -89,51 +89,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add the image
     L.imageOverlay(imageUrl, imageBounds).addTo(map);
     
-    // Add title overlay with scroll banner
-    const scrollBannerImg = new Image();
-    scrollBannerImg.onload = function() {
-      // Calculate banner size and position
-      const bannerWidth = 300;
-      const bannerHeight = (this.height / this.width) * bannerWidth;
+    // Create a custom control for the title banner
+    const MapTitleControl = L.Control.extend({
+      options: {
+        position: 'topright'
+      },
       
-      // Position in top left corner with padding
-      const bannerX = 20;
-      const bannerY = 20;
-      
-      // Create bounds for the banner
-      const bannerBounds = [
-        [bannerY, bannerX],
-        [bannerY + bannerHeight, bannerX + bannerWidth]
-      ];
-      
-      // Add the banner as an image overlay
-      const bannerOverlay = L.imageOverlay(scrollBannerUrl, bannerBounds, {
-        interactive: false,
-        opacity: 1,
-        zIndex: 1000
-      }).addTo(map);
-      
-      // Add title text as a custom control
-      const TitleControl = L.Control.extend({
-        options: {
-          position: 'topleft'
-        },
+      onAdd: function() {
+        // Create the control container
+        const container = L.DomUtil.create('div', 'map-title-container');
         
-        onAdd: function() {
-          const container = L.DomUtil.create('div', 'map-title-control');
-          container.innerHTML = `<div class="map-title-text">${postTitle}</div>`;
-          container.style.marginLeft = '20px';
-          container.style.marginTop = '20px';
-          container.style.pointerEvents = 'none';
-          return container;
-        }
-      });
-      
-      // Add the title control to the map
-      map.addControl(new TitleControl());
-    };
+        // Create the banner image
+        const banner = L.DomUtil.create('div', 'map-banner', container);
+        banner.style.backgroundImage = `url('${scrollBannerUrl}')`;
+        
+        // Create the title text
+        const title = L.DomUtil.create('div', 'map-title-text', container);
+        title.textContent = postTitle;
+        
+        return container;
+      }
+    });
     
-    scrollBannerImg.src = scrollBannerUrl;
+    // Add the title control to the map
+    map.addControl(new MapTitleControl());
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
