@@ -107,13 +107,6 @@ In order for this to work, the Sheet must be "Published" not just "Shared"
 </style>
 
 <article class="timeline-container">
-  {{!-- Debug information to check post data structure --}}
-  <div class="debug-info" style="display: none;">
-    Post exists: {{#if post}}Yes{{else}}No{{/if}}<br>
-    Visibility: {{post.visibility}}<br>
-    Member exists: {{#if member}}Yes{{else}}No{{/if}}<br>
-    Member paid: {{#if member.paid}}Yes{{else}}No{{/if}}
-  </div>
 
   {{!-- Check post visibility and render accordingly --}}
   {{#post}}
