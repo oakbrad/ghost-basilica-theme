@@ -1,42 +1,23 @@
-<!-- TimelineJS Component -->
-<!-- Timeline CSS -->
+<!-- Timeline Component -->
 <link rel="stylesheet" href="{{asset 'timelinejs/css/timeline.css'}}">
-<!-- My Style Overrides -->
 <link rel="stylesheet" href="{{asset 'timeline.css'}}">
 
-<!-- Timeline container -->
 <div id="timeline-embed"></div>
 
-<!-- Load TimelineJS script -->
 <script src="/assets/timelinejs/js/timeline.js"></script>
 
 <script>
-  /**
-   * Timeline initialization and BCE date handling
-   * 
-   * This script:
-   * 1. Initializes the TimelineJS component with configuration
-   * 2. Removes any BCE (negative year) date ticks from the timeline
-   */
-  document.addEventListener("DOMContentLoaded", function () {
-    // Only initialize the timeline if the timeline-embed element exists
-    // (it won't exist for members/paid content if the user doesn't have access)
+  // Initialize timeline when DOM is ready
+  document.addEventListener("DOMContentLoaded", function() {
     const timelineEmbed = document.getElementById('timeline-embed');
     if (!timelineEmbed) return;
-
-    initializeTimeline();
-    setupBCETickRemoval();
-  });
-
-  /**
-   * Initialize the TimelineJS component with data from the meta tag
-   */
-  function initializeTimeline() {
-    const timelineEmbed = document.getElementById('timeline-embed');
+    
+    // Get timeline data URL from meta tag
     const metaTag = document.querySelector('meta[name="custom:sheet_url"]');
     const sheetUrl = metaTag ? metaTag.content : null;
-
+    
     if (sheetUrl) {
+      // Create timeline with configuration
       window.timeline = new TL.Timeline('timeline-embed', sheetUrl, {
         timenav_position: "bottom",
         initial_zoom: 4,
@@ -47,67 +28,45 @@
         hash_bookmark: false,
         lang: "/assets/timelinejs/timeline-locale.json",
       });
+      
+      // Set up BCE date removal
+      setupBCERemoval();
     } else {
       timelineEmbed.innerHTML = "Missing timeline URL.";
     }
+  });
+  
+  // Remove BCE dates and set up observer to keep them removed
+  function setupBCERemoval() {
+    // Check for timeline ticks every 200ms
+    const checkInterval = setInterval(() => {
+      const ticks = document.querySelectorAll('.tl-timeaxis-tick');
+      
+      if (ticks.length > 0) {
+        clearInterval(checkInterval);
+        
+        // Remove BCE ticks (negative positions)
+        removeBCETicks();
+        
+        // Watch for timeline changes and remove BCE ticks when they appear
+        const axis = document.querySelector('.tl-timeaxis-content-container');
+        if (axis) {
+          const observer = new MutationObserver(removeBCETicks);
+          observer.observe(axis, { childList: true, subtree: true });
+        }
+      }
+    }, 200);
+    
+    // Stop checking after 5 seconds to prevent infinite loop
+    setTimeout(() => clearInterval(checkInterval), 5000);
   }
-
-  /**
-   * Remove BCE date ticks (those with negative positions)
-   * 
-   * This is needed because we don't want to show dates before year 0
-   * in our timeline navigation.
-   */
+  
+  // Remove timeline ticks with negative positions (BCE dates)
   function removeBCETicks() {
     document.querySelectorAll('.tl-timeaxis-tick').forEach(tick => {
       const left = parseFloat(tick.style.left);
-      if (left < 0) {
-        tick.remove();
-      }
+      if (left < 0) tick.remove();
     });
-  }
-
-  /**
-   * Set up the BCE tick removal process
-   * 
-   * This function:
-   * 1. Waits for timeline ticks to be rendered
-   * 2. Removes any BCE ticks initially
-   * 3. Sets up a MutationObserver to remove BCE ticks when the timeline changes
-   */
-  function setupBCETickRemoval() {
-    const pollInterval = 200; // ms between checks
-    const maxWaitTime = 10000; // 10 seconds maximum wait time
-    let elapsedTime = 0;
-    
-    const waitForTimeline = setInterval(() => {
-      // Only run if timeline-embed exists
-      const timelineEmbed = document.getElementById('timeline-embed');
-      if (!timelineEmbed) {
-        clearInterval(waitForTimeline);
-        return;
-      }
-
-      const ticksReady = document.querySelectorAll('.tl-timeaxis-tick');
-      elapsedTime += pollInterval;
-      
-      // If ticks are ready or we've waited too long
-      if (ticksReady.length > 0 || elapsedTime >= maxWaitTime) {
-        clearInterval(waitForTimeline);
-        
-        if (ticksReady.length > 0) {
-          // Remove BCE ticks initially
-          removeBCETicks();
-
-          // Set up observer to remove BCE ticks when timeline changes
-          const axis = document.querySelector('.tl-timeaxis-content-container');
-          if (axis) {
-            const observer = new MutationObserver(removeBCETicks);
-            observer.observe(axis, { childList: true, subtree: true });
-          }
-        }
-      }
-    }, pollInterval);
   }
 </script>
 
