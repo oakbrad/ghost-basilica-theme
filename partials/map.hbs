@@ -41,8 +41,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Extract gallery images and special layers from the content
     const { regularImages, specialLayerImages } = extractGalleryImages(mapDataContainer);
     
-    // If we have regular images, use them for day/night
-    if (regularImages.length > 0) {
+    // Store special layers
+    specialLayers = specialLayerImages;
+    
+    // Handle different scenarios based on what images we have
+    if (specialLayerImages.length > 0) {
+      // If we have special layers, always use featured image as "Day"
+      dayImageUrl = featuredImageUrl;
+      
+      // If we also have regular images, use the first one as "Night"
+      if (regularImages.length > 0) {
+        nightImageUrl = regularImages[0];
+        
+        // If there's a second regular image, it won't be used (only first one as night)
+      }
+    } else if (regularImages.length > 0) {
+      // No special layers, but we have regular images
+      // Use the first regular image as day
       dayImageUrl = regularImages[0];
       
       // If there's a second regular image, use it as night
@@ -50,9 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
         nightImageUrl = regularImages[1];
       }
     }
-    
-    // Store special layers
-    specialLayers = specialLayerImages;
+    // If no gallery images at all, we'll use the featured image (already set as default)
   }
   
   // Get video overlay from meta tag if it exists
@@ -254,28 +267,26 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Process all images to separate special layers from regular images
       allImages.forEach(img => {
-        // Check if the image name contains the special layer marker "---"
+        // Check if the image name contains the special layer marker pattern "---layername---"
         const urlParts = img.url.split('/');
         const filename = urlParts[urlParts.length - 1];
         
-        if (filename.includes('---')) {
+        // Check for the pattern ---layername---
+        const specialLayerPattern = /---(.+?)---/;
+        const match = filename.match(specialLayerPattern);
+        
+        if (match && match[1]) {
           // This is a special layer
-          const nameParts = filename.split('---');
-          if (nameParts.length > 1) {
-            // Extract the layer name (everything after the last "---")
-            let layerName = nameParts[nameParts.length - 1];
-            
-            // Remove file extension from layer name if present
-            layerName = layerName.replace(/\.[^/.]+$/, "");
-            
-            // Replace hyphens with spaces for better readability
-            layerName = layerName.replace(/-/g, " ");
-            
-            specialLayerImages.push({
-              url: img.url,
-              name: layerName
-            });
-          }
+          // Extract the layer name (text between the --- markers)
+          let layerName = match[1];
+          
+          // Replace hyphens with spaces for better readability
+          layerName = layerName.replace(/-/g, " ");
+          
+          specialLayerImages.push({
+            url: img.url,
+            name: layerName
+          });
         } else {
           // This is a regular image (day/night)
           regularImages.push(img.url);
