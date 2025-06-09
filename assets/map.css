@@ -201,54 +201,25 @@
         height: 100vh !important;
         width: 100vw !important;
         overflow: hidden !important;
-        box-sizing: border-box !important;
       }
       
+      /* Ensure the map container takes the full page */
       #map, .leaflet-map-template, .leaflet-container {
         width: 100% !important;
         height: 100% !important;
         page-break-inside: avoid !important;
-        position: relative !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
       }
       
-      /* Dynamically resize the map to fit the page dimensions */
-      .leaflet-container {
-        page-size: auto !important;
-        size: auto !important;
+      /* Disable animations during print */
+      .leaflet-fade-anim .leaflet-tile,
+      .leaflet-fade-anim .leaflet-popup,
+      .leaflet-zoom-animated {
+        transition: none !important;
       }
       
-      /* Critical: Force the map view to fit the container */
-      .leaflet-container .leaflet-map-pane {
-        position: relative !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
-      
-      /* Scale the actual map tiles to fit the container */
-      .leaflet-container .leaflet-tile-container img {
-        width: auto !important;
-        height: auto !important;
-        max-width: 100% !important;
-        max-height: 100% !important;
-        object-fit: contain !important;
-      }
-      
-      /* Force the map to fit bounds */
-      .leaflet-container:after {
-        content: "" !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        z-index: 9999 !important;
-        pointer-events: none !important;
-      }
-      
-      /* Ensure all map layers are visible and properly sized */
+      /* Ensure map elements are visible */
       .leaflet-container .leaflet-tile-pane,
       .leaflet-container .leaflet-overlay-pane,
       .leaflet-container .leaflet-marker-pane,
@@ -256,10 +227,6 @@
       .leaflet-container .leaflet-tooltip-pane {
         visibility: visible !important;
         opacity: 1 !important;
-        width: 100% !important;
-        height: 100% !important;
-        transform-origin: top left !important;
-        transform: scale(0.8) !important; /* Slightly scale down to ensure visibility */
       }
       
       /* Improve visibility of map elements for print */
@@ -273,4 +240,13 @@
       .leaflet-tooltip b {
         color: #000 !important;
       }
+    }
+
+    /* Special class added by JavaScript when printing */
+    .leaflet-print-mode .leaflet-tile,
+    .leaflet-print-mode .leaflet-marker-icon,
+    .leaflet-print-mode .leaflet-marker-shadow,
+    .leaflet-print-mode .leaflet-popup,
+    .leaflet-print-mode .leaflet-tooltip {
+      transition: none !important;
     }
