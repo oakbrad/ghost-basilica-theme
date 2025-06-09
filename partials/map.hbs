@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Create base layers object for the layer control
     const baseLayers = {
       "Day": dayLayer
-    };
+    });
     
     // If we have a night image, create a night layer
     if (nightImageUrl) {
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add layer control if we have multiple layers
     if (Object.keys(baseLayers).length > 1) {
       L.control.layers(baseLayers, {}, {
-        position: 'topright'
+        position: 'bottomleft'
       }).addTo(map);
     }
     
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(function() {
       map.invalidateSize();
     }, 100);
-  };
+  });
 
   img.src = dayImageUrl;
   
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   const y = marker.position[0];
                   const x = marker.position[1];
                   
-                  let markerOptions = {};
+                  let markerOptions = {});
                   
                   // Apply custom icon if specified
                   if (marker.icon) {
@@ -399,7 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (mapData.polylines && Array.isArray(mapData.polylines)) {
               mapData.polylines.forEach(polyline => {
                 if (polyline.points && Array.isArray(polyline.points)) {
-                  const options = polyline.options || {};
+                  const options = polyline.options || {});
                   L.polyline(polyline.points, options).addTo(map);
                 }
               });
@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (mapData.polygons && Array.isArray(mapData.polygons)) {
               mapData.polygons.forEach(polygon => {
                 if (polygon.points && Array.isArray(polygon.points)) {
-                  const options = polygon.options || {};
+                  const options = polygon.options || {});
                   L.polygon(polygon.points, options).addTo(map);
                 }
               });
@@ -417,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
                 if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
-                  const options = circle.options || {};
+                  const options = circle.options || {});
                   L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
                 }
               });
@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
               mapData.rectangles.forEach(rectangle => {
                 if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
-                  const options = rectangle.options || {};
+                  const options = rectangle.options || {});
                   L.rectangle(rectangle.bounds, options).addTo(map);
                 }
               });

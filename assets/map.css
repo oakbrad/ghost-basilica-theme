@@ -1,5 +1,5 @@
 .leaflet-overlay-pane video {
-      z-index: 1 !important;
+      z-index: 650 !important;
     }
 
     /* Hide picture-in-picture button */
