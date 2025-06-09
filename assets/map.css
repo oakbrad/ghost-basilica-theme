@@ -1,4 +1,4 @@
-  /* Keep video Overlay on top of map layers but below markers/tooltips */
+/* Keep video Overlay on top of map layers but below markers/tooltips */
   .leaflet-overlay-pane video {
       z-index: 650 !important;
     }
@@ -189,7 +189,77 @@
 
     /* Printer adjustments */
     @media print {
+      /* Hide elements not needed for printing */
       .gh-head, .leaflet-control-container, video, .gh-portal-triggerbtn-iframe {
         display: none !important;
+      }
+      
+      /* Ensure the map takes up the full page */
+      body, html {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+      
+      .site-content {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Make the map fill the page */
+      #map {
+        width: 100% !important;
+        height: 100% !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      
+      .page-template-custom-map #map {
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+      
+      /* Ensure map container is visible and sized properly */
+      .leaflet-map-template {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        page-break-inside: avoid !important;
+      }
+      
+      /* Ensure map elements are visible */
+      .leaflet-container {
+        background-color: white !important;
+      }
+      
+      /* Ensure tooltips are visible in print */
+      .leaflet-tooltip {
+        background-color: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: 1px solid #333 !important;
+      }
+      
+      /* Ensure markers are visible */
+      .leaflet-marker-icon {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      /* Ensure polylines, polygons, etc. are visible */
+      .leaflet-overlay-pane path {
+        stroke-width: 1.5 !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      /* Ensure the map is properly sized for the paper */
+      @page {
+        size: auto;
+        margin: 0mm;
       }
     }

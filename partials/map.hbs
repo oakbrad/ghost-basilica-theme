@@ -2,6 +2,8 @@
 <link rel="stylesheet" href="{{asset 'map.css'}}">
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet Print Plugin CSS -->
+<link rel="stylesheet" href="{{asset 'js/leaflet.browser.print.min.css'}}">
 
 <!-- MAP CONTAINTER -->
         <article class="post-full leaflet-map-template">
@@ -13,6 +15,8 @@
 <!-- Leaflet Script -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
+<!-- Leaflet Print Plugin Script -->
+<script src="{{asset "js/leaflet.browser.print.min.js"}}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -124,6 +128,19 @@ document.addEventListener("DOMContentLoaded", function () {
     L.control.zoom({
       position: 'topright'
     }).addTo(map);
+    
+    // Add print control
+    L.control.browserPrint({
+      title: 'Print Map',
+      position: 'topright',
+      printModes: [
+        L.BrowserPrint.Mode.Landscape("Landscape", {title: "Landscape"}),
+        L.BrowserPrint.Mode.Portrait("Portrait", {title: "Portrait"}),
+        L.BrowserPrint.Mode.Auto("Auto", {title: "Auto"}),
+        L.BrowserPrint.Mode.Custom("Custom", {title: "Custom Size"})
+      ],
+      documentTitle: document.title || 'Printed Map'
+    }).addTo(map);
 
     // Create base layers for day and night
     const dayLayer = L.imageOverlay(dayImageUrl, imageBounds);
@@ -218,6 +235,24 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(function() {
       map.invalidateSize();
     }, 100);
+    
+    // Add print button event listener for keyboard shortcut
+    document.addEventListener('keydown', function(e) {
+      // Check if Ctrl+P is pressed
+      if (e.ctrlKey && e.key === 'p') {
+        // Prevent default browser print dialog
+        e.preventDefault();
+        
+        // Trigger the Auto print mode
+        const printPlugin = map._printControl;
+        if (printPlugin) {
+          printPlugin.printMap('Auto', document.title || 'Printed Map');
+        } else {
+          // Fallback to browser print if plugin not available
+          window.print();
+        }
+      }
+    });
   };
 
   img.src = dayImageUrl;
