@@ -214,9 +214,24 @@
         padding: 0 !important;
       }
       
-      /* Ensure the map is properly scaled */
+      /* Ensure the map content is properly scaled to fit the page */
       .leaflet-map-pane {
         transform-origin: top left !important;
+      }
+      
+      /* Force the map to scale its content to fit within the page */
+      .leaflet-container .leaflet-map-pane {
+        transform: scale(0.7) !important; /* Adjust scale factor as needed */
+      }
+      
+      /* Ensure all map layers are visible */
+      .leaflet-container .leaflet-tile-pane,
+      .leaflet-container .leaflet-overlay-pane,
+      .leaflet-container .leaflet-marker-pane,
+      .leaflet-container .leaflet-popup-pane,
+      .leaflet-container .leaflet-tooltip-pane {
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
       /* Improve visibility of map elements for print */
