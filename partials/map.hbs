@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add layer control if we have multiple layers
     if (Object.keys(baseLayers).length > 1) {
       L.control.layers(baseLayers, {}, {
-        position: 'topright'
+        position: 'bottomleft'
       }).addTo(map);
     }
     
