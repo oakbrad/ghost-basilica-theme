@@ -33,22 +33,26 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize variables for day and night image URLs
   let dayImageUrl = featuredImageUrl;
   let nightImageUrl = null;
+  let specialLayers = []; // Array to store special layers
   
   // Try to find gallery images in the post content
   const mapDataContainer = document.querySelector('.map-data-container');
   if (mapDataContainer) {
-    // Look for gallery blocks in the content
-    const galleryImages = extractGalleryImages(mapDataContainer);
+    // Extract gallery images and special layers from the content
+    const { regularImages, specialLayerImages } = extractGalleryImages(mapDataContainer);
     
-    // If gallery images found, use the first one as day image
-    if (galleryImages.length > 0) {
-      dayImageUrl = galleryImages[0];
+    // If we have regular images, use them for day/night
+    if (regularImages.length > 0) {
+      dayImageUrl = regularImages[0];
       
-      // If there's a second image, use it as night image
-      if (galleryImages.length > 1) {
-        nightImageUrl = galleryImages[1];
+      // If there's a second regular image, use it as night
+      if (regularImages.length > 1) {
+        nightImageUrl = regularImages[1];
       }
     }
+    
+    // Store special layers
+    specialLayers = specialLayerImages;
   }
   
   // Get video overlay from meta tag if it exists
@@ -126,9 +130,15 @@ document.addEventListener("DOMContentLoaded", function () {
       baseLayers["Night"] = nightLayer;
     }
     
-    // Add layer control if we have multiple layers
-    if (Object.keys(baseLayers).length > 1) {
-      L.control.layers(baseLayers, {}, {
+    // Create special layers if any
+    const overlayLayers = {};
+    specialLayers.forEach(layer => {
+      overlayLayers[layer.name] = L.imageOverlay(layer.url, imageBounds);
+    });
+    
+    // Add layer control if we have multiple layers (base or special)
+    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
+      L.control.layers(baseLayers, overlayLayers, {
         position: 'bottomleft'
       }).addTo(map);
     }
@@ -202,7 +212,8 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Function to extract gallery images from post content
   function extractGalleryImages(contentContainer) {
-    const images = [];
+    const regularImages = [];
+    const specialLayerImages = [];
     
     try {
       // Look for gallery blocks in the content
@@ -212,32 +223,67 @@ document.addEventListener("DOMContentLoaded", function () {
       // Look for figure elements with gallery class
       const galleryElements = contentContainer.querySelectorAll('.kg-gallery-container, .kg-gallery-image');
       
+      let allImages = [];
+      
       if (galleryElements.length > 0) {
         // Extract image URLs from gallery
         galleryElements.forEach(gallery => {
           const imgElements = gallery.querySelectorAll('img');
           imgElements.forEach(img => {
             if (img.src) {
-              images.push(img.src);
+              allImages.push({
+                url: img.src,
+                alt: img.alt || ''
+              });
             }
           });
         });
       }
       
       // If no gallery found, look for individual images
-      if (images.length === 0) {
+      if (allImages.length === 0) {
         const imgElements = contentContainer.querySelectorAll('img');
         imgElements.forEach(img => {
           if (img.src) {
-            images.push(img.src);
+            allImages.push({
+              url: img.src,
+              alt: img.alt || ''
+            });
           }
         });
       }
+      
+      // Process all images to separate special layers from regular images
+      allImages.forEach(img => {
+        // Check if the image name contains the special layer marker "---"
+        const urlParts = img.url.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        
+        if (filename.includes('---')) {
+          // This is a special layer
+          const nameParts = filename.split('---');
+          if (nameParts.length > 1) {
+            // Extract the layer name (everything after the last "---")
+            let layerName = nameParts[nameParts.length - 1];
+            
+            // Remove file extension from layer name if present
+            layerName = layerName.replace(/\.[^/.]+$/, "");
+            
+            specialLayerImages.push({
+              url: img.url,
+              name: layerName
+            });
+          }
+        } else {
+          // This is a regular image (day/night)
+          regularImages.push(img.url);
+        }
+      });
     } catch (e) {
       console.error('Error extracting gallery images:', e);
     }
     
-    return images;
+    return { regularImages, specialLayerImages };
   }
   
   // Function to adjust map height based on its container
@@ -416,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
             
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
-                if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
+                if (circle.center && Array.isArray(circle.center) && circle.radius) {
                   const options = circle.options || {};
                   L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
                 }
@@ -447,10 +493,10 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error('Error processing map data:', e);
     }
   }
+  
+  // Enable debug info with a query parameter
+  if (window.location.search.includes('debug=true')) {
+    document.querySelector('.debug-info').style.display = 'block';
+  }
 });
-
-// Enable debug info with a query parameter
-if (window.location.search.includes('debug=true')) {
-  document.querySelector('.debug-info').style.display = 'block';
-}
 </script>
