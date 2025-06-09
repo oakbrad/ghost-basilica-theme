@@ -27,7 +27,29 @@ document.addEventListener("DOMContentLoaded", function () {
   // Adjust map height on window resize
   window.addEventListener('resize', adjustMapHeight);
 
-  const imageUrl = "{{feature_image}}";
+  // Get the featured image URL as fallback
+  const featuredImageUrl = "{{feature_image}}";
+  
+  // Initialize variables for day and night image URLs
+  let dayImageUrl = featuredImageUrl;
+  let nightImageUrl = null;
+  
+  // Try to find gallery images in the post content
+  const mapDataContainer = document.querySelector('.map-data-container');
+  if (mapDataContainer) {
+    // Look for gallery blocks in the content
+    const galleryImages = extractGalleryImages(mapDataContainer);
+    
+    // If gallery images found, use the first one as day image
+    if (galleryImages.length > 0) {
+      dayImageUrl = galleryImages[0];
+      
+      // If there's a second image, use it as night image
+      if (galleryImages.length > 1) {
+        nightImageUrl = galleryImages[1];
+      }
+    }
+  }
   
   // Get video overlay from meta tag if it exists
   const overlayMeta = document.querySelector('meta[name="custom:overlay"]');
@@ -60,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   const videoUrl = overlayFileName ? `/assets/images/overlays/${overlayFileName}` : null;
   
+  // Load the day image first
   const img = new Image();
   img.onload = function () {
     const w = this.naturalWidth;
@@ -85,8 +108,30 @@ document.addEventListener("DOMContentLoaded", function () {
       position: 'topright'
     }).addTo(map);
 
-    // Add the image
-    L.imageOverlay(imageUrl, imageBounds).addTo(map);
+    // Create base layers for day and night
+    const dayLayer = L.imageOverlay(dayImageUrl, imageBounds);
+    let nightLayer = null;
+    
+    // Add the day layer to the map by default
+    dayLayer.addTo(map);
+    
+    // Create base layers object for the layer control
+    const baseLayers = {
+      "Day": dayLayer
+    };
+    
+    // If we have a night image, create a night layer
+    if (nightImageUrl) {
+      nightLayer = L.imageOverlay(nightImageUrl, imageBounds);
+      baseLayers["Night"] = nightLayer;
+    }
+    
+    // Add layer control if we have multiple layers
+    if (Object.keys(baseLayers).length > 1) {
+      L.control.layers(baseLayers, {}, {
+        position: 'topright'
+      }).addTo(map);
+    }
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
@@ -153,7 +198,47 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 100);
   };
 
-  img.src = imageUrl;
+  img.src = dayImageUrl;
+  
+  // Function to extract gallery images from post content
+  function extractGalleryImages(contentContainer) {
+    const images = [];
+    
+    try {
+      // Look for gallery blocks in the content
+      // This is a simplified approach - actual implementation may need to be adjusted
+      // based on how Ghost structures gallery blocks in the DOM
+      
+      // Look for figure elements with gallery class
+      const galleryElements = contentContainer.querySelectorAll('.kg-gallery-container, .kg-gallery-image');
+      
+      if (galleryElements.length > 0) {
+        // Extract image URLs from gallery
+        galleryElements.forEach(gallery => {
+          const imgElements = gallery.querySelectorAll('img');
+          imgElements.forEach(img => {
+            if (img.src) {
+              images.push(img.src);
+            }
+          });
+        });
+      }
+      
+      // If no gallery found, look for individual images
+      if (images.length === 0) {
+        const imgElements = contentContainer.querySelectorAll('img');
+        imgElements.forEach(img => {
+          if (img.src) {
+            images.push(img.src);
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Error extracting gallery images:', e);
+    }
+    
+    return images;
+  }
   
   // Function to adjust map height based on its container
   function adjustMapHeight() {
@@ -310,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }
             
-            // Process polylines
+            // Process other map elements
             if (mapData.polylines && Array.isArray(mapData.polylines)) {
               mapData.polylines.forEach(polyline => {
                 if (polyline.points && Array.isArray(polyline.points)) {
@@ -320,7 +405,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }
             
-            // Process polygons
             if (mapData.polygons && Array.isArray(mapData.polygons)) {
               mapData.polygons.forEach(polygon => {
                 if (polygon.points && Array.isArray(polygon.points)) {
@@ -330,7 +414,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }
             
-            // Process circles
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
                 if (circle.center && Array.isArray(circle.center) && circle.center.length === 2 && circle.radius) {
@@ -340,7 +423,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }
             
-            // Process rectangles
             if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
               mapData.rectangles.forEach(rectangle => {
                 if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
@@ -350,7 +432,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }
             
-            // Process custom view settings
             if (mapData.view) {
               if (mapData.view.center && Array.isArray(mapData.view.center) && mapData.view.center.length === 2) {
                 const zoom = mapData.view.zoom !== undefined ? mapData.view.zoom : map.getZoom();
