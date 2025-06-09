@@ -130,15 +130,14 @@ document.addEventListener("DOMContentLoaded", function () {
       baseLayers["Night"] = nightLayer;
     }
     
-    // Create special layers if any
-    const overlayLayers = {};
+    // Create special layers if any and add them to base layers (for radio button behavior)
     specialLayers.forEach(layer => {
-      overlayLayers[layer.name] = L.imageOverlay(layer.url, imageBounds);
+      baseLayers[layer.name] = L.imageOverlay(layer.url, imageBounds);
     });
     
-    // Add layer control if we have multiple layers (base or special)
-    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
-      L.control.layers(baseLayers, overlayLayers, {
+    // Add layer control if we have multiple layers
+    if (Object.keys(baseLayers).length > 1) {
+      L.control.layers(baseLayers, {}, {
         position: 'bottomleft'
       }).addTo(map);
     }
@@ -268,6 +267,9 @@ document.addEventListener("DOMContentLoaded", function () {
             
             // Remove file extension from layer name if present
             layerName = layerName.replace(/\.[^/.]+$/, "");
+            
+            // Replace hyphens with spaces for better readability
+            layerName = layerName.replace(/-/g, " ");
             
             specialLayerImages.push({
               url: img.url,
