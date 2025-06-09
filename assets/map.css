@@ -194,32 +194,37 @@
         display: none !important;
       }
       
-      /* Make the map take up the full page */
+      /* Reset body and html for print */
       body, html {
         margin: 0 !important;
         padding: 0 !important;
-        height: 100vh !important;
-        width: 100vw !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      
+      /* Force the map to a fixed size that fits on a standard printed page */
+      #map, .leaflet-map-template {
+        width: 7.5in !important;  /* Standard paper width minus margins */
+        height: 10in !important;  /* Standard paper height minus margins */
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
         overflow: hidden !important;
       }
       
-      /* Ensure the map container takes the full page */
-      #map, .leaflet-map-template, .leaflet-container {
+      /* Critical: Scale the map content to fit within the fixed container */
+      .leaflet-container {
         width: 100% !important;
         height: 100% !important;
-        page-break-inside: avoid !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        overflow: hidden !important;
       }
       
-      /* Disable animations during print */
-      .leaflet-fade-anim .leaflet-tile,
-      .leaflet-fade-anim .leaflet-popup,
-      .leaflet-zoom-animated {
-        transition: none !important;
+      /* Force the map pane to scale down */
+      .leaflet-map-pane {
+        transform: scale(0.5) !important;
+        transform-origin: top left !important;
       }
       
-      /* Ensure map elements are visible */
+      /* Ensure all map elements are visible */
       .leaflet-container .leaflet-tile-pane,
       .leaflet-container .leaflet-overlay-pane,
       .leaflet-container .leaflet-marker-pane,
@@ -242,11 +247,4 @@
       }
     }
 
-    /* Special class added by JavaScript when printing */
-    .leaflet-print-mode .leaflet-tile,
-    .leaflet-print-mode .leaflet-marker-icon,
-    .leaflet-print-mode .leaflet-marker-shadow,
-    .leaflet-print-mode .leaflet-popup,
-    .leaflet-print-mode .leaflet-tooltip {
-      transition: none !important;
     }
