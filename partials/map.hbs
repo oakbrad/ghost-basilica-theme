@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Get the featured image URL as fallback
   const featuredImageUrl = "{{feature_image}}";
   
-  // Initialize variables for day and night image URLs
-  let dayImageUrl = featuredImageUrl;
-  let nightImageUrl = null;
+  // Initialize variables for layers
+  let baseLayers = {};
+  let defaultLayerUrl = featuredImageUrl;
   
   // Try to find gallery images in the post content
   const mapDataContainer = document.querySelector('.map-data-container');
@@ -40,14 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Look for gallery blocks in the content
     const galleryImages = extractGalleryImages(mapDataContainer);
     
-    // If gallery images found, use the first one as day image
+    // If gallery images found, use them for layers
     if (galleryImages.length > 0) {
-      dayImageUrl = galleryImages[0];
-      
-      // If there's a second image, use it as night image
-      if (galleryImages.length > 1) {
-        nightImageUrl = galleryImages[1];
-      }
+      defaultLayerUrl = galleryImages[0];
     }
   }
   
@@ -82,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   const videoUrl = overlayFileName ? `/assets/images/overlays/${overlayFileName}` : null;
   
-  // Load the day image first
+  // Load the default image first
   const img = new Image();
   img.onload = function () {
     const w = this.naturalWidth;
@@ -108,26 +103,62 @@ document.addEventListener("DOMContentLoaded", function () {
       position: 'topright'
     }).addTo(map);
 
-    // Create base layers for day and night
-    const dayLayer = L.imageOverlay(dayImageUrl, imageBounds);
-    let nightLayer = null;
+    // Process all available images for layers
+    const mapDataContainer = document.querySelector('.map-data-container');
+    let galleryImages = [];
     
-    // Add the day layer to the map by default
-    dayLayer.addTo(map);
-    
-    // Create base layers object for the layer control
-    const baseLayers = {
-      "Day": dayLayer
-    };
-    
-    // If we have a night image, create a night layer
-    if (nightImageUrl) {
-      nightLayer = L.imageOverlay(nightImageUrl, imageBounds);
-      baseLayers["Night"] = nightLayer;
+    if (mapDataContainer) {
+      galleryImages = extractGalleryImages(mapDataContainer);
     }
     
+    // Add featured image to the list if not already included
+    if (!galleryImages.includes(featuredImageUrl)) {
+      galleryImages.push(featuredImageUrl);
+    }
+    
+    // Create layers from all available images
+    let defaultLayer = null;
+    let layersAdded = 0;
+    
+    galleryImages.forEach((imageUrl, index) => {
+      // Extract layer name from filename if it contains "--"
+      let layerName = "Layer " + (index + 1);
+      
+      // Check if the URL contains a filename with "--" pattern
+      const urlParts = imageUrl.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      
+      if (filename.includes('--')) {
+        // Extract the part after "--" as the layer name
+        const nameParts = filename.split('--');
+        if (nameParts.length > 1) {
+          // Remove file extension from the layer name
+          layerName = nameParts[1].split('.')[0];
+        }
+      } else if (index === 0) {
+        // Default name for the first layer if not using custom naming
+        layerName = "Day";
+      } else if (index === 1) {
+        // Default name for the second layer if not using custom naming
+        layerName = "Night";
+      }
+      
+      // Create the layer
+      const layer = L.imageOverlay(imageUrl, imageBounds);
+      
+      // Add the first layer to the map by default
+      if (index === 0 || imageUrl === defaultLayerUrl) {
+        layer.addTo(map);
+        defaultLayer = layer;
+      }
+      
+      // Add to base layers object
+      baseLayers[layerName] = layer;
+      layersAdded++;
+    });
+    
     // Add layer control if we have multiple layers
-    if (Object.keys(baseLayers).length > 1) {
+    if (layersAdded > 1) {
       L.control.layers(baseLayers, {}, {
         position: 'bottomleft'
       }).addTo(map);
@@ -198,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 100);
   };
 
-  img.src = dayImageUrl;
+  img.src = defaultLayerUrl;
   
   // Function to extract gallery images from post content
   function extractGalleryImages(contentContainer) {
