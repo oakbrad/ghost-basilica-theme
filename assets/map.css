@@ -1,5 +1,6 @@
-.leaflet-overlay-pane video {
-      z-index: 1 !important;
+  /* Keep video Overlay on top of map layers but below markers/tooltips */
+  .leaflet-overlay-pane video {
+      z-index: 650 !important;
     }
 
     /* Hide picture-in-picture button */
@@ -12,6 +13,7 @@
       display: none !important;
     }
 
+    /* No attribution, Ghost portal already in bottomright */
     .leaflet-control-attribution {
       display: none !important;
     }
@@ -37,6 +39,43 @@
       flex-direction: column;
       height: 100%;
       width: 100%;
+    }
+
+    /* Zoom control styling */
+    .leaflet-control-zoom  {
+      background-color: rgba(21, 23, 26, 0.9) !important;
+      color: #fff !important;
+      border: 1px solid #a5a5a550 !important;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
+    }
+    .leaflet-control-zoom-out, .leaflet-control-zoom-in {
+      background-color: rgba(21, 23, 26, 0.9) !important;
+      color: #fff !important;
+      border: none;
+    }
+
+    /* Layer control styling */
+    .leaflet-control-layers {
+      background-color: rgba(21, 23, 26, 0.9) !important;
+      color: #fff !important;
+      border: 1px solid #a5a5a550 !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
+    }
+    .leaflet-control-layers-toggle {
+      background-color: rgba(21, 23, 26, 0.9) !important;
+      border: none;
+      border-radius: 4px !important;
+    }
+
+    .leaflet-control-layers label {
+      color: var(--ghost-accent-color) !important;
+      font-size: 2.5em !important;
+      font-family: "Waning Star" !important;
+    }
+
+    .leaflet-control-layers-selector {
+        accent-color: var(--ghost-accent-color) !important; 
     }
 
     /* Leaflet tooltip styling */
