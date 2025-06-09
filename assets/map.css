@@ -186,3 +186,10 @@
             padding: 6px 10px !important;
         }
     }
+
+    /* Printer adjustments */
+    @media print {
+      .gh-head, .leaflet-control-container, video, .gh-portal-triggerbtn-iframe {
+        display: none !important;
+      }
+    }
