@@ -80,7 +80,7 @@ into the {body} of the default.hbs template --}}
     <div class="post-card-header"><!-- removed header --></div>
 
     {{!-- Map container at the top - 100% width and 500px high --}}
-    <div class="test-map-container" data-overlay="Sunset_Clouds_Squar_One.webm" data-opacity="1.0">
+    <div class="test-map-container" data-overlay="Sunset_Clouds_Squar_One.webm" data-opacity="1.0" data-controls="false">
         {{!-- Get the first map post to use for the test --}}
         {{#get "posts" filter="slug:pyora" limit="1"}}
             {{#foreach posts}}

@@ -99,6 +99,14 @@ document.addEventListener("DOMContentLoaded", function () {
   
   const videoUrl = overlayFileName ? `/assets/images/overlays/${overlayFileName}` : null;
   
+  // Check if controls should be displayed
+  // Get controls setting from parent container data attribute
+  let showControls = true;
+  const parentContainer = mapElement.closest('.test-map-container, .map-container');
+  if (parentContainer && parentContainer.dataset.controls === "false") {
+    showControls = false;
+  }
+  
   // Load the day image first
   const img = new Image();
   img.onload = function () {
@@ -120,10 +128,13 @@ document.addEventListener("DOMContentLoaded", function () {
       zoomControl: false // defaults to left
     });
     
-    // Re-add zoom on right side
-    L.control.zoom({
-      position: 'topright'
-    }).addTo(map);
+    // Add zoom control only if showControls is true
+    if (showControls) {
+      // Re-add zoom on right side
+      L.control.zoom({
+        position: 'topright'
+      }).addTo(map);
+    }
 
     // Create base layers for day and night
     const dayLayer = L.imageOverlay(dayImageUrl, imageBounds);
@@ -215,8 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
     
-    // Add layer control with both base and overlay layers
-    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
+    // Add layer control with both base and overlay layers only if showControls is true
+    if (showControls && (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0)) {
       L.control.layers(baseLayers, overlayLayers, {
         position: 'bottomleft'
       }).addTo(map);
