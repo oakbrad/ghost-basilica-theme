@@ -215,6 +215,42 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
     
+    // Create a map data layer group to hold all markers, polylines, etc.
+    const mapDataLayerGroup = L.layerGroup().addTo(map);
+    
+    // Add the map data layer to overlay layers if we have map data
+    const mapDataContainer = document.querySelector('.map-data-container');
+    if (mapDataContainer) {
+      const preElements = mapDataContainer.querySelectorAll('pre');
+      let hasMapData = false;
+      
+      // Check if any pre element contains valid map data
+      preElements.forEach(pre => {
+        try {
+          const content = pre.textContent.trim();
+          if (content.startsWith('{') || content.startsWith('[')) {
+            const mapData = JSON.parse(content);
+            if (mapData && (
+                (mapData.markers && mapData.markers.length > 0) || 
+                (mapData.polylines && mapData.polylines.length > 0) || 
+                (mapData.polygons && mapData.polygons.length > 0) || 
+                (mapData.circles && mapData.circles.length > 0) || 
+                (mapData.rectangles && mapData.rectangles.length > 0)
+              )) {
+              hasMapData = true;
+            }
+          }
+        } catch (e) {
+          // Ignore parsing errors
+        }
+      });
+      
+      // Only add the control if we have map data
+      if (hasMapData) {
+        overlayLayers["Map Data"] = mapDataLayerGroup;
+      }
+    }
+    
     // Add layer control with both base and overlay layers
     if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
       L.control.layers(baseLayers, overlayLayers, {
@@ -384,8 +420,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     markerOptions.icon = window.customIcons[marker.iconType];
                   }
                   
-                  // Create the marker
-                  const m = L.marker([y, x], markerOptions).addTo(map);
+                  // Create the marker and add to the layer group instead of directly to the map
+                  const m = L.marker([y, x], markerOptions).addTo(mapDataLayerGroup);
                   
                   // Add popup if specified
                   if (marker.popup) {
@@ -480,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.polylines.forEach(polyline => {
                 if (polyline.points && Array.isArray(polyline.points)) {
                   const options = polyline.options || {};
-                  L.polyline(polyline.points, options).addTo(map);
+                  L.polyline(polyline.points, options).addTo(mapDataLayerGroup);
                 }
               });
             }
@@ -489,7 +525,7 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.polygons.forEach(polygon => {
                 if (polygon.points && Array.isArray(polygon.points)) {
                   const options = polygon.options || {};
-                  L.polygon(polygon.points, options).addTo(map);
+                  L.polygon(polygon.points, options).addTo(mapDataLayerGroup);
                 }
               });
             }
@@ -498,7 +534,7 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.circles.forEach(circle => {
                 if (circle.center && Array.isArray(circle.center) && circle.radius) {
                   const options = circle.options || {};
-                  L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
+                  L.circle(circle.center, { radius: circle.radius, ...options }).addTo(mapDataLayerGroup);
                 }
               });
             }
@@ -507,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.rectangles.forEach(rectangle => {
                 if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
                   const options = rectangle.options || {};
-                  L.rectangle(rectangle.bounds, options).addTo(map);
+                  L.rectangle(rectangle.bounds, options).addTo(mapDataLayerGroup);
                 }
               });
             }
