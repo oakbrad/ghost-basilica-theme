@@ -17,6 +17,8 @@
 <script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
 <!-- Leaflet Print Plugin Script -->
 <script src="{{asset "js/leaflet.browser.print.min.js"}}"></script>
+<!-- Map Print Helper Script -->
+<script src="{{asset "js/map-print-helper.js"}}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -124,6 +126,11 @@ document.addEventListener("DOMContentLoaded", function () {
       zoomControl: false // defaults to left
     });
     
+    // Store map reference for the print helper
+    if (window.storeMapReference) {
+      window.storeMapReference(map);
+    }
+    
     // Re-add zoom on right side
     L.control.zoom({
       position: 'topright'
@@ -139,7 +146,44 @@ document.addEventListener("DOMContentLoaded", function () {
         L.BrowserPrint.Mode.Auto("Auto", {title: "Auto"}),
         L.BrowserPrint.Mode.Custom("Custom", {title: "Custom Size"})
       ],
-      documentTitle: document.title || 'Printed Map'
+      documentTitle: document.title || 'Printed Map',
+      contentSelector: '.leaflet-map-template', // Ensure the entire map template is included
+      closePopupsOnPrint: false,
+      printFunction: function() {
+        // Custom print function to ensure the map is properly scaled
+        const mapContainer = document.getElementById('map');
+        const originalWidth = mapContainer.style.width;
+        const originalHeight = mapContainer.style.height;
+        
+        // Set the map to 100% width and height for printing
+        mapContainer.style.width = '100%';
+        mapContainer.style.height = '100%';
+        
+        // Force a resize of the map to ensure it's properly scaled
+        map.invalidateSize({pan: false});
+        
+        // Ensure the image layer is properly scaled
+        const imageOverlays = document.querySelectorAll('.leaflet-image-layer');
+        imageOverlays.forEach(function(overlay) {
+          overlay.style.width = '100%';
+          overlay.style.height = '100%';
+          overlay.style.maxWidth = '100%';
+          overlay.style.maxHeight = '100%';
+          overlay.style.objectFit = 'contain';
+        });
+        
+        // Print the map
+        const printResult = window.print();
+        
+        // Restore the original dimensions after printing
+        setTimeout(function() {
+          mapContainer.style.width = originalWidth;
+          mapContainer.style.height = originalHeight;
+          map.invalidateSize({pan: false});
+        }, 500);
+        
+        return printResult;
+      }
     }).addTo(map);
 
     // Create base layers for day and night

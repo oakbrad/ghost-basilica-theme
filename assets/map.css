@@ -234,6 +234,37 @@
         background-color: white !important;
       }
       
+      /* Critical fix: Ensure the image overlay scales properly */
+      .leaflet-image-layer {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
+      }
+      
+      /* Ensure the map panes scale properly */
+      .leaflet-map-pane,
+      .leaflet-tile,
+      .leaflet-marker-icon,
+      .leaflet-marker-shadow,
+      .leaflet-tile-pane,
+      .leaflet-overlay-pane,
+      .leaflet-shadow-pane,
+      .leaflet-marker-pane,
+      .leaflet-popup-pane,
+      .leaflet-overlay-pane svg,
+      .leaflet-zoom-box,
+      .leaflet-image-layer,
+      .leaflet-layer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        height: 100% !important;
+        transform-origin: 0 0;
+      }
+      
       /* Ensure tooltips are visible in print */
       .leaflet-tooltip {
         background-color: white !important;
