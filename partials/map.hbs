@@ -178,6 +178,16 @@ document.addEventListener("DOMContentLoaded", function () {
         keepAspectRatio: false
       }).addTo(map);
       
+      // Create an overlay layers object for the atmosphere control
+      const overlayLayers = {
+        "Atmosphere": videoOverlay
+      };
+      
+      // Add the atmosphere control to the map
+      L.control.layers(null, overlayLayers, {
+        position: 'bottomright'
+      }).addTo(map);
+      
       // Function to disable picture-in-picture
       function disablePiP() {
         try {
