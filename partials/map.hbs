@@ -216,7 +216,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     // Create a map data layer group to hold all markers, polylines, etc.
+    // We'll add this to the map by default
     const mapDataLayerGroup = L.layerGroup().addTo(map);
+    
+    // Store references to all map elements so we can toggle them
+    const mapElements = [];
     
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
@@ -233,10 +237,37 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Log debug information about map data
     console.log('Map data layer group has ' + mapDataLayerGroup.getLayers().length + ' layers');
+    console.log('Map elements array has ' + mapElements.length + ' elements');
     
-    // Always add the Map Data layer to overlay layers
-    // This ensures the control is always visible
-    overlayLayers["Map Data"] = mapDataLayerGroup;
+    // Set up the map data layer control
+    if (mapElements.length > 0) {
+      // Remove the layer group from the map since elements are already added directly
+      map.removeLayer(mapDataLayerGroup);
+      
+      // Add event handlers for the overlay control
+      map.on('overlayremove', function(e) {
+        if (e.name === "Map Data") {
+          // When the checkbox is unchecked, remove all map elements from the map
+          mapElements.forEach(element => {
+            map.removeLayer(element);
+          });
+          console.log('Removed ' + mapElements.length + ' map elements');
+        }
+      });
+      
+      map.on('overlayadd', function(e) {
+        if (e.name === "Map Data") {
+          // When the checkbox is checked, add all map elements back to the map
+          mapElements.forEach(element => {
+            map.addLayer(element);
+          });
+          console.log('Added ' + mapElements.length + ' map elements back to map');
+        }
+      });
+      
+      // Add the map data layer to overlay layers
+      overlayLayers["Map Data"] = mapDataLayerGroup;
+    }
     
     // Add layer control with both base and overlay layers
     if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
@@ -407,8 +438,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     markerOptions.icon = window.customIcons[marker.iconType];
                   }
                   
-                  // Create the marker and add to the layer group instead of directly to the map
-                  const m = L.marker([y, x], markerOptions).addTo(mapDataLayerGroup);
+                  // Create the marker and add directly to the map
+                  const m = L.marker([y, x], markerOptions).addTo(map);
+                  
+                  // Also add to the layer group for toggling
+                  mapDataLayerGroup.addLayer(m);
+                  
+                  // Store reference to the marker
+                  mapElements.push(m);
+                  
                   markerCount++;
                   
                   // Add popup if specified
@@ -504,34 +542,45 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.polylines.forEach(polyline => {
                 if (polyline.points && Array.isArray(polyline.points)) {
                   const options = polyline.options || {};
-                  L.polyline(polyline.points, options).addTo(mapDataLayerGroup);
+                  const poly = L.polyline(polyline.points, options).addTo(map);
+                  mapDataLayerGroup.addLayer(poly);
+                  mapElements.push(poly);
                 }
               });
             }
             
+            // Process other map elements
             if (mapData.polygons && Array.isArray(mapData.polygons)) {
               mapData.polygons.forEach(polygon => {
                 if (polygon.points && Array.isArray(polygon.points)) {
                   const options = polygon.options || {};
-                  L.polygon(polygon.points, options).addTo(mapDataLayerGroup);
+                  const poly = L.polygon(polygon.points, options).addTo(map);
+                  mapDataLayerGroup.addLayer(poly);
+                  mapElements.push(poly);
                 }
               });
             }
             
+            // Process other map elements
             if (mapData.circles && Array.isArray(mapData.circles)) {
               mapData.circles.forEach(circle => {
                 if (circle.center && Array.isArray(circle.center) && circle.radius) {
                   const options = circle.options || {};
-                  L.circle(circle.center, { radius: circle.radius, ...options }).addTo(mapDataLayerGroup);
+                  const circ = L.circle(circle.center, { radius: circle.radius, ...options }).addTo(map);
+                  mapDataLayerGroup.addLayer(circ);
+                  mapElements.push(circ);
                 }
               });
             }
             
+            // Process other map elements
             if (mapData.rectangles && Array.isArray(mapData.rectangles)) {
               mapData.rectangles.forEach(rectangle => {
                 if (rectangle.bounds && Array.isArray(rectangle.bounds) && rectangle.bounds.length === 2) {
                   const options = rectangle.options || {};
-                  L.rectangle(rectangle.bounds, options).addTo(mapDataLayerGroup);
+                  const rect = L.rectangle(rectangle.bounds, options).addTo(map);
+                  mapDataLayerGroup.addLayer(rect);
+                  mapElements.push(rect);
                 }
               });
             }
