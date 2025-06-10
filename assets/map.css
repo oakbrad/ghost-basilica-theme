@@ -1,4 +1,4 @@
-  /* Keep video Overlay on top of map layers but below markers/tooltips */
+/* Keep video Overlay on top of map layers but below markers/tooltips */
   .leaflet-overlay-pane video {
       z-index: 650 !important;
     }
@@ -189,7 +189,62 @@
 
     /* Printer adjustments */
     @media print {
+      /* Hide UI elements not needed for print */
       .gh-head, .leaflet-control-container, video, .gh-portal-triggerbtn-iframe {
         display: none !important;
       }
+      
+      /* Reset body and html for print */
+      body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      
+      /* Force the map to a fixed size that fits on a standard printed page */
+      #map, .leaflet-map-template {
+        width: 7.5in !important;  /* Standard paper width minus margins */
+        height: 10in !important;  /* Standard paper height minus margins */
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
+        overflow: hidden !important;
+      }
+      
+      /* Critical: Scale the map content to fit within the fixed container */
+      .leaflet-container {
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+      }
+      
+      /* Force the map pane to scale down */
+      .leaflet-map-pane {
+        transform: scale(0.5) !important;
+        transform-origin: top left !important;
+      }
+      
+      /* Ensure all map elements are visible */
+      .leaflet-container .leaflet-tile-pane,
+      .leaflet-container .leaflet-overlay-pane,
+      .leaflet-container .leaflet-marker-pane,
+      .leaflet-container .leaflet-popup-pane,
+      .leaflet-container .leaflet-tooltip-pane {
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+      
+      /* Improve visibility of map elements for print */
+      .leaflet-tooltip {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        background-color: white !important;
+        color: black !important;
+      }
+      
+      .leaflet-tooltip b {
+        color: #000 !important;
+      }
+    }
+
     }
