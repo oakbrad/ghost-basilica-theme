@@ -231,10 +231,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Process map data from post content
     processMapData(map, h, w);
     
-    // After processing map data, check if the layer group has any layers
-    if (mapDataLayerGroup.getLayers().length > 0) {
-      overlayLayers["Map Data"] = mapDataLayerGroup;
-    }
+    // Log debug information about map data
+    console.log('Map data layer group has ' + mapDataLayerGroup.getLayers().length + ' layers');
+    
+    // Always add the Map Data layer to overlay layers
+    // This ensures the control is always visible
+    overlayLayers["Map Data"] = mapDataLayerGroup;
     
     // Add layer control with both base and overlay layers
     if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
@@ -358,19 +360,32 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function processMapData(map, imageHeight, imageWidth) {
     const mapDataContainer = document.querySelector('.map-data-container');
-    if (!mapDataContainer) return;
+    if (!mapDataContainer) {
+      console.log('No map data container found');
+      return;
+    }
+    
+    // Debug counter for markers
+    let markerCount = 0;
     
     try {
       // Find all pre elements that might contain JSON data
       const preElements = mapDataContainer.querySelectorAll('pre');
+      console.log('Found ' + preElements.length + ' pre elements in map data container');
       
       preElements.forEach(pre => {
         try {
           // Try to parse the content as JSON
           const content = pre.textContent.trim();
-          if (!content.startsWith('{') && !content.startsWith('[')) return;
+          console.log('Pre element content starts with: ' + content.substring(0, 20));
+          
+          if (!content.startsWith('{') && !content.startsWith('[')) {
+            console.log('Content does not start with { or [, skipping');
+            return;
+          }
           
           const mapData = JSON.parse(content);
+          console.log('Successfully parsed JSON data');
           
           // Process the map data
           if (mapData) {
@@ -394,6 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   
                   // Create the marker and add to the layer group instead of directly to the map
                   const m = L.marker([y, x], markerOptions).addTo(mapDataLayerGroup);
+                  markerCount++;
                   
                   // Add popup if specified
                   if (marker.popup) {
@@ -531,6 +547,10 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error('Error parsing map data JSON:', e);
         }
       });
+      
+      // Log the number of markers added
+      console.log('Added ' + markerCount + ' markers to the map data layer group');
+      
     } catch (e) {
       console.error('Error processing map data:', e);
     }
