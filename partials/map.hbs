@@ -218,46 +218,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Create a map data layer group to hold all markers, polylines, etc.
     const mapDataLayerGroup = L.layerGroup().addTo(map);
     
-    // Add the map data layer to overlay layers if we have map data
-    const mapDataContainer = document.querySelector('.map-data-container');
-    if (mapDataContainer) {
-      const preElements = mapDataContainer.querySelectorAll('pre');
-      let hasMapData = false;
-      
-      // Check if any pre element contains valid map data
-      preElements.forEach(pre => {
-        try {
-          const content = pre.textContent.trim();
-          if (content.startsWith('{') || content.startsWith('[')) {
-            const mapData = JSON.parse(content);
-            if (mapData && (
-                (mapData.markers && mapData.markers.length > 0) || 
-                (mapData.polylines && mapData.polylines.length > 0) || 
-                (mapData.polygons && mapData.polygons.length > 0) || 
-                (mapData.circles && mapData.circles.length > 0) || 
-                (mapData.rectangles && mapData.rectangles.length > 0)
-              )) {
-              hasMapData = true;
-            }
-          }
-        } catch (e) {
-          // Ignore parsing errors
-        }
-      });
-      
-      // Only add the control if we have map data
-      if (hasMapData) {
-        overlayLayers["Map Data"] = mapDataLayerGroup;
-      }
-    }
-    
-    // Add layer control with both base and overlay layers
-    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
-      L.control.layers(baseLayers, overlayLayers, {
-        position: 'bottomleft'
-      }).addTo(map);
-    }
-    
     // Get viewport height and calculate scale to fit height
     const viewportHeight = window.innerHeight;
     const scale = viewportHeight / h;
@@ -270,7 +230,19 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Process map data from post content
     processMapData(map, h, w);
-
+    
+    // After processing map data, check if the layer group has any layers
+    if (mapDataLayerGroup.getLayers().length > 0) {
+      overlayLayers["Map Data"] = mapDataLayerGroup;
+    }
+    
+    // Add layer control with both base and overlay layers
+    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
+      L.control.layers(baseLayers, overlayLayers, {
+        position: 'bottomleft'
+      }).addTo(map);
+    }
+    
     // Invalidate map size after a short delay to ensure proper rendering
     setTimeout(function() {
       map.invalidateSize();
