@@ -148,12 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
       baseLayers[layer.name] = L.imageOverlay(layer.url, imageBounds);
     });
     
-    // Add layer control if we have multiple layers
-    if (Object.keys(baseLayers).length > 1) {
-      L.control.layers(baseLayers, {}, {
-        position: 'bottomleft'
-      }).addTo(map);
-    }
+    // Create overlay layers object for optional overlays like atmosphere
+    const overlayLayers = {};
     
     // Add video overlay (ie. clouds) only if videoUrl exists
     if (videoUrl) {
@@ -178,6 +174,9 @@ document.addEventListener("DOMContentLoaded", function () {
         keepAspectRatio: false
       }).addTo(map);
       
+      // Add the video overlay to the overlay layers
+      overlayLayers["Atmosphere"] = videoOverlay;
+      
       // Function to disable picture-in-picture
       function disablePiP() {
         try {
@@ -199,6 +198,28 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Also try after a short delay to ensure the video is loaded
       setTimeout(disablePiP, 100);
+      
+      // Add event listener to ensure video plays when overlay is added back to the map
+      map.on('overlayadd', function(e) {
+        if (e.name === "Atmosphere") {
+          try {
+            const videoElement = videoOverlay.getElement();
+            if (videoElement && videoElement.paused) {
+              videoElement.play()
+                .catch(err => console.error("Error playing video:", err));
+            }
+          } catch (err) {
+            console.error("Error handling overlay add event:", err);
+          }
+        }
+      });
+    }
+    
+    // Add layer control with both base and overlay layers
+    if (Object.keys(baseLayers).length > 1 || Object.keys(overlayLayers).length > 0) {
+      L.control.layers(baseLayers, overlayLayers, {
+        position: 'bottomleft'
+      }).addTo(map);
     }
     
     // Get viewport height and calculate scale to fit height
