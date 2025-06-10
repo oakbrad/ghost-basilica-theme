@@ -84,6 +84,13 @@ into the {body} of the default.hbs template --}}
         {{!-- Get the first map post to use for the test --}}
         {{#get "posts" filter="slug:pyora" limit="1"}}
             {{#foreach posts}}
+                <!-- Turn off map controls -->
+                        <style>
+                            .leaflet-control-container {
+                                display: none !important;
+                            }
+                        </style>
+                <!-- Render the map -->
                 {{> "map" }}
             {{/foreach}}
         {{/get}}
