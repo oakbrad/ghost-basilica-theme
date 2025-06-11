@@ -2,7 +2,15 @@
 {{!-- Include the CSS and JS for the table roller --}}
 <link rel="stylesheet" href="{{asset "css/rolltable.css"}}">
 
+{{!-- Include the required libraries for 3D dice in the correct order --}}
+<script src="{{asset "js/lib/three.min.js"}}"></script>
+<script src="{{asset "js/lib/cannon.min.js"}}"></script>
+<script src="{{asset "js/lib/dice.min.js"}}"></script>
+
+{{!-- Include our custom scripts after the libraries --}}
+<script src="{{asset "js/3d-dice.js"}}"></script>
 <script src="{{asset "js/rolltable.js"}}"></script>
+
 {{!-- Table Roller UI --}}
 <div class="table-roller-container gh-canvas" {{#if contentSelector}}data-content-selector="{{contentSelector}}"{{/if}}>
     <button class="table-roller-button">

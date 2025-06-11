@@ -3,7 +3,8 @@
 <head>
 
     {{!-- Basic meta - advanced meta is output with {ghost_head} below --}}
-    <title>{{meta_title}}</title>
+    <!-- let pages define title instead of applying {{meta_title}} to everything -->
+    <title>{{{block "title"}}}</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="HandheldFriendly" content="True" />
