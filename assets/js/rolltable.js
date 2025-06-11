@@ -1,5 +1,65 @@
 // Table roller functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if 3D dice libraries are available
+    const checkLibraries = function() {
+        const threeLoaded = typeof THREE !== 'undefined';
+        const cannonLoaded = typeof CANNON !== 'undefined';
+        const diceManagerLoaded = typeof DiceManager !== 'undefined';
+        const diceRollerLoaded = typeof DiceRoller !== 'undefined';
+        
+        console.log('Library check:', {
+            THREE: threeLoaded,
+            CANNON: cannonLoaded,
+            DiceManager: diceManagerLoaded,
+            DiceRoller: diceRollerLoaded
+        });
+        
+        return threeLoaded && cannonLoaded && diceManagerLoaded && diceRollerLoaded;
+    };
+    
+    // Try to load the dice libraries if they're not already loaded
+    const loadDiceLibraries = function() {
+        if (checkLibraries()) {
+            console.log('All 3D dice libraries already loaded');
+            return true;
+        }
+        
+        console.log('Attempting to load missing 3D dice libraries');
+        
+        // Try to load Three.js if not already loaded
+        if (typeof THREE === 'undefined') {
+            console.log('Loading Three.js');
+            const threeScript = document.createElement('script');
+            threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+            document.head.appendChild(threeScript);
+        }
+        
+        // Try to load Cannon.js if not already loaded
+        if (typeof CANNON === 'undefined') {
+            console.log('Loading Cannon.js');
+            const cannonScript = document.createElement('script');
+            cannonScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js';
+            document.head.appendChild(cannonScript);
+        }
+        
+        // Try to load threejs-dice if not already loaded
+        if (typeof DiceManager === 'undefined') {
+            console.log('Loading threejs-dice');
+            const diceScript = document.createElement('script');
+            diceScript.src = 'https://cdn.jsdelivr.net/npm/threejs-dice@1.1.0/lib/dice.min.js';
+            document.head.appendChild(diceScript);
+        }
+        
+        // Check again after a short delay
+        setTimeout(checkLibraries, 500);
+        
+        // Return false for now, the check will happen asynchronously
+        return false;
+    };
+    
+    // Try to load the libraries
+    loadDiceLibraries();
+    
     // Find all table roller containers on the page
     const tableRollerContainers = document.querySelectorAll('.table-roller-container');
     
@@ -38,10 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Random index:', randomIndex, 'Result:', result);
                 
                 // Check if 3D dice libraries are available
-                const use3DDice = typeof DiceRoller !== 'undefined' && 
-                                 typeof THREE !== 'undefined' && 
-                                 typeof CANNON !== 'undefined' && 
-                                 typeof DiceManager !== 'undefined';
+                const use3DDice = checkLibraries();
                 
                 console.log('Using 3D dice:', use3DDice);
                 

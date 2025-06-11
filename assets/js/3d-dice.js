@@ -1,5 +1,19 @@
 // 3D Dice Roller for Table Roller
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('3D dice module loaded');
+    
+    // Check if required libraries are available
+    if (typeof THREE === 'undefined' || typeof CANNON === 'undefined' || typeof DiceManager === 'undefined') {
+        console.error('Required libraries for 3D dice are not loaded:',
+            'THREE:', typeof THREE !== 'undefined',
+            'CANNON:', typeof CANNON !== 'undefined',
+            'DiceManager:', typeof DiceManager !== 'undefined'
+        );
+        return;
+    }
+    
+    console.log('All required libraries for 3D dice are loaded');
+    
     // Initialize Three.js scene, camera, renderer
     let diceScene = null;
     let diceCamera = null;
@@ -308,4 +322,3 @@ document.addEventListener('DOMContentLoaded', function() {
         roll: rollDie
     };
 });
-
