@@ -1,69 +1,22 @@
+<p align="center">
+    <img width="650" src="https://github.com/oakbrad/dungeonchurch/raw/main/logo-chrome.png"><br>
+    <a href=https://github.com/oakbrad/dungeonchurch>
+        <img src=https://img.shields.io/github/last-commit/oakbrad/dungeonchurch?label=dungeonchurch&color=gray&labelColor=ff2600&logoColor=ffffff&logo=docker></a>
+    <a href=https://github.com/oakbrad/dungeonchurch-pyora>
+        <img src=https://img.shields.io/github/last-commit/oakbrad/dungeonchurch-pyora?label=dungeonchurch-pyora&color=gray&labelColor=ff2600&logo=dungeonsanddragons></a>
+    <a href=https://github.com/oakbrad/dungeonchurch-basilica>
+        <img src=https://img.shields.io/github/last-commit/oakbrad/dungeonchurch-basilica?label=dungeonchurch-basilica&color=gray&labelColor=ff2600&logo=ghost></a>
+    <a href=https://github.com/oakbrad/dungeonchurch-cogs>
+        <img src=https://img.shields.io/github/last-commit/oakbrad/dungeonchurch-cogs?label=dungeonchurch-cogs&color=gray&labelColor=ff2600&logoColor=ffffff&logo=discord></a>
+</p>
+
 # Basilica
-**Basilica** is a modified version of the [Casper](https://github.com/TryGhost/Casper/releases) theme for the [Dungeon Church](https://www.dungeon.church) gaming group website.
+**Basilica** is a modified version of the [Casper](https://github.com/TryGhost/Casper/releases) theme for the [Dungeon Church](https://www.dungeon.church) RPG group website.
 
 ## Custom Templates
-This theme contains custom templates for visualizing RPG related information:
+This theme contains custom templates & partials for RPG related content:
+* `custom-map.hbs` - Create an interactive [LeafletJS](https://leafletjs.com) map from an image. Supports markers, shapes, overlays, custom icons, etc. See [readme](/README-map.md).
 * `custom-timeline.hbs` - Create [TimelineJS3](https://github.com/NUKnightLab/TimelineJS3) timelines with a linked Google Sheet.
-* `custom-leaflet-map.hbs` - Create an interactive [LeafletJS](https://leafletjs.com) map from an image. Supports markers, shapes, overlays, custom icons, etc. see additional [readme](/MAP-OVERLAY-INSTRUCTIONS.md).
+* `custom-table.hbs` - Creates an interactive dice roller for Markdown tables. See [readme](/README-table-roller.md)
 
-🚨 Changes to this repo are deployed onto the live production site 🚨
-
-## First time using a Ghost theme?
-
-Ghost uses a simple templating language called [Handlebars](http://handlebarsjs.com/) for its themes.
-
-This theme has lots of code comments to help explain what's going on just by reading the code. Once you feel comfortable with how everything works, we also have full [theme API documentation](https://ghost.org/docs/themes/) which explains every possible Handlebars helper and template.
-
-**The main files are:**
-
-- `default.hbs` - The parent template file, which includes your global header/footer
-- `index.hbs` - The main template to generate a list of posts, usually the home page
-- `post.hbs` - The template used to render individual posts
-- `page.hbs` - Used for individual pages
-- `tag.hbs` - Used for tag archives, eg. "all posts tagged with `news`"
-- `author.hbs` - Used for author archives, eg. "all posts written by Jamie"
-
-One neat trick is that you can also create custom one-off templates by adding the slug of a page to a template file. For example:
-
-- `page-about.hbs` - Custom template for an `/about/` page
-- `tag-news.hbs` - Custom template for `/tag/news/` archive
-- `author-ali.hbs` - Custom template for `/author/ali/` archive
-
-
-## Development
-
-Casper styles are compiled using Gulp/PostCSS to polyfill future CSS spec. You'll need [Node](https://nodejs.org/), [Yarn](https://yarnpkg.com/) and [Gulp](https://gulpjs.com) installed globally. After that, from the theme's root directory:
-
-```bash
-# install dependencies
-yarn install
-
-# run development server
-yarn dev
-```
-
-Now you can edit `/assets/css/` files, which will be compiled to `/assets/built/` automatically.
-
-The `zip` Gulp task packages the theme files into `dist/<theme-name>.zip`, which you can then upload to your site.
-
-```bash
-# create .zip file
-yarn zip
-```
-
-## PostCSS Features Used
-
-- Autoprefixer - Don't worry about writing browser prefixes of any kind, it's all done automatically with support for the latest 2 major versions of every browser.
-- [Color Mod](https://github.com/jonathantneal/postcss-color-mod-function)
-
-
-## SVG Icons
-
-Casper uses inline SVG icons, included via Handlebars partials. You can find all icons inside `/partials/icons`. To use an icon just include the name of the relevant file, eg. To include the SVG icon in `/partials/icons/rss.hbs` - use `{{> "icons/rss"}}`.
-
-You can add your own SVG icons in the same manner.
-
-
-## Copyright & License
-
-Copyright (c) 2013-2025 Ghost Foundation - Released under the [MIT license](LICENSE).
+#### [Casper Readme](README-casper.md)
