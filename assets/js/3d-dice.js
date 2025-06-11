@@ -1,7 +1,6 @@
 // 3D Dice Roller for Table Roller
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Three.js scene, camera, renderer
-    let diceBox = null;
     let diceScene = null;
     let diceCamera = null;
     let diceRenderer = null;
@@ -11,11 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentDie = null;
     let animationId = null;
     let resultCallback = null;
+    let overlayElement = null;
 
     // Initialize the 3D dice environment
-    function initDice(container, sides) {
-        if (diceInitialized && diceContainer === container) {
-            // If already initialized for this container, just reset
+    function initDice(sides) {
+        if (diceInitialized) {
+            // If already initialized, just reset
             if (currentDie) {
                 diceScene.remove(currentDie.getObject());
                 currentDie = null;
@@ -23,29 +23,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Create overlay for the dice to roll on top of the entire page
+        overlayElement = document.createElement('div');
+        overlayElement.className = 'dice-overlay';
+        document.body.appendChild(overlayElement);
+        
         // Store the container reference
-        diceContainer = container;
+        diceContainer = overlayElement;
 
         // Create the scene
         diceScene = new THREE.Scene();
         
-        // Set up the camera
-        const containerRect = container.getBoundingClientRect();
-        const width = containerRect.width;
-        const height = 300; // Fixed height for the dice area
+        // Set up the camera - use the entire window
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         
         diceCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        diceCamera.position.set(0, 20, 40);
+        diceCamera.position.set(0, 30, 60);
         diceCamera.lookAt(new THREE.Vector3(0, 0, 0));
         
         // Set up the renderer
         diceRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         diceRenderer.setSize(width, height);
-        diceRenderer.setClearColor(0x000000, 0);
+        diceRenderer.setClearColor(0x000000, 0); // Transparent background
         
-        // Clear the container and add the renderer
-        container.innerHTML = '';
-        container.appendChild(diceRenderer.domElement);
+        // Add the renderer to the overlay
+        overlayElement.appendChild(diceRenderer.domElement);
         
         // Set up the physics world
         diceWorld = new CANNON.World();
@@ -78,20 +81,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Handle window resize
         window.addEventListener('resize', function() {
-            if (diceContainer) {
-                const containerRect = diceContainer.getBoundingClientRect();
-                const width = containerRect.width;
-                const height = 300;
-                
-                diceCamera.aspect = width / height;
-                diceCamera.updateProjectionMatrix();
-                diceRenderer.setSize(width, height);
-            }
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            diceCamera.aspect = width / height;
+            diceCamera.updateProjectionMatrix();
+            diceRenderer.setSize(width, height);
         });
     }
 
     // Create and roll a die with the specified number of sides
     function rollDie(sides, targetValue, callback) {
+        // Initialize if not already done
+        if (!diceInitialized) {
+            initDice(sides);
+        } else {
+            // Show the overlay if it exists
+            if (overlayElement) {
+                overlayElement.style.display = 'block';
+            }
+        }
+
         resultCallback = callback;
         
         // Determine which die type to use based on sides
@@ -116,10 +126,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 dieType = DiceD20;
                 break;
             default:
-                // Default to D6 if unsupported number of sides
-                dieType = DiceD6;
-                console.warn(`Unsupported die type: D${sides}. Using D6 instead.`);
-                sides = 6;
+                // If unsupported number of sides, use the closest supported die type
+                if (sides <= 4) {
+                    dieType = DiceD4;
+                    console.warn(`Using D4 for ${sides} sides.`);
+                } else if (sides <= 6) {
+                    dieType = DiceD6;
+                    console.warn(`Using D6 for ${sides} sides.`);
+                } else if (sides <= 8) {
+                    dieType = DiceD8;
+                    console.warn(`Using D8 for ${sides} sides.`);
+                } else if (sides <= 10) {
+                    dieType = DiceD10;
+                    console.warn(`Using D10 for ${sides} sides.`);
+                } else if (sides <= 12) {
+                    dieType = DiceD12;
+                    console.warn(`Using D12 for ${sides} sides.`);
+                } else {
+                    dieType = DiceD20;
+                    console.warn(`Using D20 for ${sides} sides.`);
+                }
         }
         
         // Create the die
@@ -132,9 +158,9 @@ document.addEventListener('DOMContentLoaded', function() {
         diceScene.add(currentDie.getObject());
         
         // Position the die above the center
-        currentDie.getObject().position.x = 0;
-        currentDie.getObject().position.y = 10;
-        currentDie.getObject().position.z = 0;
+        currentDie.getObject().position.x = Math.random() * 10 - 5; // Random X position
+        currentDie.getObject().position.y = 20; // Higher starting position
+        currentDie.getObject().position.z = Math.random() * 10 - 5; // Random Z position
         
         // Add some random rotation
         currentDie.getObject().rotation.x = Math.random() * Math.PI;
@@ -145,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentDie.updateBodyFromMesh();
         
         // Apply a random impulse to make it roll
-        const impulse = 10 + Math.random() * 10;
+        const impulse = 15 + Math.random() * 15; // Stronger impulse
         currentDie.getObject().body.applyImpulse(
             new CANNON.Vec3(Math.random() * impulse - impulse/2, impulse, Math.random() * impulse - impulse/2),
             new CANNON.Vec3(0, 0, 0)
@@ -209,6 +235,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (animationId) {
                     cancelAnimationFrame(animationId);
                     animationId = null;
+                }
+                
+                // Hide the overlay
+                if (overlayElement) {
+                    overlayElement.style.display = 'none';
                 }
                 
                 // Call the callback with the result

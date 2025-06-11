@@ -2,12 +2,12 @@
 {{!-- Include the CSS and JS for the table roller --}}
 <link rel="stylesheet" href="{{asset "css/rolltable.css"}}">
 
-<script src="{{asset "js/rolltable.js"}}"></script>
 {{!-- Include the required libraries for 3D dice --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/threejs-dice@1.1.0/lib/dice.min.js"></script>
 <script src="{{asset "js/3d-dice.js"}}"></script>
+<script src="{{asset "js/rolltable.js"}}"></script>
 
 {{!-- Table Roller UI --}}
 <div class="table-roller-container gh-canvas" {{#if contentSelector}}data-content-selector="{{contentSelector}}"{{/if}}>
@@ -15,7 +15,6 @@
         <span class="d20-icon">{{> "icons/d20"}}</span>
         {{#if buttonText}}{{buttonText}}{{else}}Roll on Table{{/if}}
     </button>
-    <div class="dice-container"></div>
     <div class="table-roller-result">
         &nbsp;
     </div>

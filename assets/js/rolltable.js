@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const tableRollerButton = container.querySelector('.table-roller-button');
         const tableRollerResult = container.querySelector('.table-roller-result');
         const tableRollerIcon = container.querySelector('.d20-icon');
-        const diceContainer = container.querySelector('.dice-container');
         
         // Find the associated content section for this roller
         // If there's a data-content-selector attribute, use that to find the content
@@ -30,23 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 tableRollerResult.textContent = 'Rolling...';
                 tableRollerResult.classList.remove('result-fade-in');
                 
-                // Add rolling animation to the d20 icon if not using 3D dice
-                if (tableRollerIcon && !diceContainer) {
-                    tableRollerIcon.classList.add('rolling');
-                    setTimeout(() => {
-                        tableRollerIcon.classList.remove('rolling');
-                    }, 800);
-                }
-                
                 // Roll on the table (random selection)
                 const randomIndex = Math.floor(Math.random() * tableData.length);
                 const result = tableData[randomIndex];
                 
                 // If 3D dice is available, use it
-                if (typeof DiceRoller !== 'undefined' && diceContainer) {
-                    // Initialize the dice container if needed
-                    DiceRoller.init(diceContainer, tableData.length);
-                    
+                if (typeof DiceRoller !== 'undefined' && typeof THREE !== 'undefined' && typeof CANNON !== 'undefined') {
                     // Roll the die with the appropriate number of sides
                     // Use randomIndex + 1 as the target value (since dice values start at 1)
                     DiceRoller.roll(tableData.length, randomIndex + 1, function(diceResult) {
@@ -54,6 +42,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         displayResult(result);
                     });
                 } else {
+                    // Add rolling animation to the d20 icon if not using 3D dice
+                    if (tableRollerIcon) {
+                        tableRollerIcon.classList.add('rolling');
+                        setTimeout(() => {
+                            tableRollerIcon.classList.remove('rolling');
+                        }, 800);
+                    }
+                    
                     // Use the traditional method with a slight delay
                     setTimeout(() => {
                         displayResult(result);
