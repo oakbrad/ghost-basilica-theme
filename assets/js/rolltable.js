@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (tableRollerButton && tableRollerResult && contentSection) {
             tableRollerButton.addEventListener('click', function() {
+                console.log('Table roller button clicked');
+                
                 // Extract table data from the markdown table
                 const tableData = extractTableData(contentSection);
                 
@@ -33,16 +35,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 const randomIndex = Math.floor(Math.random() * tableData.length);
                 const result = tableData[randomIndex];
                 
-                // If 3D dice is available, use it
-                if (typeof DiceRoller !== 'undefined' && typeof THREE !== 'undefined' && typeof CANNON !== 'undefined') {
+                console.log('Random index:', randomIndex, 'Result:', result);
+                
+                // Check if 3D dice libraries are available
+                const use3DDice = typeof DiceRoller !== 'undefined' && 
+                                 typeof THREE !== 'undefined' && 
+                                 typeof CANNON !== 'undefined' && 
+                                 typeof DiceManager !== 'undefined';
+                
+                console.log('Using 3D dice:', use3DDice);
+                
+                if (use3DDice) {
                     // Roll the die with the appropriate number of sides
                     // Use randomIndex + 1 as the target value (since dice values start at 1)
-                    DiceRoller.roll(tableData.length, randomIndex + 1, function(diceResult) {
-                        // Display the result with animation
-                        displayResult(result);
-                    });
+                    try {
+                        DiceRoller.roll(tableData.length, randomIndex + 1, function(diceResult) {
+                            console.log('Dice roll completed with result:', diceResult);
+                            // Display the result with animation
+                            displayResult(result);
+                        });
+                    } catch (error) {
+                        console.error('Error using 3D dice:', error);
+                        // Fall back to traditional method
+                        fallbackToTraditional();
+                    }
                 } else {
-                    // Add rolling animation to the d20 icon if not using 3D dice
+                    // Fall back to traditional method
+                    fallbackToTraditional();
+                }
+                
+                // Traditional method as fallback
+                function fallbackToTraditional() {
+                    // Add rolling animation to the d20 icon
                     if (tableRollerIcon) {
                         tableRollerIcon.classList.add('rolling');
                         setTimeout(() => {
@@ -59,6 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Function to display the result
             function displayResult(result) {
+                console.log('Displaying result:', result);
+                
                 // Use innerHTML to preserve HTML links
                 tableRollerResult.innerHTML = result;
                 
