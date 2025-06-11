@@ -4,10 +4,26 @@ This template allows you to create RPG-style random table rolls in your Ghost po
 
 ## How to Use
 
+### Option 1: Using the Custom Table Template
+
 1. Create a new post in Ghost
-2. In the post settings (gear icon), select "custom-table-roller" as the template
+2. In the post settings (gear icon), select "custom-table" as the template
 3. Add your content to the post, including a markdown table with your random table entries
 4. Publish the post
+
+### Option 2: Using the Table Roller Partial in Any Template
+
+You can include the table roller in any template or post by adding the partial:
+
+```handlebars
+{{> "table-roller"}}
+```
+
+You can also customize the button text and content selector:
+
+```handlebars
+{{> "table-roller" buttonText="Roll for Random Encounter" contentSelector=".my-custom-content-area"}}
+```
 
 ## Table Format
 
@@ -36,7 +52,7 @@ The table roller fully supports HTML links in your table entries. For example:
 | 3  | [+1 Dagger](https://example.com/items/dagger-plus-one) |
 ```
 
-When a result with a link is rolled, the link will be preserved in the result display and will be clickable.
+When a result with a link is rolled, the link will be preserved in the result display and will be clickable. All links will automatically open in a new tab.
 
 ## Example
 
@@ -76,3 +92,14 @@ The table roller works by:
 4. Displaying the selected entry in the result area
 
 The table itself remains visible in your post content, so readers can see all possible results.
+
+## Customization
+
+The table roller is designed to be modular and reusable:
+
+- CSS styles are in `assets/css/rolltable.css`
+- JavaScript functionality is in `assets/js/rolltable.js`
+- The partial template is in `partials/table-roller.hbs`
+
+You can customize these files to change the appearance and behavior of the table roller.
+
