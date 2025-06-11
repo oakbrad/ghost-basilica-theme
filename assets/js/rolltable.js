@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tableRollerButton = container.querySelector('.table-roller-button');
         const tableRollerResult = container.querySelector('.table-roller-result');
         const tableRollerIcon = container.querySelector('.d20-icon');
+        const diceContainer = container.querySelector('.dice-container');
         
         // Find the associated content section for this roller
         // If there's a data-content-selector attribute, use that to find the content
@@ -29,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 tableRollerResult.textContent = 'Rolling...';
                 tableRollerResult.classList.remove('result-fade-in');
                 
-                // Add rolling animation to the d20 icon
-                if (tableRollerIcon) {
+                // Add rolling animation to the d20 icon if not using 3D dice
+                if (tableRollerIcon && !diceContainer) {
                     tableRollerIcon.classList.add('rolling');
                     setTimeout(() => {
                         tableRollerIcon.classList.remove('rolling');
@@ -41,21 +42,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 const randomIndex = Math.floor(Math.random() * tableData.length);
                 const result = tableData[randomIndex];
                 
-                // Display the result with a slight delay and animation
-                setTimeout(() => {
-                    // Use innerHTML to preserve HTML links
-                    tableRollerResult.innerHTML = result;
+                // If 3D dice is available, use it
+                if (typeof DiceRoller !== 'undefined' && diceContainer) {
+                    // Initialize the dice container if needed
+                    DiceRoller.init(diceContainer, tableData.length);
                     
-                    // Add target="_blank" to all links in the result
-                    const links = tableRollerResult.querySelectorAll('a');
-                    links.forEach(link => {
-                        link.setAttribute('target', '_blank');
-                        link.setAttribute('rel', 'noopener noreferrer');
+                    // Roll the die with the appropriate number of sides
+                    // Use randomIndex + 1 as the target value (since dice values start at 1)
+                    DiceRoller.roll(tableData.length, randomIndex + 1, function(diceResult) {
+                        // Display the result with animation
+                        displayResult(result);
                     });
-                    
-                    tableRollerResult.classList.add('result-fade-in');
-                }, 800);
+                } else {
+                    // Use the traditional method with a slight delay
+                    setTimeout(() => {
+                        displayResult(result);
+                    }, 800);
+                }
             });
+            
+            // Function to display the result
+            function displayResult(result) {
+                // Use innerHTML to preserve HTML links
+                tableRollerResult.innerHTML = result;
+                
+                // Add target="_blank" to all links in the result
+                const links = tableRollerResult.querySelectorAll('a');
+                links.forEach(link => {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                });
+                
+                tableRollerResult.classList.add('result-fade-in');
+            }
         }
     });
     
@@ -91,4 +110,3 @@ document.addEventListener('DOMContentLoaded', function() {
         return tableData;
     }
 });
-

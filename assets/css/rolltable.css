@@ -65,6 +65,16 @@ table thead tr th:nth-of-type(1) {
     transform: translateY(-2px);
 }
 
+/* 3D Dice container styling */
+.dice-container {
+    width: 100%;
+    height: 300px;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
 .table-roller-result {
     margin-top: 1.5rem;
     padding: 2rem;
