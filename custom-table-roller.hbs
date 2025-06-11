@@ -50,23 +50,35 @@ into the {body} tag of the default.hbs template --}}
     
     /* Animation for the dice roll */
     @keyframes diceRoll {
-        0% { transform: rotate(0deg); }
-        25% { transform: rotate(90deg); }
-        50% { transform: rotate(180deg); }
-        75% { transform: rotate(270deg); }
-        100% { transform: rotate(360deg); }
+        0% { transform: rotate(0deg) scale(1); }
+        25% { transform: rotate(90deg) scale(1.2); }
+        50% { transform: rotate(180deg) scale(1.4); }
+        75% { transform: rotate(270deg) scale(1.2); }
+        100% { transform: rotate(360deg) scale(1); }
     }
     
     .rolling {
-        animation: diceRoll 0.5s ease-in-out;
+        display: inline-block;
+        animation: diceRoll 0.8s ease-in-out;
     }
     
     /* D20 icon styling */
     .d20-icon {
+        display: inline-block;
         width: 24px;
         height: 24px;
         margin-right: 8px;
         vertical-align: middle;
+    }
+
+    /* Result animation */
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-fade-in {
+        animation: fadeIn 0.5s ease-out;
     }
 </style>
 
@@ -87,22 +99,27 @@ into the {body} tag of the default.hbs template --}}
                     return;
                 }
                 
-                // Add rolling animation
+                // Clear previous result and show loading state
+                tableRollerResult.textContent = 'Rolling...';
+                tableRollerResult.classList.remove('result-fade-in');
+                
+                // Add rolling animation to the d20 icon
                 if (tableRollerIcon) {
                     tableRollerIcon.classList.add('rolling');
                     setTimeout(() => {
                         tableRollerIcon.classList.remove('rolling');
-                    }, 500);
+                    }, 800);
                 }
                 
                 // Roll on the table (random selection)
                 const randomIndex = Math.floor(Math.random() * tableData.length);
                 const result = tableData[randomIndex];
                 
-                // Display the result
+                // Display the result with a slight delay and animation
                 setTimeout(() => {
                     tableRollerResult.textContent = result;
-                }, 500);
+                    tableRollerResult.classList.add('result-fade-in');
+                }, 800);
             });
         }
         
