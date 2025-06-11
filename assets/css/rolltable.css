@@ -1,6 +1,6 @@
 /* Too much padding */
-header {
-    padding-bottom: 20px !important;
+.article-header {
+    padding-bottom: 10px !important;
 }
 
 /* Table centered */
