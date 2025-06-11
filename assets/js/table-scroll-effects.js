@@ -10,11 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the first table (main table for the page)
     const table = tables[0];
     
-    // Create a container for the table with parallax effect
-    const tableParent = table.parentNode;
-    const parallaxContainer = document.createElement('div');
-    parallaxContainer.className = 'parallax-table-container';
-    
     // Add shadow element
     const tableShadow = document.createElement('div');
     tableShadow.className = 'table-shadow';
@@ -29,11 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressIndicator = document.createElement('div');
     progressIndicator.className = 'table-scroll-progress';
     document.body.appendChild(progressIndicator);
-    
-    // Wrap the table in the parallax container
-    tableParent.insertBefore(parallaxContainer, table);
-    parallaxContainer.appendChild(table);
-    parallaxContainer.appendChild(tableShadow);
     
     // Variables to track scroll state
     let lastScrollTop = 0;
@@ -87,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // More dramatic rotation based on scroll position
                 // Increased from -5/+5 to -20/+20 degrees
-                const rotation = (tableScrollPercentage / 100) * 40 - 20; // -20 to +20 degrees
+                const rotation = (tableScrollPercentage / 100) * 80 - 20; // -20 to +20 degrees
                 backgroundSigil.querySelector('svg').style.transform = 
                     `scale(1.2) rotate(${rotation}deg)`;
             } else {
