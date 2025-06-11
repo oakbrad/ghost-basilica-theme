@@ -63,7 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ));
         
         // Update progress indicator for tables with height > viewport
-        if (showProgressIndicator) {
+        // Only show when table is in view
+        if (showProgressIndicator && scrollTop < tableBottom && scrollTop + windowHeight > tableTop) {
             progressIndicator.style.width = `${tableScrollPercentage}%`;
         } else {
             progressIndicator.style.width = '0%';
@@ -72,7 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only show sigil effect if the table is long enough
         if (isLongTable) {
             // Show background sigil when scrolled past first viewport of table
-            if (scrollTop > tableTop + (windowHeight / 2)) {
+            // AND hide it when scrolled past the table
+            if (scrollTop > tableTop + (windowHeight / 2) && scrollTop < tableBottom) {
                 backgroundSigil.classList.add('visible');
                 
                 // More dramatic rotation based on scroll position
@@ -116,4 +118,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial call to set up the state
     handleScroll();
 });
-
