@@ -1,0 +1,43 @@
+/* Styles for the background sigil that appears during scrolling */
+.background-sigil {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.background-sigil svg {
+    width: 80%;
+    height: 80%;
+    max-width: 800px;
+    max-height: 800px;
+    opacity: 0.03; /* Very subtle */
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+/* Class added when scrolling past threshold */
+.background-sigil.visible {
+    opacity: 1;
+}
+
+/* Progress indicator */
+.table-scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: var(--ghost-accent-color);
+    width: 0%;
+    z-index: 100;
+    transition: width 0.1s ease;
+}
+
