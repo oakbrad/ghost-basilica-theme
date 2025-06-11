@@ -3,6 +3,10 @@
 {{!-- The tag above means: insert everything in this file
 into the {body} tag of the default.hbs template --}}
 
+{{!-- Include the CSS and JS for the table roller --}}
+<link rel="stylesheet" href="{{asset "css/rolltable.css"}}">
+<script src="{{asset "js/rolltable.js"}}"></script>
+
 {{#post}}
 {{!-- Everything inside the #post block pulls data from the post --}}
 

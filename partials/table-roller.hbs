@@ -1,10 +1,5 @@
 {{!-- Table Roller Partial - Can be included in any template or post --}}
 
-{{!-- Load the CSS and JS only once per page --}}
-{{#contentFor "head"}}
-    <link rel="stylesheet" href="{{asset "css/rolltable.css"}}">
-{{/contentFor}}
-
 {{!-- Table Roller UI --}}
 <div class="table-roller-container gh-canvas" {{#if contentSelector}}data-content-selector="{{contentSelector}}"{{/if}}>
     <button class="table-roller-button">
@@ -15,9 +10,4 @@
         &nbsp;
     </div>
 </div>
-
-{{!-- Load the JS at the end of the body --}}
-{{#contentFor "scripts"}}
-    <script src="{{asset "js/rolltable.js"}}"></script>
-{{/contentFor}}
 
