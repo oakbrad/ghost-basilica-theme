@@ -19,6 +19,15 @@ into the {body} tag of the default.hbs template --}}
     {{!-- Include the table roller partial --}}
     {{> "table-roller"}}
 
+    {{!-- Hidden template for the sigil SVG --}}
+    <div class="partials-sigil-template" style="display: none;">
+        {{> "icons/sigil"}}
+    </div>
+
+    {{!-- Include the CSS and JS for table scroll effects --}}
+    <link rel="stylesheet" href="{{asset "css/table-scroll-effects.css"}}">
+    <script src="{{asset "js/table-scroll-effects.js"}}"></script>
+
     <section class="gh-content gh-canvas">
         {{content}}
     </section>

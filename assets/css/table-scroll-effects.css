@@ -1,0 +1,83 @@
+/* Styles for the background sigil that appears during scrolling */
+.background-sigil {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.background-sigil svg {
+    width: 80%;
+    height: 80%;
+    max-width: 800px;
+    max-height: 800px;
+    opacity: 0.03; /* Very subtle */
+    filter: blur(2px);
+    transform: scale(1.2);
+}
+
+/* Class added when scrolling past threshold */
+.background-sigil.visible {
+    opacity: 1;
+}
+
+/* Row highlight effect when scrolling */
+@keyframes rowHighlight {
+    0% { background-color: rgba(var(--ghost-accent-color-rgb), 0.1); }
+    100% { background-color: transparent; }
+}
+
+.row-highlight {
+    animation: rowHighlight 1.5s ease-out forwards;
+}
+
+/* Subtle parallax effect for the table */
+.parallax-table-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.parallax-table-container table {
+    position: relative;
+    z-index: 2;
+    background-color: var(--color-bg); /* Ensure table background matches site */
+}
+
+/* Subtle shadow effect that intensifies during scroll */
+.table-shadow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.table-shadow.visible {
+    opacity: 1;
+}
+
+/* Progress indicator */
+.table-scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: var(--ghost-accent-color);
+    width: 0%;
+    z-index: 100;
+    transition: width 0.1s ease;
+}
+
