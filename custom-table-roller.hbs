@@ -4,6 +4,16 @@
 into the {body} tag of the default.hbs template --}}
 
 <style>
+    /* Every other row dark gray */
+    tr:nth-child(even) {
+        background-color: #3f3f3f25;
+    }
+    /* Table centered */
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     /* Styling for the table roller */
     .table-roller-container {
         margin: 2rem 0;
@@ -20,10 +30,11 @@ into the {body} tag of the default.hbs template --}}
         color: #fff;
         border: none;
         border-radius: 4px;
-        font-size: 1.2rem;
+        font-size: 2rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
+        width: auto;
     }
 
     .table-roller-button:hover {
@@ -36,7 +47,7 @@ into the {body} tag of the default.hbs template --}}
         padding: 1rem;
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
-        font-size: 1.2rem;
+        font-size: 2rem;
         min-height: 3rem;
         display: flex;
         align-items: center;
@@ -85,6 +96,7 @@ into the {body} tag of the default.hbs template --}}
     .table-roller-result a {
         color: var(--ghost-accent-color);
         text-decoration: underline;
+        target: "_new"
     }
     
     .table-roller-result a:hover {
@@ -213,7 +225,7 @@ into the {body} tag of the default.hbs template --}}
             Roll on Table
         </button>
         <div id="table-roller-result" class="table-roller-result">
-            Click the button above to roll on the table
+            &nbsp;
         </div>
     </div>
 
