@@ -72,8 +72,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ((scrollTop - tableTop) / (tableBottom - tableTop - windowHeight)) * 100
         ));
         
-        // Update progress indicator
-        progressIndicator.style.width = `${tableScrollPercentage}%`;
+        // Only update progress indicator for long tables
+        if (isLongTable) {
+            progressIndicator.style.width = `${tableScrollPercentage}%`;
+        } else {
+            progressIndicator.style.width = '0%';
+        }
         
         // Only show effects if the table is long enough
         if (isLongTable) {
@@ -81,8 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (scrollTop > tableTop + (windowHeight / 2)) {
                 backgroundSigil.classList.add('visible');
                 
-                // Subtle rotation based on scroll position
-                const rotation = (tableScrollPercentage / 100) * 10 - 5; // -5 to +5 degrees
+                // More dramatic rotation based on scroll position
+                // Increased from -5/+5 to -20/+20 degrees
+                const rotation = (tableScrollPercentage / 100) * 40 - 20; // -20 to +20 degrees
                 backgroundSigil.querySelector('svg').style.transform = 
                     `scale(1.2) rotate(${rotation}deg)`;
             } else {
@@ -100,39 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 tableShadow.classList.remove('visible');
             }
-            
-            // Highlight rows that come into view
-            highlightVisibleRows(table, scrollTop, windowHeight, scrollDirection);
         }
         
         ticking = false;
-    }
-    
-    // Function to highlight rows that come into view
-    function highlightVisibleRows(table, scrollTop, windowHeight, direction) {
-        const rows = table.querySelectorAll('tbody tr');
-        const buffer = 100; // Buffer zone to trigger highlight before fully in view
-        
-        rows.forEach(row => {
-            const rowTop = row.getBoundingClientRect().top + scrollTop;
-            const rowBottom = rowTop + row.offsetHeight;
-            
-            // Check if row is entering the viewport
-            if (direction === 'down' && 
-                rowTop < scrollTop + windowHeight + buffer && 
-                rowTop > scrollTop - buffer) {
-                
-                // Only add highlight if it doesn't already have it
-                if (!row.classList.contains('row-highlight')) {
-                    row.classList.add('row-highlight');
-                    
-                    // Remove the class after animation completes
-                    setTimeout(() => {
-                        row.classList.remove('row-highlight');
-                    }, 1500);
-                }
-            }
-        });
     }
     
     // Listen for scroll events with requestAnimationFrame for performance

@@ -22,21 +22,12 @@
     opacity: 0.03; /* Very subtle */
     filter: blur(2px);
     transform: scale(1.2);
+    transition: transform 0.3s ease;
 }
 
 /* Class added when scrolling past threshold */
 .background-sigil.visible {
     opacity: 1;
-}
-
-/* Row highlight effect when scrolling */
-@keyframes rowHighlight {
-    0% { background-color: rgba(var(--ghost-accent-color-rgb), 0.1); }
-    100% { background-color: transparent; }
-}
-
-.row-highlight {
-    animation: rowHighlight 1.5s ease-out forwards;
 }
 
 /* Subtle parallax effect for the table */
