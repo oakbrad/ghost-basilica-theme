@@ -29,7 +29,6 @@
     opacity: 1;
 }
 
-
 /* Progress indicator */
 .table-scroll-progress {
     position: fixed;
@@ -41,3 +40,4 @@
     z-index: 100;
     transition: width 0.1s ease;
 }
+

@@ -10,10 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the first table (main table for the page)
     const table = tables[0];
     
-    // Add shadow element
-    const tableShadow = document.createElement('div');
-    tableShadow.className = 'table-shadow';
-    
     // Create background sigil element
     const backgroundSigil = document.createElement('div');
     backgroundSigil.className = 'background-sigil';
@@ -40,9 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.offsetHeight
     );
     
-    // Calculate if the table is long enough to warrant effects
+    // Calculate if the table is long enough to warrant sigil effect
     // We'll consider "long" as more than 2x the viewport height
     const isLongTable = table.offsetHeight > (windowHeight * 2);
+    
+    // Calculate if the table is long enough for progress indicator
+    // We'll show progress indicator for tables with height > viewport
+    const showProgressIndicator = table.offsetHeight > windowHeight;
     
     // Function to handle scroll effects
     function handleScroll() {
@@ -62,38 +62,25 @@ document.addEventListener('DOMContentLoaded', function() {
             ((scrollTop - tableTop) / (tableBottom - tableTop - windowHeight)) * 100
         ));
         
-        // Only update progress indicator for long tables
-        if (isLongTable) {
+        // Update progress indicator for tables with height > viewport
+        if (showProgressIndicator) {
             progressIndicator.style.width = `${tableScrollPercentage}%`;
         } else {
             progressIndicator.style.width = '0%';
         }
         
-        // Only show effects if the table is long enough
+        // Only show sigil effect if the table is long enough
         if (isLongTable) {
             // Show background sigil when scrolled past first viewport of table
             if (scrollTop > tableTop + (windowHeight / 2)) {
                 backgroundSigil.classList.add('visible');
                 
                 // More dramatic rotation based on scroll position
-                // Increased from -5/+5 to -20/+20 degrees
-                const rotation = (tableScrollPercentage / 100) * 80 - 20; // -20 to +20 degrees
+                const rotation = (tableScrollPercentage / 100) * 80 - 20; // -20 to +60 degrees
                 backgroundSigil.querySelector('svg').style.transform = 
                     `scale(1.2) rotate(${rotation}deg)`;
             } else {
                 backgroundSigil.classList.remove('visible');
-            }
-            
-            // Show shadow effect when scrolling
-            if (scrollTop > tableTop && scrollTop < tableBottom - windowHeight) {
-                tableShadow.classList.add('visible');
-                
-                // Intensify shadow based on scroll speed
-                const shadowIntensity = Math.min(0.15, Math.abs(scrollTop - lastScrollTop) / 30);
-                tableShadow.style.background = 
-                    `linear-gradient(to bottom, transparent, rgba(0,0,0,${0.05 + shadowIntensity}))`;
-            } else {
-                tableShadow.classList.remove('visible');
             }
         }
         
@@ -121,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.offsetHeight
         );
         
-        // Recalculate if the table is long
+        // Recalculate if the table is long enough for effects
         isLongTable = table.offsetHeight > (windowHeight * 2);
+        showProgressIndicator = table.offsetHeight > windowHeight;
     });
     
     // Initial call to set up the state
