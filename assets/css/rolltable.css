@@ -1,0 +1,98 @@
+/* Every other row dark gray */
+tr:nth-child(even) {
+    background-color: #3f3f3f25;
+}
+/* Table centered */
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styling for the table roller */
+.table-roller-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--color-darkgrey);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.table-roller-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--ghost-accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+}
+
+.table-roller-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.table-roller-result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-size: 2rem;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide the table in the post content */
+.table-roller-data {
+    display: none;
+}
+
+/* Animation for the dice roll */
+@keyframes diceRoll {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.2); }
+    50% { transform: rotate(180deg) scale(1.4); }
+    75% { transform: rotate(270deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.rolling {
+    display: inline-block;
+    animation: diceRoll 0.8s ease-in-out;
+}
+
+/* D20 icon styling */
+.d20-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Result animation */
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.result-fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Style links in the result */
+.table-roller-result a {
+    color: var(--ghost-accent-color);
+    text-decoration: underline;
+}
+
+.table-roller-result a:hover {
+    opacity: 0.8;
+}
+

@@ -1,0 +1,16 @@
+{{!-- Table Roller Partial - Can be included in any template or post --}}
+{{!-- Include the CSS and JS for the table roller --}}
+<link rel="stylesheet" href="{{asset "css/rolltable.css"}}">
+
+<script src="{{asset "js/rolltable.js"}}"></script>
+{{!-- Table Roller UI --}}
+<div class="table-roller-container gh-canvas" {{#if contentSelector}}data-content-selector="{{contentSelector}}"{{/if}}>
+    <button class="table-roller-button">
+        <span class="d20-icon">{{> "icons/d20"}}</span>
+        {{#if buttonText}}{{buttonText}}{{else}}Roll on Table{{/if}}
+    </button>
+    <div class="table-roller-result">
+        &nbsp;
+    </div>
+</div>
+
