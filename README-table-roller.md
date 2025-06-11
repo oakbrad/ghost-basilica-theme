@@ -24,6 +24,20 @@ The table roller will use the first markdown table it finds in your post content
 
 The script will use the second column (Result) for the random roll. If your table only has one column, it will use that column.
 
+## HTML Links Support
+
+The table roller fully supports HTML links in your table entries. For example:
+
+```markdown
+| d6 | Magic Item |
+|----|-----------|
+| 1  | [Potion of Healing](https://example.com/items/potion-of-healing) |
+| 2  | [Scroll of Identify](https://example.com/items/scroll-of-identify) |
+| 3  | [+1 Dagger](https://example.com/items/dagger-plus-one) |
+```
+
+When a result with a link is rolled, the link will be preserved in the result display and will be clickable.
+
 ## Example
 
 Here's an example of a random encounter table:
@@ -62,4 +76,3 @@ The table roller works by:
 4. Displaying the selected entry in the result area
 
 The table itself remains visible in your post content, so readers can see all possible results.
-

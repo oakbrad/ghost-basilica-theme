@@ -80,6 +80,16 @@ into the {body} tag of the default.hbs template --}}
     .result-fade-in {
         animation: fadeIn 0.5s ease-out;
     }
+    
+    /* Style links in the result */
+    .table-roller-result a {
+        color: var(--ghost-accent-color);
+        text-decoration: underline;
+    }
+    
+    .table-roller-result a:hover {
+        opacity: 0.8;
+    }
 </style>
 
 <script>
@@ -117,7 +127,8 @@ into the {body} tag of the default.hbs template --}}
                 
                 // Display the result with a slight delay and animation
                 setTimeout(() => {
-                    tableRollerResult.textContent = result;
+                    // Use innerHTML to preserve HTML links
+                    tableRollerResult.innerHTML = result;
                     tableRollerResult.classList.add('result-fade-in');
                 }, 800);
             });
@@ -144,9 +155,10 @@ into the {body} tag of the default.hbs template --}}
                         // Get the second column (index 1) if it exists, otherwise get the first column
                         const cells = row.querySelectorAll('td');
                         if (cells.length > 1) {
-                            tableData.push(cells[1].textContent.trim());
+                            // Use innerHTML instead of textContent to preserve links
+                            tableData.push(cells[1].innerHTML.trim());
                         } else if (cells.length > 0) {
-                            tableData.push(cells[0].textContent.trim());
+                            tableData.push(cells[0].innerHTML.trim());
                         }
                     });
                 }
