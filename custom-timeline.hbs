@@ -11,6 +11,8 @@ In order for this to work, the Sheet must be "Published" not just "Shared"
 {{!< default}}
 {{#contentFor "title"}}{{post.title}} Timeline{{/contentFor}}
 
+<link rel="stylesheet" href="{{asset "header-height.css"}}">
+
 <style>
   .site-footer,
   .content-title,
@@ -21,7 +23,6 @@ In order for this to work, the Sheet must be "Published" not just "Shared"
 
   .timeline-container {
     flex: 1;
-    height: calc(100vh - 88px); /* Adjust header height if needed */
     width: 100%;
     background: var(--color-darkmode) !important;
   }
