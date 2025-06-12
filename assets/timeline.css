@@ -239,4 +239,31 @@
       padding: 5px;
     }
 
+    /* Adjust timeline height for mobile */
+    #timeline-embed {
+      height: calc(100% - 20px) !important; /* Add some bottom padding */
+    }
+    
+    /* Ensure the timeline navigation (bottom bar) is fully visible */
+    .tl-timenav {
+      height: auto !important;
+      min-height: 150px !important; /* Ensure minimum height for navigation */
+    }
+  }
+
+  /* Additional fixes for landscape mode */
+  @media only screen and (max-width: 900px) and (orientation: landscape) {
+    .timeline-container {
+      height: calc(100vh - 60px) !important; /* Smaller offset for landscape */
+    }
+    
+    #timeline-embed {
+      height: 100% !important;
+    }
+    
+    /* Ensure the timeline navigation is visible but not too large */
+    .tl-timenav {
+      min-height: 120px !important;
+      max-height: 30vh !important; /* Limit height in landscape */
+    }
   }
