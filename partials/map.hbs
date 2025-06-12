@@ -13,6 +13,7 @@
 <!-- Leaflet Script -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{asset "js/leaflet-custom-icons.js"}}"></script>
+<script src="{{asset "js/responsive-height.js"}}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -20,12 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // (it won't exist for members/paid content if the user doesn't have access)
   const mapElement = document.getElementById('map');
   if (!mapElement) return;
-
-  // Set map height to fill its parent container
-  adjustMapHeight();
-  
-  // Adjust map height on window resize
-  window.addEventListener('resize', adjustMapHeight);
 
   // Get the featured image URL as fallback
   const featuredImageUrl = "{{feature_image}}";
@@ -321,28 +316,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   // Function to adjust map height based on its container
-  function adjustMapHeight() {
-    const mapElement = document.getElementById('map');
-    if (!mapElement) return;
-    
-    // Check if we're in the custom-map template
-    const isCustomMapTemplate = document.body.classList.contains('page-template-custom-map');
-    
-    if (isCustomMapTemplate) {
-      // For custom-map.hbs, fill the entire site-content area
-      mapElement.style.height = 'calc(100vh - 88px)'; // Adjust header height if needed
-    } else {
-      // For other templates, fill the parent container
-      const parentHeight = mapElement.parentElement.clientHeight;
-      if (parentHeight > 0) {
-        mapElement.style.height = '100%';
-        mapElement.style.minHeight = '400px'; // Set a minimum height for visibility
-      } else {
-        // If parent has no height, set a reasonable default
-        mapElement.style.height = '600px';
-      }
-    }
-  }
   
   /**
    * Process map data from post content

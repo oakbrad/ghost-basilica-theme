@@ -29,7 +29,7 @@
 
     /* For the custom-map template */
     .page-template-custom-map #map {
-      /* Height is now controlled by header-height.css */
+      /* Height is now controlled by responsive-height.js */
     }
 
     /* Make the map container fill its parent */
