@@ -21,9 +21,17 @@ In order for this to work, the Sheet must be "Published" not just "Shared"
 
   .timeline-container {
     flex: 1;
-    height: calc(100vh - 88px); /* Adjust header height if needed */
+    height: calc(100vh - 88px); /* Default for desktop */
     width: 100%;
     background: var(--color-darkmode) !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .timeline-container {
+      height: calc(100vh - 70px); /* Slightly smaller offset for mobile */
+    }
   }
 
   /* Styling for access message */
