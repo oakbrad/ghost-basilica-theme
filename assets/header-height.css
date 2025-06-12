@@ -1,0 +1,27 @@
+/* CSS Variables for header height */
+:root {
+  --header-height: 88px; /* Default header height for desktop */
+}
+
+@media only screen and (max-width: 767px) {
+  :root {
+    --header-height: 64px; /* Mobile header height */
+  }
+}
+
+/* Apply to map template */
+.page-template-custom-map #map {
+  height: calc(100vh - var(--header-height));
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* Apply to timeline template */
+.timeline-container {
+  height: calc(100vh - var(--header-height));
+}
+
+/* Also apply to map access message */
+.map-access-message {
+  height: calc(100vh - var(--header-height));
+}
+

@@ -1,5 +1,5 @@
 #timeline-embed {
-    height: 100%;
+    /* Height is now controlled by responsive-height.js */
     width: 100%;
 }
 

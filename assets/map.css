@@ -1,4 +1,4 @@
-  /* Keep video Overlay on top of map layers but below markers/tooltips */
+/* Keep video Overlay on top of map layers but below markers/tooltips */
   .leaflet-overlay-pane video {
       z-index: 650 !important;
     }
@@ -29,8 +29,7 @@
 
     /* For the custom-map template */
     .page-template-custom-map #map {
-      height: calc(100vh - 88px); /* Adjust header height if needed */
-      min-height: calc(100vh - 88px);
+      /* Height is now controlled by responsive-height.js */
     }
 
     /* Make the map container fill its parent */
