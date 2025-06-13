@@ -120,14 +120,17 @@ The `options` property follows Leaflet's [Polyline options](https://leafletjs.co
       "options": {
         "color": "blue",
         "fillColor": "lightblue",
-        "fillOpacity": 0.5
-      }
+        "fillOpacity": 0.5,
+        "tooltip": "Optional tooltip text"
+      },
+      "url": "https://lore.dungeon.church",
+      "target": "_new"
     }
   ]
 }
 ```
 
-The `options` property follows Leaflet's [Polygon options](https://leafletjs.com/reference.html#polygon).
+The `options` property follows Leaflet's [Polygon options](https://leafletjs.com/reference.html#polygon). You can add a `tooltip` property to display a tooltip when hovering over the polygon, just like with markers. If you also provide a `url` property, the polygon becomes clickable and will open the URL when clicked.
 
 ### Circles
 
@@ -218,8 +221,11 @@ Here's a complete example that includes multiple types of overlays:
       "options": {
         "color": "blue",
         "fillColor": "lightblue",
-        "fillOpacity": 0.5
-      }
+        "fillOpacity": 0.5,
+        "tooltip": "Optional tooltip text"
+      },
+      "url": "https://lore.dungeon.church",
+      "target": "_new"
     }
   ],
   "circles": [
