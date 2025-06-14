@@ -489,10 +489,18 @@ document.addEventListener("DOMContentLoaded", function () {
               mapData.polygons.forEach(polygon => {
                 if (polygon.points && Array.isArray(polygon.points)) {
                   const options = polygon.options || {};
+                  
+                  // Extract tooltip from options if present and remove it from options
+                  // to prevent it from being passed to the polygon constructor
+                  const tooltipContent = options.tooltip;
+                  if (tooltipContent) {
+                    delete options.tooltip;
+                  }
+                  
                   const p = L.polygon(polygon.points, options).addTo(map);
                   
                   // Add tooltip if specified - similar to marker tooltip handling
-                  if (polygon.tooltip) {
+                  if (tooltipContent) {
                     // If polygon has a URL, append appropriate link bubble based on URL
                     if (polygon.url) {
                       // Get the SVG content from the partial
@@ -515,19 +523,22 @@ document.addEventListener("DOMContentLoaded", function () {
                       const linkBubble = `<span class="tooltip-link-bubble">${linkText} ${linkSvg}</span>`;
                       
                       // Create tooltip content with mobile hint
-                      const tooltipContent = `
-                        <div>${polygon.tooltip} ${linkBubble}</div>
+                      const tooltipHtml = `
+                        <div>${tooltipContent} ${linkBubble}</div>
                         <div class="mobile-tooltip-hint">Tap again to open link</div>
                       `;
                       
-                      p.bindTooltip(tooltipContent, { 
+                      p.bindTooltip(tooltipHtml, { 
                         permanent: false,
+                        sticky: true,
                         direction: 'top',
                         className: 'custom-tooltip',
                         opacity: 1.0
                       });
                     } else {
-                      p.bindTooltip(polygon.tooltip);
+                      p.bindTooltip(tooltipContent, {
+                        sticky: true
+                      });
                     }
                   }
                   
@@ -570,6 +581,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Add cursor style to indicate clickable polygon
                     p.getElement().style.cursor = 'pointer';
                   }
+                  
+                  // Add mouseover/mouseout events to show/hide tooltip
+                  p.on('mouseover', function(e) {
+                    p.openTooltip(e.latlng);
+                  });
+                  
+                  p.on('mouseout', function() {
+                    // Only close if not in the mobile two-step process
+                    if (!tooltipOpen) {
+                      p.closeTooltip();
+                    }
+                  });
                 }
               });
             }
