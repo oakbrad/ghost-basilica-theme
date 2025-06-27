@@ -1,0 +1,79 @@
+{{!< default}}
+{{#contentFor "title"}}{{post.title}} - Pyora NPCs{{/contentFor}}
+
+{{!-- The tag above means: insert everything in this file
+into the {body} tag of the default.hbs template --}}
+
+{{#post}}
+{{!-- Everything inside the #post block pulls data from the post --}}
+
+<main id="site-main" class="site-main">
+<article class="article {{post_class}} {{#match @custom.post_image_style "Full"}}image-full{{else match @custom.post_image_style "=" "Small"}}image-small{{/match}}">
+
+    <header class="article-header gh-canvas">
+        <h1 class="article-title">{{title}}</h1>
+        {{#if custom_excerpt}}
+            <p class="article-excerpt">{{custom_excerpt}}</p>
+        {{/if}}
+    </header>
+
+    {{!-- Include the CSS and JS for NPC grid --}}
+    <link rel="stylesheet" href="{{asset "css/npc-grid.css"}}">
+    <script src="{{asset "js/npc-grid.js"}}"></script>
+
+    <section class="gh-content gh-canvas">
+        <div class="npc-grid-container">
+            {{!-- The NPC grid will be populated here by JavaScript --}}
+        </div>
+        
+        {{!-- The original content is still rendered but the table will be hidden by CSS --}}
+        <div class="npc-content">
+            {{content}}
+        </div>
+    </section>
+
+    {{#if comments}}
+        <section class="article-comments gh-canvas">
+            {{comments}}
+        </section>
+    {{/if}}
+
+</article>
+</main>
+
+{{!-- A signup call to action is displayed here, unless viewed as a logged-in member --}}
+{{#if @site.members_enabled}}
+{{#unless @member}}
+{{#unless @site.comments_enabled}}
+{{#if access}}
+    <section class="footer-cta outer">
+        <div class="inner">
+            {{#if @custom.email_signup_text}}<h2 class="footer-cta-title">{{@custom.email_signup_text}}</h2>{{/if}}
+            <a class="footer-cta-button" href="#/portal" data-portal>
+                <div class="footer-cta-input">Enter your email</div>
+                <span>Subscribe</span>
+            </a>
+        </div>
+    </section>
+{{/if}}
+{{/unless}}
+{{/unless}}
+{{/if}}
+
+{{!-- Read more links, just above the footer --}}
+{{#if @custom.show_recent_posts_footer}}
+    {{#get "posts" filter="tag:pyora" limit="3" as |more_posts|}}
+        {{#if more_posts}}
+            <aside class="read-more-wrap outer">
+                <div class="read-more inner">
+                    {{#foreach more_posts}}
+                        {{> "post-card"}}
+                    {{/foreach}}
+                </div>
+            </aside>
+        {{/if}}
+    {{/get}}
+{{/if}}
+
+{{/post}}
+
