@@ -2,11 +2,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Find the NPC grid container
     const npcGridContainer = document.querySelector('.npc-grid-container');
-    const contentSection = document.querySelector('.npc-content');
+    const tableContainer = document.querySelector('.npc-table-container');
     
-    if (npcGridContainer && contentSection) {
+    if (npcGridContainer && tableContainer) {
         // Extract NPC data from the markdown table
-        const npcData = extractNPCData(contentSection);
+        const npcData = extractNPCData(tableContainer);
         
         if (npcData.length === 0) {
             npcGridContainer.innerHTML = '<p class="no-data-message">No NPC data found. Please add a markdown table to your post with columns for Name, Description, Artwork, File, and optionally Wiki.</p>';

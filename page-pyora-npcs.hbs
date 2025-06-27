@@ -22,12 +22,18 @@ into the {body} tag of the default.hbs template --}}
     <script src="{{asset "js/npc-grid.js"}}"></script>
 
     <section class="gh-content gh-canvas">
+        {{!-- Post content is now rendered above the grid --}}
+        <div class="npc-post-content">
+            {{content}}
+        </div>
+        
+        {{!-- The NPC grid container comes after the content --}}
         <div class="npc-grid-container">
             {{!-- The NPC grid will be populated here by JavaScript --}}
         </div>
         
-        {{!-- The original content is still rendered but the table will be hidden by CSS --}}
-        <div class="npc-content">
+        {{!-- Hidden div that contains the table for JavaScript to process --}}
+        <div class="npc-table-container" style="display: none;">
             {{content}}
         </div>
     </section>

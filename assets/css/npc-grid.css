@@ -1,8 +1,13 @@
 /* NPC Grid Styling */
 
-/* Hide the original markdown table */
-.npc-content table {
+/* Hide tables in the main post content */
+.npc-post-content table {
     display: none !important;
+}
+
+/* Add some spacing between post content and grid */
+.npc-post-content {
+    margin-bottom: 3rem;
 }
 
 /* NPC Grid Container */
