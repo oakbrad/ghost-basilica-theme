@@ -35,13 +35,14 @@
     background-color: var(--color-darkgrey);
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
     height: 100%;
 }
 
 .npc-card:hover {
-    transform: translateY(-5px) rotate(1deg);
+    transform: rotate(1deg);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to bottom, #1a1d20, #15171A);
 }
 
 /* NPC Image Container */
@@ -59,16 +60,17 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.3s ease;
 }
 
-.npc-card:hover .npc-image {
+/* Remove the image zoom effect on hover */
+/* .npc-card:hover .npc-image {
     transform: scale(1.05);
-}
+} */
 
 /* NPC Content */
 .npc-content-container {
-    padding: 1.5rem;
+    padding: 1.2rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -78,7 +80,7 @@
 .npc-name {
     font-family: "Waning Star", serif;
     font-size: 2rem;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.3rem 0;
     color: #fff;
     text-align: center;
 }
@@ -97,7 +99,7 @@
 .npc-description {
     font-size: 1.4rem;
     color: var(--color-midgrey);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     flex-grow: 1;
     text-align: center;
 }
@@ -108,7 +110,7 @@
     background-color: var(--ghost-accent-color);
     color: #fff;
     text-align: center;
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: 4px;
     text-decoration: none;
     font-weight: 600;
