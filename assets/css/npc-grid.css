@@ -35,14 +35,23 @@
     background-color: var(--color-darkgrey);
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background 0.3s ease;
     height: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.npc-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 .npc-card:hover {
     transform: rotate(1deg);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(to bottom, #1a1d20, #15171A);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(to bottom, #2a2d30, #15171A);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* NPC Image Container */
@@ -62,11 +71,6 @@
     object-fit: cover;
     transition: transform 0.3s ease;
 }
-
-/* Remove the image zoom effect on hover */
-/* .npc-card:hover .npc-image {
-    transform: scale(1.05);
-} */
 
 /* NPC Content */
 .npc-content-container {
@@ -121,27 +125,4 @@
 .npc-download:hover {
     opacity: 0.9;
 }
-
-/* Animation for card appearance */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.npc-card {
-    animation: fadeIn 0.5s ease-out forwards;
-    opacity: 0;
-}
-
-/* Staggered animation delay for cards */
-.npc-card:nth-child(1) { animation-delay: 0.1s; }
-.npc-card:nth-child(2) { animation-delay: 0.2s; }
-.npc-card:nth-child(3) { animation-delay: 0.3s; }
-.npc-card:nth-child(4) { animation-delay: 0.4s; }
-.npc-card:nth-child(5) { animation-delay: 0.5s; }
-.npc-card:nth-child(6) { animation-delay: 0.6s; }
-.npc-card:nth-child(7) { animation-delay: 0.7s; }
-.npc-card:nth-child(8) { animation-delay: 0.8s; }
-.npc-card:nth-child(9) { animation-delay: 0.9s; }
-.npc-card:nth-child(n+10) { animation-delay: 1s; }
 

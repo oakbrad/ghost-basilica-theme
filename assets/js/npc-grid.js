@@ -18,6 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const npcCard = createNPCCard(npc, index);
             npcGridContainer.appendChild(npcCard);
         });
+        
+        // Force a reflow to ensure animations work
+        void npcGridContainer.offsetWidth;
+        
+        // Add animation class to each card after a small delay
+        setTimeout(() => {
+            const cards = npcGridContainer.querySelectorAll('.npc-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate-in');
+                }, index * 100);
+            });
+        }, 100);
     }
     
     // Function to extract NPC data from markdown table
@@ -97,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function createNPCCard(npc, index) {
         const card = document.createElement('div');
         card.className = 'npc-card';
-        card.style.animationDelay = `${0.1 * (index % 10)}s`;
         
         // Create image container and image
         const imageContainer = document.createElement('div');
