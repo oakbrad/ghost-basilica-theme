@@ -1,0 +1,13 @@
+{{!-- NPC Roller Partial - Can be included in any template or post --}}
+{{!-- Include the CSS and JS for the NPC roller --}}
+<link rel="stylesheet" href="{{asset "css/npc-roller.css"}}">
+<script src="{{asset "js/npc-roller.js"}}"></script>
+
+{{!-- NPC Roller UI --}}
+<div class="npc-roller-container">
+    <button class="npc-roller-button">
+        <span class="d20-icon">{{> "icons/d20"}}</span>
+        {{#if buttonText}}{{buttonText}}{{else}}Roll Random NPC{{/if}}
+    </button>
+</div>
+
