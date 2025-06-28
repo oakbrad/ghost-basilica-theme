@@ -6,23 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize each NPC roller
     npcRollerContainers.forEach(function(container) {
         const rollerButton = container.querySelector('.npc-roller-button');
-        const rollerResult = container.querySelector('.npc-roller-result');
         const rollerIcon = container.querySelector('.d20-icon');
         const tableContainer = document.querySelector('.npc-table-container');
         
-        if (rollerButton && rollerResult && tableContainer) {
+        if (rollerButton && tableContainer) {
             rollerButton.addEventListener('click', function() {
                 // Extract NPC data from the markdown table
                 const npcData = extractNPCData(tableContainer);
                 
                 if (npcData.length === 0) {
-                    rollerResult.textContent = 'No NPC data found. Please add a markdown table to your post.';
+                    console.error('No NPC data found. Please add a markdown table to your post.');
                     return;
                 }
-                
-                // Clear previous result and show loading state
-                rollerResult.textContent = 'Rolling...';
-                rollerResult.classList.remove('result-fade-in');
                 
                 // Add rolling animation to the d20 icon
                 if (rollerIcon) {
@@ -34,42 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Roll for a random NPC
                 const randomIndex = Math.floor(Math.random() * npcData.length);
-                const selectedNPC = npcData[randomIndex];
                 
-                // Create the result HTML
-                let resultHTML = `<div class="npc-roll-card">`;
-                
-                // Add image if available
-                if (selectedNPC.artwork && selectedNPC.artwork.url) {
-                    resultHTML += `<div class="npc-roll-image-container">
-                        <img src="${selectedNPC.artwork.url}" alt="${selectedNPC.name}" class="npc-roll-image">
-                    </div>`;
-                }
-                
-                // Add name with optional wiki link
-                resultHTML += `<div class="npc-roll-content">`;
-                if (selectedNPC.wiki && selectedNPC.wiki.url) {
-                    resultHTML += `<h3 class="npc-roll-name"><a href="${selectedNPC.wiki.url}" target="_blank" rel="noopener noreferrer">${selectedNPC.name}</a></h3>`;
-                } else {
-                    resultHTML += `<h3 class="npc-roll-name">${selectedNPC.name}</h3>`;
-                }
-                
-                // Add description
-                resultHTML += `<p class="npc-roll-description">${selectedNPC.description}</p>`;
-                
-                // Add download link
-                if (selectedNPC.file && selectedNPC.file.url) {
-                    resultHTML += `<a href="${selectedNPC.file.url}" class="npc-roll-download" target="_blank" rel="noopener noreferrer">Download</a>`;
-                }
-                
-                resultHTML += `</div></div>`;
-                
-                // Display the result with a slight delay and animation
+                // Highlight the corresponding card in the grid using the index after a slight delay
                 setTimeout(() => {
-                    rollerResult.innerHTML = resultHTML;
-                    rollerResult.classList.add('result-fade-in');
-                    
-                    // Highlight the corresponding card in the grid using the index
                     highlightNPCCardByIndex(randomIndex);
                 }, 800);
             });
