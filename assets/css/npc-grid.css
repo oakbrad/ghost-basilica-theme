@@ -40,12 +40,11 @@
     background-color: var(--color-darkgrey);
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background 0.3s ease, border 0.3s ease;
+    /* Added hover-effect class for common styling */
     height: 100%;
     opacity: 0;
     transform: translateY(20px);
     position: relative;
-
 }
 
 .npc-card.animate-in {
@@ -54,19 +53,7 @@
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
-.npc-card:hover {
-    transform: rotate(1deg);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    background: linear-gradient(to bottom, #2a2d30, #15171A);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Highlighted card styling - no scaling, just glow and border */
-.npc-card-highlighted {
-    box-shadow: 0 0 20px var(--ghost-accent-color) !important;
-    border: 2px solid var(--ghost-accent-color) !important;
-    z-index: 10;
-}
+/* Highlighted card styling moved to card-hover.css */
 
 /* NPC Image Container */
 .npc-image-container {
@@ -139,4 +126,3 @@
 .npc-download:hover {
     opacity: 0.9;
 }
-

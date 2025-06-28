@@ -1,0 +1,21 @@
+/* Common Card Hover Effects
+   Used by both map cards and NPC cards for consistent hover styling */
+
+.hover-effect {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background 0.3s ease, border 0.3s ease;
+}
+
+.hover-effect:hover {
+    transform: rotate(1deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(to bottom, #2a2d30, #15171A);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Highlighted card styling - no scaling, just glow and border */
+.card-highlighted {
+    box-shadow: 0 0 20px var(--ghost-accent-color) !important;
+    border: 2px solid var(--ghost-accent-color) !important;
+    z-index: 10;
+}
+
