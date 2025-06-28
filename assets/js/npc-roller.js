@@ -69,8 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     rollerResult.innerHTML = resultHTML;
                     rollerResult.classList.add('result-fade-in');
                     
-                    // Highlight the corresponding card in the grid
-                    highlightNPCCard(selectedNPC.name);
+                    // Highlight the corresponding card in the grid using the index
+                    highlightNPCCardByIndex(randomIndex);
                 }, 800);
             });
         }
@@ -149,24 +149,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    // Function to highlight the corresponding NPC card in the grid
-    function highlightNPCCard(npcName) {
+    // Function to highlight the corresponding NPC card in the grid by index
+    function highlightNPCCardByIndex(index) {
         // Remove highlight from all cards
         const allCards = document.querySelectorAll('.npc-card');
         allCards.forEach(card => {
             card.classList.remove('npc-card-highlighted');
         });
         
-        // Find the card with the matching NPC name
-        allCards.forEach(card => {
-            const cardName = card.querySelector('.npc-name').textContent.trim();
-            if (cardName === npcName) {
-                card.classList.add('npc-card-highlighted');
-                
-                // Scroll to the card
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        });
+        // Highlight the card at the specified index
+        if (allCards.length > index) {
+            const cardToHighlight = allCards[index];
+            cardToHighlight.classList.add('npc-card-highlighted');
+            
+            // Scroll to the card
+            cardToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 });
 

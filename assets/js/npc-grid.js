@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createNPCCard(npc, index) {
         const card = document.createElement('div');
         card.className = 'npc-card';
+        card.setAttribute('data-npc-index', index); // Add index as a data attribute
         
         // Create image container and image
         const imageContainer = document.createElement('div');
