@@ -1,0 +1,54 @@
+/* NPC Roller Styling */
+
+/* Styling for the NPC roller */
+.npc-roller-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--color-darkgrey);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.npc-roller-button {
+    display: inline-block;
+    padding: 1.5rem 2rem;
+    background-color: var(--ghost-accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+}
+
+.npc-roller-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation for the dice roll */
+@keyframes diceRoll {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.2); }
+    50% { transform: rotate(180deg) scale(1.4); }
+    75% { transform: rotate(270deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.rolling {
+    display: inline-block;
+    animation: diceRoll 0.8s ease-in-out;
+}
+
+/* D20 icon styling */
+.d20-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
