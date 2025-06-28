@@ -52,11 +52,5 @@
     margin-right: 10px;
 }
 
-/* Highlighted card in the grid */
-.npc-card-highlighted {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px var(--ghost-accent-color);
-    border: 2px solid var(--ghost-accent-color);
-    z-index: 10;
-}
+/* Highlighted card in the grid - moved to npc-grid.css for better organization */
 
