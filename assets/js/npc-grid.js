@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to create an NPC card
     function createNPCCard(npc, index) {
         const card = document.createElement('div');
-        card.className = 'npc-card';
+        card.className = 'npc-card hover-effect';
         card.setAttribute('data-npc-index', index); // Add index as a data attribute
         
         // Create image container and image
@@ -167,4 +167,3 @@ document.addEventListener('DOMContentLoaded', function() {
         return card;
     }
 });
-

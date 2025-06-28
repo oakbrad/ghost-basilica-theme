@@ -117,16 +117,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const allCards = document.querySelectorAll('.npc-card');
         allCards.forEach(card => {
             card.classList.remove('npc-card-highlighted');
+            card.classList.remove('card-highlighted');
         });
         
         // Highlight the card at the specified index
         if (allCards.length > index) {
             const cardToHighlight = allCards[index];
-            cardToHighlight.classList.add('npc-card-highlighted');
+            cardToHighlight.classList.add('card-highlighted');
             
             // Scroll to the card
             cardToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 });
-
