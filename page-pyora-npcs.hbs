@@ -57,19 +57,32 @@ into the {body} of the default.hbs template --}}
             {{/if}}
 
             <section class="post-full-content">
-                {{!-- Include the NPC roller above the grid --}}
-                {{> "npc-roller"}}
+                {{!-- Include the NPC grid CSS and JS --}}
+                <link rel="stylesheet" href="{{asset "css/npc-grid.css"}}">
+                <link rel="stylesheet" href="{{asset "css/npc-roller.css"}}">
+                
+                {{!-- NPC Roller UI --}}
+                <div class="npc-roller-container">
+                    <button class="npc-roller-button">
+                        <span class="d20-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L2 6.5V17.5L12 22L22 17.5V6.5L12 2ZM12 4.2L19.2 7.5L12 10.8L4.8 7.5L12 4.2ZM4 16.5V8.7L11 11.9V19.7L4 16.5ZM13 19.7V11.9L20 8.7V16.5L13 19.7Z"/>
+                            </svg>
+                        </span>
+                        Roll Random NPC
+                    </button>
+                </div>
                 
                 <div class="npc-table-container">
                     <div class="npc-post-content">
                         {{content}}
                     </div>
                 </div>
+                
+                {{!-- Include the NPC grid and roller JS --}}
+                <script src="{{asset "js/npc-grid.js"}}"></script>
+                <script src="{{asset "js/npc-roller.js"}}"></script>
             </section>
-
-            {{!-- Include the NPC grid CSS and JS --}}
-            <link rel="stylesheet" href="{{asset "css/npc-grid.css"}}">
-            <script src="{{asset "js/npc-grid.js"}}"></script>
 
         </article>
 
