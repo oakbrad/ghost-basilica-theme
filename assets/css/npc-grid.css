@@ -60,17 +60,16 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Highlighted card styling */
+/* Highlighted card styling - no scaling, just glow and border */
 .npc-card-highlighted {
     box-shadow: 0 0 20px var(--ghost-accent-color) !important;
     border: 2px solid var(--ghost-accent-color) !important;
     z-index: 10;
-    transform: scale(1.05);
 }
 
 /* Allow highlighted card to still have hover effects */
 .npc-card-highlighted:hover {
-    transform: scale(1.05) rotate(1deg) !important;
+    transform: rotate(1deg) !important; /* Same as regular hover, no scaling */
     background: linear-gradient(to bottom, #2a2d30, #15171A);
     box-shadow: 0 0 20px var(--ghost-accent-color), 0 10px 20px rgba(0, 0, 0, 0.4) !important;
 }
