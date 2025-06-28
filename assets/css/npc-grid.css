@@ -40,10 +40,11 @@
     background-color: var(--color-darkgrey);
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background 0.3s ease;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background 0.3s ease, border 0.3s ease;
     height: 100%;
     opacity: 0;
     transform: translateY(20px);
+    position: relative;
 }
 
 .npc-card.animate-in {
@@ -57,6 +58,14 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     background: linear-gradient(to bottom, #2a2d30, #15171A);
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Highlighted card styling */
+.npc-card-highlighted {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px var(--ghost-accent-color) !important;
+    border: 2px solid var(--ghost-accent-color) !important;
+    z-index: 10;
 }
 
 /* NPC Image Container */
