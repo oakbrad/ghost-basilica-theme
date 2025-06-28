@@ -22,7 +22,9 @@ into the {body} tag of the default.hbs template --}}
     <script src="{{asset "js/npc-grid.js"}}"></script>
 
     <section class="gh-content gh-canvas">
+
         {{!-- Post content is rendered above the roller and grid --}}
+
         <div class="npc-post-content">
             {{content}}
         </div>
@@ -31,6 +33,7 @@ into the {body} tag of the default.hbs template --}}
         {{> "npc-roller"}}
         
         {{!-- The NPC grid container comes after the roller --}}
+
         <div class="npc-grid-container">
             {{!-- The NPC grid will be populated here by JavaScript --}}
         </div>

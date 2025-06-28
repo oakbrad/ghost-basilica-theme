@@ -45,6 +45,7 @@
     opacity: 0;
     transform: translateY(20px);
     position: relative;
+
 }
 
 .npc-card.animate-in {
@@ -65,13 +66,6 @@
     box-shadow: 0 0 20px var(--ghost-accent-color) !important;
     border: 2px solid var(--ghost-accent-color) !important;
     z-index: 10;
-}
-
-/* Allow highlighted card to still have hover effects */
-.npc-card-highlighted:hover {
-    transform: rotate(1deg) !important; /* Same as regular hover, no scaling */
-    background: linear-gradient(to bottom, #2a2d30, #15171A);
-    box-shadow: 0 0 20px var(--ghost-accent-color), 0 10px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* NPC Image Container */
